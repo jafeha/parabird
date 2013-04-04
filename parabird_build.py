@@ -67,7 +67,7 @@ cmds_create [TRUECRYPT, MAKE_FS, UNMOUNT_USB]
 cmds_mount [MOUNTPOINT_CREATE, TRUEMOUNT]
 for cmd in cmds_create:
 	print "Creating encrypted USB-Stick"
-	subprocess.call(cmd_create, shell=True) # bin mir nicht sicher ob das klappt. 1) leerzeichen, 2) kann sein, dass man jedes arg einzeln übergeben muss
+	subprocess.check_call(cmd_create, shell=True) # bin mir nicht sicher ob das klappt. 1) leerzeichen, 2) kann sein, dass man jedes arg einzeln übergeben muss
 	print "Encrypted USB-Stick created and mounted to:", MOUNTPOINT # siehe shell -> 
 
 for cmd in cmds_mount:
@@ -85,6 +85,6 @@ thunderbird_url = "http://releases.mozilla.org/pub/mozilla.org/thunderbird/relea
 urllib.urlretrieve(thunderbird_url, TB_DOWNFILE) # erstes rgument: url. zweites argument: ziel. + kettet stings aneinander
 ß
 print "Download complete, unpacking"
-subprocess.call(tar xfj + TB_DOWNFILE +, shell=True)
+subprocess.check_call(tar xfj + TB_DOWNFILE +, shell=True)
 
 
