@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import urllib # url handling, downloads
 import getopt # optionen/argumente parsen
 import sys    # dinge die den interpreter betreffen
