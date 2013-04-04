@@ -74,7 +74,8 @@ for cmd in cmds_mount:
 	print "Creating Mountpoint and Mounting USB Stick"
 	try:
 		subprocess.check_call(cmd_mount, shell=True)
-	except 
+	except CalledProcessError:
+	  print cmd_mount, "did not work"
 	print "USB-Stick mounted..."
 
 # Truecrypt tut, jetzt kommt Thunderbird
