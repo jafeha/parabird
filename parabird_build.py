@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# encoding: utf-8 
 #das ist jetzt eine art debugversion, da ich die subprocess aufrufe kommentiert habe und dafür das kommando printen lasse
 
 import urllib # url handling, downloads
