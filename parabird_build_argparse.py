@@ -6,6 +6,7 @@ import codecs
 import urllib
 import subprocess
 import sys
+import os
 
 parser = argparse.ArgumentParser()
 parser = argparse.ArgumentParser(description='')
@@ -32,13 +33,15 @@ with codecs.open('config.ini', 'r', encoding='utf-8') as f:
 
 
 print "[INFO] Checking all Dependencies..."
+FNULL = open(os.devnull, 'w')
 
 try:
-	subprocess.check_call(["truecrypt", "--version"])
+	
+	subprocess.check_call(["truecrypt", "--version"], stdout=FNULL)
 except OSError: 
 	print "[ERROR] Missing Depedencies: Truecrypt not installed"
 try:
-	subprocess.check_call(["7z"])
+	subprocess.check_call(["7z"], stdout=FNULL)
 except OSError:
 	print "[ERROR] Missing Depedencies: 7zip not installed"
 
@@ -87,43 +90,43 @@ print "[INFO] Mounting Truecrypt Container"
 print "[INFO] Creating Folders in Truecrypt Container"
 print "[INFO] Downloading Thunderbird [Linux]"
 	
-	try: 
-		urllib.urlretrieve(parser.get('thunderbird', 'linux_url'), filename="/tmp/thunderbird_linux.tgz")
-	except:
-		print "Could not Download Thunderbird for Linux"	
+try: 
+	urllib.urlretrieve(parser.get('thunderbird', 'linux_url'), filename="/tmp/thunderbird_linux.tgz")
+except:
+	print "Could not Download Thunderbird for Linux"	
 
 
 print "[INFO] Downloading Thunderbird [Windows]"
 
-	try:
-		urllib.urlretreive(parser.get('thunderbird', 'windows_url'), filename="/tmp/thunderbird_windows.exe")
-	except:
-		print "Could not Download Thunderbird for Windows"
+try:
+	urllib.urlretreive(parser.get('thunderbird', 'windows_url'), filename="/tmp/thunderbird_windows.exe")
+except:
+	print "Could not Download Thunderbird for Windows"
 
 print "[INFO] Downloading Thunderbird [Mac OS]"
 	
-	try: 
-		urllib.urlretreive(parser.get('thunderbird',  'mac_url'), filename="/tmp/thunderbird_mac.zip")
-	except: 
-		print "Could not Download Thunderbird for Mac OS"
+try: 
+	urllib.urlretreive(parser.get('thunderbird',  'mac_url'), filename="/tmp/thunderbird_mac.dmg")
+except: 
+	print "Could not Download Thunderbird for Mac OS"
 	
 print "[INFO] Extracting Thunderbird [Linux]"
 print "[INFO] Extracting Thunderbird [Windows]"
 print "[INFO] Extracting Thunderbird [Mac OS]"
 print "[INFO] Downloading Torbirdy"
 
-        try:
-                urllib.urlretreive(parser.get('torbirdy',  'url'), filename="/tmp/thunderbird_mac.zip")
-        except:
-                print "Could not Download Torbirdy"
+try:
+	urllib.urlretreive(parser.get('torbirdy', 'url'), filename="/tmp/thunderbird_mac.zip")
+except:
+	print "Could not Download Torbirdy"
 
 
 print "[INFO] Downloading Enigmail"
 
-        try:
-                urllib.urlretreive(parser.get('enigmail',  'url'), filename="/tmp/thunderbird_mac.zip")
-        except:
-                print "Could not Download Thunderbird for Mac OS"
+try:
+	urllib.urlretreive(parser.get('enigmail',  'url'), filename="/tmp/thunderbird_mac.zip")
+except:
+	print "Could not Download Thunderbird for Mac OS"
 
 
 print "[INFO] Configure Extensions and Profile Folder"
