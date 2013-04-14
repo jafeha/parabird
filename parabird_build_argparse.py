@@ -30,6 +30,9 @@ parser = SafeConfigParser()
 with codecs.open('config.ini', 'r', encoding='utf-8') as f:
     parser.readfp(f)
 
+
+print "[INFO] Checking all Dependencies..."
+
 try:
 	if args.device:
 		print "[INFO] Parameter given, device is:", args.device
