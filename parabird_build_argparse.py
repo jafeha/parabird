@@ -34,6 +34,17 @@ with codecs.open('config.ini', 'r', encoding='utf-8') as f:
 print "[INFO] Checking all Dependencies..."
 
 try:
+	subprocess.check_call(["truecrypt", "--version"])
+except OSError: 
+	print "[ERROR] Missing Depedencies: Truecrypt not installed"
+try:
+	subprocess.check_call(["7z"])
+except OSError:
+	print "[ERROR] Missing Depedencies: 7zip not installed"
+
+print "[INFO] Configuring..."
+
+try:
 	if args.device:
 		print "[INFO] Parameter given, device is:", args.device
 	
@@ -75,13 +86,46 @@ print "[INFO] Creating Truecrypt Container on USB-Stick"
 print "[INFO] Mounting Truecrypt Container"
 print "[INFO] Creating Folders in Truecrypt Container"
 print "[INFO] Downloading Thunderbird [Linux]"
+	
+	try: 
+		urllib.urlretrieve(parser.get('thunderbird', 'linux_url'), filename="/tmp/thunderbird_linux.tgz")
+	except:
+		print "Could not Download Thunderbird for Linux"	
+
+
 print "[INFO] Downloading Thunderbird [Windows]"
+
+	try:
+		urllib.urlretreive(parser.get('thunderbird', 'windows_url'), filename="/tmp/thunderbird_windows.exe")
+	except:
+		print "Could not Download Thunderbird for Windows"
+
 print "[INFO] Downloading Thunderbird [Mac OS]"
+	
+	try: 
+		urllib.urlretreive(parser.get('thunderbird',  'mac_url'), filename="/tmp/thunderbird_mac.zip")
+	except: 
+		print "Could not Download Thunderbird for Mac OS"
+	
 print "[INFO] Extracting Thunderbird [Linux]"
 print "[INFO] Extracting Thunderbird [Windows]"
 print "[INFO] Extracting Thunderbird [Mac OS]"
 print "[INFO] Downloading Torbirdy"
+
+        try:
+                urllib.urlretreive(parser.get('torbirdy',  'url'), filename="/tmp/thunderbird_mac.zip")
+        except:
+                print "Could not Download Torbirdy"
+
+
 print "[INFO] Downloading Enigmail"
+
+        try:
+                urllib.urlretreive(parser.get('enigmail',  'url'), filename="/tmp/thunderbird_mac.zip")
+        except:
+                print "Could not Download Thunderbird for Mac OS"
+
+
 print "[INFO] Configure Extensions and Profile Folder"
 print "[INFO] Unmounting Truecrypt Container"
 print "[INFO] Unmounting USB-Stick"
