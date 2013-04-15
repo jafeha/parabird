@@ -9,6 +9,10 @@ import sys
 import os
 import tempfile
 
+mountpoint = tempfile.mkdtemp()
+tempdir = tempfile.mkdtemp()
+
+
 def dependency_check(checked_app):
 
 	try:
@@ -32,6 +36,8 @@ def download_application(progname, url):
 	
 	try:
 		returnobject = urllib.urlretrieve(url, filename="/tmp/"+progname)
+		print tempdir
+		returnobject = urllib.urlretrieve(url, filename='+tempdir, +progname')
 	except:
 		print "Could not download", progname
 		return None
@@ -79,10 +85,6 @@ try:
 except NameError: 
 	print "Hier ist was ganz arg schiefgelaufen"
 
-print "[INFO] Creating Mountpoint"
-mountpoint = tempfile.mkdtemp()
-print "Mountpoint is", mountpoint
-
 print "[INFO] Mounting USB Stick to", mountpoint
 
 try:
@@ -94,8 +96,7 @@ print "[INFO] Creating Truecrypt Container on USB-Stick"
 print "[INFO] Mounting Truecrypt Container"
 print "[INFO] Creating Folders in Truecrypt Container"
 
-print "[INFO] Starting to download Applications..."
-
+print "[INFO] Starting to download Applications to", tempdir
 
 download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
 download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows_url'))
