@@ -7,6 +7,7 @@ import urllib
 import subprocess
 import sys
 import os
+import tempfile
 
 def dependency_check(checked_app):
 
@@ -78,9 +79,18 @@ try:
 except NameError: 
 	print "Hier ist was ganz arg schiefgelaufen"
 
-
 print "[INFO] Creating Mountpoint"
-print "[INFO] Mounting USB Stick"
+
+mountpoint = tempfile.mkdtemp()
+print "Mountpoint is", mountpoint
+
+print "[INFO] Mounting USB Stick to", mountpoint
+
+try:
+	subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
+except:
+	print "Mounting", parser.get('DEFAULT', 'device'), "to", mountpoint, "failed"
+
 print "[INFO] Creating Truecrypt Container on USB-Stick"
 print "[INFO] Mounting Truecrypt Container"
 print "[INFO] Creating Folders in Truecrypt Container"
@@ -106,3 +116,5 @@ print "[INFO] Configure Extensions and Profile Folder"
 print "[INFO] Unmounting Truecrypt Container"
 print "[INFO] Unmounting USB-Stick"
 
+print "[INFO] Cleaning up Temporary Directories"
+os.removedirs(mountpoint)
