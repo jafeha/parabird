@@ -80,7 +80,6 @@ except NameError:
 	print "Hier ist was ganz arg schiefgelaufen"
 
 print "[INFO] Creating Mountpoint"
-
 mountpoint = tempfile.mkdtemp()
 print "Mountpoint is", mountpoint
 
