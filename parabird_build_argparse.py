@@ -56,7 +56,7 @@ def update_config(section, key, value_from_argparser):
 		parser.set(section, key, value_from_argparser)
 
 	if value_from_argparser == None:
-		print "[INFO] Setting", value_from_argparser, "to Parameter from Config File:", parser.get(section, key)
+		print "[INFO] Setting", section, key, "to Parameter from Config File:", parser.get(section, key)
 
 try:
 	update_config("DEFAULT", "device", args.device)
