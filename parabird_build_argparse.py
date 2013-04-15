@@ -33,19 +33,18 @@ with codecs.open('config.ini', 'r', encoding='utf-8') as f:
 
 
 print "[INFO] Checking all Dependencies..."
-FNULL = open(os.devnull, 'w')
 
-try:
-	subprocess.check_call(["truecrypt", "--version"], stdout=FNULL)
+def dependency_check(checked_app):
 
-except OSError: 
-	print "[ERROR] Missing Depedencies: Truecrypt not installed"
+	try:
+		FNULL = open(os.devnull, 'w')
+		subprocess.check_call(checked_app, stdout=FNULL)
 
-try:
-	subprocess.check_call(["7z"], stdout=FNULL)
+	except OSError:
+		print "[ERROR] Missing Depedencies:", checked_app, "not installed"
 
-except OSError:
-	print "[ERROR] Missing Depedencies: 7zip not installed"
+dependency_check(["truecrypt", "--version"])
+dependency_check("7z")
 
 print "[INFO] Configuring..."
 
@@ -57,6 +56,7 @@ def update_config(section, key, value_from_argparser):
 
 	if value_from_argparser == None:
 		print "[INFO] Setting", section, key, "to Parameter from Config File:", parser.get(section, key)
+
 
 try:
 	update_config("DEFAULT", "device", args.device)
