@@ -8,6 +8,33 @@ import subprocess
 import sys
 import os
 
+def dependency_check(checked_app):
+
+	try:
+		FNULL = open(os.devnull, 'w')
+		subprocess.check_call(checked_app, stdout=FNULL)
+
+	except OSError:
+		print "[ERROR] Missing Depedencies:", checked_app, "not installed"
+
+def update_config(section, key, value_from_argparser):
+        
+	if value_from_argparser:
+		print "[INFO] Parameter given, device is:", value_from_argparser
+		parser.set(section, key, value_from_argparser)
+
+	if value_from_argparser == None:
+		print "[INFO] Setting", section, key, "to Parameter from Config File:", parser.get(section, key)
+
+def download_application(progname, url):
+	print "[INFO] Downloading", progname
+	
+	try:
+		returnobject = urllib.urlretrieve(url, filename="/tmp/"+progname)
+	except:
+		print "Could not download", progname
+		return None
+
 parser = argparse.ArgumentParser()
 parser = argparse.ArgumentParser(description='')
 parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
@@ -34,28 +61,11 @@ with codecs.open('config.ini', 'r', encoding='utf-8') as f:
 
 print "[INFO] Checking all Dependencies..."
 
-def dependency_check(checked_app):
-
-	try:
-		FNULL = open(os.devnull, 'w')
-		subprocess.check_call(checked_app, stdout=FNULL)
-
-	except OSError:
-		print "[ERROR] Missing Depedencies:", checked_app, "not installed"
 
 dependency_check(["truecrypt", "--version"])
 dependency_check("7z")
 
 print "[INFO] Configuring..."
-
-def update_config(section, key, value_from_argparser):
-        
-	if value_from_argparser:
-		print "[INFO] Parameter given, device is:", value_from_argparser
-		parser.set(section, key, value_from_argparser)
-
-	if value_from_argparser == None:
-		print "[INFO] Setting", section, key, "to Parameter from Config File:", parser.get(section, key)
 
 
 try:
@@ -77,21 +87,13 @@ print "[INFO] Creating Folders in Truecrypt Container"
 
 print "[INFO] Starting to download Applications..."
 
-def download_application(progname, url):
-	print "[INFO] Downloading", progname
-	
-	try:
-		returnobject = urllib.urlretrieve(url, filename="/tmp/"+progname)
-	except:
-		print "Could not download", progname
-		return None
 
 download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
 download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows_url'))
 download_application("Thunderbird [Mac OS]", parser.get('thunderbird', 'mac_url'))
 download_application("Torbirdy", parser.get('torbirdy', 'url'))
 download_application("Enigmail", parser.get('enigmail', 'url'))
-download_application("Vidalia [Linux]", parser.get('vidalia', 'linux_ur_url'))
+download_application("Vidalia [Linux]", parser.get('vidalia', 'linux_url'))
 download_application("Vidalia [Windows]", parser.get('vidalia', 'windows_url'))
 download_application("Vidalia [Mac OS]", parser.get('vidalia', 'mac_url'))
 
