@@ -91,51 +91,14 @@ download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows
 download_application("Thunderbird [Mac OS]", parser.get('thunderbird', 'mac_url'))
 download_application("Torbirdy", parser.get('torbirdy', 'url'))
 download_application("Enigmail", parser.get('enigmail', 'url'))
-download_application("Vidalia", parser.get('vidalia', 'url'))
+download_application("Vidalia [Linux]", parser.get('vidalia', 'linux_ur_url'))
+download_application("Vidalia [Windows]", parser.get('vidalia', 'windows_url'))
+download_application("Vidalia [Mac OS]", parser.get('vidalia', 'mac_url'))
 
 print "[INFO] Extracting Thunderbird [Linux]"
 print "[INFO] Extracting Thunderbird [Windows]"
 print "[INFO] Extracting Thunderbird [Mac OS]"
-print "[INFO] Downloading Torbirdy"
-
-try:
-	urllib.urlretreive(parser.get('torbirdy', 'url'), filename="/tmp/thunderbird_mac.zip")
-except:
-	print "Could not Download Torbirdy"
-
-
-print "[INFO] Downloading Enigmail"
-
-try:
-	urllib.urlretreive(parser.get('enigmail',  'url'), filename="/tmp/thunderbird_mac.zip")
-except:
-	print "Could not Download Thunderbird for Mac OS"
-
-
 print "[INFO] Configure Extensions and Profile Folder"
-
-print "[INFO] Downloading Vidalia [Linux]"
-
-try:
-        urllib.urlretreive(parser.get('vidalia',  'linux_url'), filename="/tmp/thunderbird_mac.zip")
-except:
-	print "Could not Download Vidalia for Linux"
-
-
-print "[INFO] Downloading Vidalia [Windows]"
-
-try:
-        urllib.urlretreive(parser.get('vidalia',  'windows_url'), filename="/tmp/thunderbird_mac.zip")
-except:
-        print "Could not Download Vidalia for Windows"
-
-
-print "[INFO] Downloading Vidalia [Mac OS]"
-
-try:
-        urllib.urlretreive(parser.get('vidalia',  'mac_url'), filename="/tmp/thunderbird_mac.zip")
-except:
-        print "Could not Download Vidalia for Mac OS"
 
 
 print "[INFO] Unmounting Truecrypt Container"
