@@ -58,54 +58,14 @@ def update_config(section, key, value_from_argparser):
 	if value_from_argparser == None:
 		print "[INFO] Setting", value_from_argparser, "to Parameter from Config File:", parser.get(section, key)
 
-
-
 try:
+	update_config("DEFAULT", "device", args.device)
+	update_config("thunderbird", "version", args.thunder)
+	update_config("torbirdy", "version", args.torbirdy)
+	update_config("enigmail", "version", args.enigmail)
+	update_config("vidalia", "version", args.vidalia)
 
-update_config(DEFAULT, device, args.device)
-update_config(thunderbird, version, args.thunder)
-update_config(torbirdy, version, args.torbirdy)
-update_config(enigmail, version, args.enigmail)
-update_config(vidalia, version, args.vidalia)
-
-
-#	if args.device:
-#		print "[INFO] Parameter given, device is:", args.device
-#		parser.set('DEFAULT', 'device', args.device)
-
-#	if args.device == None:
-#		print "[INFO] Setting Device Parameter from Config File:"
-#		args.device = parser.get('DEFAULT', 'device')
-#		print "[CONFIG] Parameter is set to", args.device
-	
-#	if args.thunder:
-#		print "[INFO] Parameter given, Thunderbird Version is:", args.thunder
-#		parser.set('thunderbird', 'version', args.thunder)
-#
-#	if args.thunder == None:
-#		print "[INFO] Setting Thunderbird Version Parameter from Config File:"
-#		args.thunder = parser.get('thunderbird', 'version')
-#		print "[CONFIG] Parameter is set to", args.thunder
-#
-#	if args.torbirdy == None:
-#		print "[INFO] Setting Torbirdy Version Parameter from Config File:"
-#		args.torbirdy = parser.get('torbirdy', 'version')
-#		print "[CONFIG] Parameter is set to", args.torbirdy
-#
-#	if args.enigmail == None:
-#		print "[INFO] Setting Torbirdy Version Parameter from Config File:"
-#		args.enigmail = parser.get('enigmail', 'version')
-#		print "[CONFIG] Parameter is set to", args.enigmail
-#
-#	if args.vidalia == None:
-#		print "[INFO] Setting Vidalia Version Parameter from Config File:"
-#		args.vidalia = parser.get('vidalia', 'version')
-#		print "[CONFIG] Parameter is set to", args.vidalia
-#
 except NameError: 
-#  args.device = parser.get('device')
-
-	print "Parameter taken from Config file, device is:", parser.get('device')
 	print "Hier ist was ganz arg schiefgelaufen"
 
 
