@@ -20,7 +20,9 @@ def dependency_check(checked_app):
 		subprocess.check_call(checked_app, stdout=FNULL)
 
 	except OSError:
-		print "[ERROR] Missing Depedencies:", checked_app, "not installed"
+		print "[ERROR] Missing Depedencies:", checked_app, "not installed, exiting..."
+		from sys import exit
+		exit()
 
 def update_config(section, key, value_from_argparser):
         
@@ -39,7 +41,7 @@ def download_application(progname, url):
 		print tempdir
 		returnobject = urllib.urlretrieve(url, filename='+tempdir, +progname')
 	except:
-		print "Could not download", progname
+		print "[ERROR] Could not download", progname
 		return None
 
 parser = argparse.ArgumentParser()
@@ -69,7 +71,7 @@ with codecs.open('config.ini', 'r', encoding='utf-8') as f:
 print "[INFO] Checking all Dependencies..."
 
 
-dependency_check(["truecrypt", "--version"])
+dependency_check(["truecrypt", "--text", "--version"])
 dependency_check("7z")
 
 print "[INFO] Configuring..."
@@ -83,14 +85,14 @@ try:
 	update_config("vidalia", "version", args.vidalia)
 
 except NameError: 
-	print "Hier ist was ganz arg schiefgelaufen"
+	print "[ERROR] Hier ist was ganz arg schiefgelaufen"
 
 print "[INFO] Mounting USB Stick to", mountpoint
 
 try:
 	subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
 except:
-	print "Mounting", parser.get('DEFAULT', 'device'), "to", mountpoint, "failed"
+	print "[ERROR] Mounting", parser.get('DEFAULT', 'device'), "to", mountpoint, "failed"
 
 print "[INFO] Creating Truecrypt Container on USB-Stick"
 print "[INFO] Mounting Truecrypt Container"
@@ -116,5 +118,14 @@ print "[INFO] Configure Extensions and Profile Folder"
 print "[INFO] Unmounting Truecrypt Container"
 print "[INFO] Unmounting USB-Stick"
 
+try:
+        subprocess.check_call(["umount", mountpoint])
+except:
+        print "[Error] Unmounting", mountpoint, "failed"
+
+
 print "[INFO] Cleaning up Temporary Directories"
-os.removedirs(mountpoint)
+
+# Removed for debugging purposes, should be reenabled in release:
+#os.removedirs(mountpoint)
+#os.removedirs(tempdir)
