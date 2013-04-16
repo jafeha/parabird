@@ -40,7 +40,7 @@ def download_application(progname, url):
 	try:
 		returnobject = urllib.urlretrieve(url, filename="/tmp/"+progname)
 		print tempdir
-		returnobject = urllib.urlretrieve(url, filename='+tempdir, +progname')
+		returnobject = urllib.urlretrieve(url, filename="/tmp/"+progname)
 	except:
 		print "[ERROR] Could not download", progname
 		return None
@@ -99,17 +99,17 @@ except:
 
 print "[INFO] Creating Truecrypt Container on USB-Stick"
 
-# Something goes wrong here. Container seems to get created but i won't find it on the USB Stick
-# Note: this should actually work by now. But there seems further testing nessesary.
- 
 container_path = mountpoint+"/"+parser.get('DEFAULT', 'container_name')
-print "[INFO] Creating", container_path
+parser.set('truecrypting', 'container_path', container_path)
 
+print "[INFO] Creating", container_path
 tc = parser.get('truecrypting', 'create')
 tc_create = shlex.split(tc)
 subprocess.check_call(tc_create)
 
 print "[INFO] Mounting Truecrypt Container"
+
+parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
 
 tc = parser.get('truecrypting', 'mount')
 tc_mount = shlex.split(tc)
