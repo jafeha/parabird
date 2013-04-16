@@ -36,9 +36,9 @@ def download_application(progname, url):
 	print "[INFO] Downloading", progname
 	
 	try:
-		returnobject = urllib.urlretrieve(url, filename="/tmp/"+progname)
-		print tempdir
-		returnobject = urllib.urlretrieve(url, filename="/tmp/"+progname)
+		# This Line works. if we need to deal more with the filename, i consider 
+		# using  >>> os.path.basename('http://sub.domain.com/filename.zip') 'filename.zip'
+		returnobject = urllib.urlretrieve(url, filename=tempdir+"/"+url.split('/')[-1].split('#')[0].split('?')[0])
 	except:
 		print "[ERROR] Could not download", progname
 		return None
@@ -127,7 +127,7 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 
 #print "[INFO] Starting to download Applications to:", tempdir
 
-#download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
+download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
 #download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows_url'))
 #download_application("Thunderbird [Mac OS]", parser.get('thunderbird', 'mac_url'))
 #download_application("Torbirdy", parser.get('torbirdy', 'url'))
