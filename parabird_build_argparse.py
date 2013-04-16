@@ -114,9 +114,7 @@ try:
 except:
 	print "[ERROR] Mounting", parser.get('DEFAULT', 'device'), "to", mountpoint, "failed"
 
-print "[INFO] Creating Truecrypt Container on USB-Stick"
-
-print "[INFO] Creating", parser.get('truecrypting', 'container_path')
+print "[INFO] Creating Container",  parser.get('truecrypting', 'container_name'), "on USB-Stick:", parser.get('DEFAULT', 'device')
 
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
 
