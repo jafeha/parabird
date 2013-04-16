@@ -10,9 +10,6 @@ import os
 import tempfile
 import shlex
 
-mountpoint = tempfile.mkdtemp()
-tempdir = tempfile.mkdtemp()
-tc_mountpoint = tempfile.mkdtemp()
 
 def dependency_check(checked_app):
 
@@ -28,11 +25,12 @@ def dependency_check(checked_app):
 def update_config(section, key, value_from_argparser):
         
 	if value_from_argparser:
-		print "[INFO] Parameter given, device is:", value_from_argparser
+		print "[INFO] Parameter given, device or container is:", value_from_argparser
 		parser.set(section, key, value_from_argparser)
 
 	if value_from_argparser == None:
 		print "[INFO] Setting", section, key, "to Parameter from Config File:", parser.get(section, key)
+
 
 def download_application(progname, url):
 	print "[INFO] Downloading", progname
@@ -79,16 +77,27 @@ except:
 
 print "[INFO] Configuring..."
 
+# Setting Parameters given from argparse
+
 try:
 	update_config("DEFAULT", "device", args.device)
-	update_config("thunderbird", "version", args.thunder)
-	update_config("torbirdy", "version", args.torbirdy)
-	update_config("enigmail", "version", args.enigmail)
-	update_config("vidalia", "version", args.vidalia)
+#	update_config("thunderbird", "version", args.thunder)
+#	update_config("torbirdy", "version", args.torbirdy)
+#	update_config("enigmail", "version", args.enigmail)
+#	update_config("vidalia", "version", args.vidalia)
 	update_config("DEFAULT", "container_name", args.container_name)
 
 except NameError: 
 	print "[ERROR] Hier ist was ganz arg schiefgelaufen"
+
+# Setting Path Parameters given by tempfile
+
+mountpoint = tempfile.mkdtemp()
+tempdir = tempfile.mkdtemp()
+tc_mountpoint = tempfile.mkdtemp()
+
+parser.set('truecrypting', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
+parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
 
 print "[INFO] Mounting USB Stick to", mountpoint
 
@@ -99,30 +108,23 @@ except:
 
 print "[INFO] Creating Truecrypt Container on USB-Stick"
 
-container_path = mountpoint+"/"+parser.get('DEFAULT', 'container_name')
-parser.set('truecrypting', 'container_path', container_path)
-
-print "[INFO] Creating", container_path
+print "[INFO] Creating", parser.get('truecrypting', 'container_path')
 tc = parser.get('truecrypting', 'create')
 tc_create = shlex.split(tc)
 subprocess.check_call(tc_create)
 
 print "[INFO] Mounting Truecrypt Container"
 
-parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
 
 tc = parser.get('truecrypting', 'mount')
 tc_mount = shlex.split(tc)
 subprocess.check_call(tc_mount)
 
-print "[INFO] Creating Folders in Truecrypt Container"
+#print "[INFO] Creating Folders in Truecrypt Container"
 
-print "[INFO] Starting to download Applications to:", tempdir
+#print "[INFO] Starting to download Applications to:", tempdir
 
-# Disabled all downloads except of one, there is no need to download everything every single
-# time i run this script. Re-enable them step by step.
-
-download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
+#download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
 #download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows_url'))
 #download_application("Thunderbird [Mac OS]", parser.get('thunderbird', 'mac_url'))
 #download_application("Torbirdy", parser.get('torbirdy', 'url'))
@@ -131,10 +133,10 @@ download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url
 #download_application("Vidalia [Windows]", parser.get('vidalia', 'windows_url'))
 #download_application("Vidalia [Mac OS]", parser.get('vidalia', 'mac_url'))
 
-print "[INFO] Extracting Thunderbird [Linux]"
-print "[INFO] Extracting Thunderbird [Windows]"
-print "[INFO] Extracting Thunderbird [Mac OS]"
-print "[INFO] Configure Extensions and Profile Folder"
+#print "[INFO] Extracting Thunderbird [Linux]"
+#print "[INFO] Extracting Thunderbird [Windows]"
+#print "[INFO] Extracting Thunderbird [Mac OS]"
+#print "[INFO] Configure Extensions and Profile Folder"
 
 print "[INFO] Unmounting Truecrypt Container"
 
@@ -150,7 +152,7 @@ except:
         print "[Error] Unmounting", mountpoint, "failed"
 
 
-print "[INFO] Cleaning up Temporary Directories"
+#print "[INFO] Cleaning up Temporary Directories"
 
 # Removed for debugging purposes, should be reenabled in release:
 #os.removedirs(mountpoint)
