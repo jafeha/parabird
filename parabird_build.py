@@ -1,104 +1,165 @@
 #!/usr/bin/env python
 # encoding: utf-8 
-# das wird jetzt eine version, die tc nicht herunter läd, sondern davon ausgeht, dass tc in der consolenvariante installiert ist.
-# der thunderbird wird mal noch nicht heruntergeladen# die subprocess aufrufe bleiben vorerst auskommentiert und werden als  kommando geprintet lasse
-
-import urllib # url handling, downloads
-import getopt # optionen/argumente parsen
-import sys    # dinge die den interpreter betreffen
-import subprocess  # make system calls
+import argparse
 import ConfigParser
+import codecs
+import urllib
+import subprocess
+import sys
+import os
+import tempfile
+import shlex
+
+
+def dependency_check(checked_app):
+
+	try:
+		FNULL = open(os.devnull, 'w')
+		subprocess.check_call(checked_app, stdout=FNULL)
+
+	except OSError:
+		print "[ERROR] Missing Depedencies:", checked_app, "not installed, exiting..."
+		from sys import exit
+		exit()
+
+def update_config(section, key, value_from_argparser):
+        
+	if value_from_argparser:
+		print "[INFO] Parameter given, device or container is:", value_from_argparser
+		parser.set(section, key, value_from_argparser)
+
+	if value_from_argparser == None:
+		print "[INFO] Setting", section, key, "to Parameter from Config File:", parser.get(section, key)
+
+
+def download_application(progname, url):
+	print "[INFO] Downloading", progname
+	
+	try:
+		returnobject = urllib.urlretrieve(url, filename="/tmp/"+progname)
+		print tempdir
+		returnobject = urllib.urlretrieve(url, filename="/tmp/"+progname)
+	except:
+		print "[ERROR] Could not download", progname
+		return None
+
+parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description='')
+parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
+parser.add_argument("-d", "--device", help="Device Flag to specify USB Stick")
+parser.add_argument("-t", "--thunder", help="Specify Thunderbird version to download")
+parser.add_argument("-b", "--torbirdy", help="Specify Torbirdy Version")
+parser.add_argument("-e", "--enigmail", help="Specify Enigmail Version") 
+parser.add_argument("-a", "--vidalia", help="Specify Vidalia Version")
+parser.add_argument("-n", "--container_name", help="Specify Container Name")
+
+args = parser.parse_args()
 
 from ConfigParser import SafeConfigParser
-import codecs
 
 parser = SafeConfigParser()
 with codecs.open('config.ini', 'r', encoding='utf-8') as f:
     parser.readfp(f)
-    
-print "Übersicht über alle Configurationsoptionen"
-print "#" * 20
-for section_name in parser.sections():
-    print 'Section:', section_name
-    for name, value in parser.items(section_name):
-        print " %s\t= %s" % (name, value)
-    print "-" * 8
 
-print "\n" * 2
-print "url from truecrypt:\t", parser.get('truecrypt', 'url')
-print "changing version to 10.0"
-parser.set('truecrypt', 'version', '10.0')
-print 'this updates the url:\t', parser.get('truecrypt', 'url')
+# Removed, because there is no verbosity support, could be reimplemented later.
+#if args.verbose:
+#   print "verbosity turned on"
+
+print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "Checking Dependencies and Configure"
+print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+print "[INFO] Checking all Dependencies..."
+
+try:
+	dependency_check(["truecrypt", "--text", "--version"])
+	dependency_check("7z")
+except: 
+	print "[ERROR] Dependency Checks failed large scale, exiting..."
+	from sys import exit
+	exit()
+
+print "[INFO] Configuring..."
+
+# Setting Parameters given from argparse
+
+try:
+	update_config("DEFAULT", "device", args.device)
+#	update_config("thunderbird", "version", args.thunder)
+#	update_config("torbirdy", "version", args.torbirdy)
+#	update_config("enigmail", "version", args.enigmail)
+#	update_config("vidalia", "version", args.vidalia)
+	update_config("DEFAULT", "container_name", args.container_name)
+
+except NameError: 
+	print "[ERROR] Hier ist was ganz arg schiefgelaufen"
+
+# Setting Path Parameters given by tempfile
+
+mountpoint = tempfile.mkdtemp()
+tempdir = tempfile.mkdtemp()
+tc_mountpoint = tempfile.mkdtemp()
+
+parser.set('truecrypting', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
+parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
+
+print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "Mounting and Truecrypting"
+print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+print "[INFO] Mounting USB Stick to", mountpoint
+
+try:
+	subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
+except:
+	print "[ERROR] Mounting", parser.get('DEFAULT', 'device'), "to", mountpoint, "failed"
+
+print "[INFO] Creating Container",  parser.get('truecrypting', 'container_name'), "on USB-Stick:", parser.get('DEFAULT', 'device')
+
+subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
+
+print "[INFO] Mounting Truecrypt Container"
+
+subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 
 
+#print "[INFO] Creating Folders in Truecrypt Container"
 
-# config goes here
-#usb_device = "" # defaultwert
-TRUECRYPT_CREATE = "truecrypt --create --volume-type=Hidden --filesystem=None --hash=RIPEMD-160 --encryption=AES" +usb_device 
-#TRUECRYPT = "truecrypt --filesystem=none"+ usb_device
-#truecrypt_version = "7.0a" # hier koennen wir spaeter nen argument uebergeben
-#truecrypt_url = "http://www.truecrypt.org/download/truecrypt-"+ truecrypt_version +  "-linux-console-x86.tar.gz"
-#MAKE_FS = "mkfs.ntfs --quick /dev/mapper/truecrypt0" # hier muss noch ein Check eingebaut werden, damit er auch das richtige device bekommt.
-#UNMOUNT_USB = "truecrypt -d"+ usb_device
-#MOUNTPOINT_CREATE = "mkdir /tmp/mount/" #ueberlegung: das mit dem mounten mit nem eigenen py modul machenexi
-#MOUNTPOINT = "/tmp/mount/"
-#TRUEMOUNT = "truecrypt "+ usb_device +" "+ MOUNTPOINT 
-#thunderbird_url = "http://releases.mozilla.org/pub/mozilla.org/thunderbird/releases/17.0.5/linux-x86_64/de/thunderbird-17.0.5.tar.bz2"
-#TB_DOWNFILE = "/tmp/thunderbird.tar.bz2" # da fehlte in deiner version das =
+#print "[INFO] Starting to download Applications to:", tempdir
 
+#download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
+#download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows_url'))
+#download_application("Thunderbird [Mac OS]", parser.get('thunderbird', 'mac_url'))
+#download_application("Torbirdy", parser.get('torbirdy', 'url'))
+#download_application("Enigmail", parser.get('enigmail', 'url'))
+#download_application("Vidalia [Linux]", parser.get('vidalia', 'linux_url'))
+#download_application("Vidalia [Windows]", parser.get('vidalia', 'windows_url'))
+#download_application("Vidalia [Mac OS]", parser.get('vidalia', 'mac_url'))
 
-# dont edit below this line
+#print "[INFO] Extracting Thunderbird [Linux]"
+#print "[INFO] Extracting Thunderbird [Windows]"
+#print "[INFO] Extracting Thunderbird [Mac OS]"
+#print "[INFO] Configure Extensions and Profile Folder"
 
-#options, remainder = getopt.getopt(sys.argv[1:], 'o:v', ['output=', 
-#						'help',
-#						'verbose',
-#						'truecrypt=',
-#						'device=',
-#						])
+print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "Unmounting Truecrypt and Stick"
+print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 
+print "[INFO] Unmounting Truecrypt Container"
 
-#for opt, arg in options:
-#	if opt in ('-o', '--output'):
-#		output_filename = arg
-#	elif opt in ('-v', '--verbose'):
-#		verbose = True
-#	elif opt in ('-h', '--help'):
-#		print "usage: lalala"
-#	elif opt == '--truecrypt':
-#		truecrypt_version = arg
-#	elif opt == '--device':
-#		usb_device = arg
+subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
+
+print "[INFO] Unmounting USB-Stick"
+
+try:
+        subprocess.check_call(["umount", mountpoint])
+except:
+        print "[Error] Unmounting", mountpoint, "failed"
 
 
+#print "[INFO] Cleaning up Temporary Directories"
 
-#urllib.urlretrieve(truecrypt_url, "/tmp/tc.tgz")
-
-#cmds_create =  [TRUECRYPT, MAKE_FS, UNMOUNT_USB] #wenn du was zuweisen willst muss da ein = hin
-cmds_create =  [TRUECRYPT_CREATE] #wenn du was zuweisen willst muss da ein = hin
-#cmds_mount = [MOUNTPOINT_CREATE, TRUEMOUNT] # ditto
-for cmd in cmds_create:
-	print "Creating encrypted USB-Stick"
-	#subprocess.call(cmd_create, shell=True)
-	#hier muss n check hin, ob das device existiert, bzw ob die --device option ueberhaupt gesetzt ist
-	print "__COMMAND__", cmd # hier muss es cmd heiszen, nicht cmd_create. cmd_create ist die liste, cmd das element in dem man atm ist
-	print "Encrypted USB-Stick created and mounted to:", MOUNTPOINT # siehe shell -> 
-
-#for cmd in cmds_mount:
-#	print "Creating Mountpoint and Mounting USB Stick"
-#	try:
-		#subprocess.check_call(cmd_mount, shell=True)
-#		print "__COMMAND__",cmd # s.o.
-#	except CalledProcessError:
-#	    print cmd_mount, "did not work"
-	
-	#hier sollte n check mit os.listfiles oder so hin    
-#	print "USB-Stick mounted..."
-
-# Truecrypt tut, jetzt kommt Thunderbird
-
-print "Downloading Thunderbird"
-#urllib.urlretrieve(thunderbird_url, TB_DOWNFILE) # erstes rgument: url. zweites argument: ziel. + kettet stings aneinander
-print "Download complete, unpacking"
-#subprocess.call("tar xfj " + TB_DOWNFILE, shell=True) # um tar muessen ", das 2. + ist zu viel, leerzeichen fehlen
-print "tar xfj " + TB_DOWNFILE
-
+# Removed for debugging purposes, should be reenabled in release:
+#os.removedirs(mountpoint)
+#os.removedirs(tempdir)
+#os.removedirs(tc_mountpoint)
