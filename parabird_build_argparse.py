@@ -65,6 +65,10 @@ with codecs.open('config.ini', 'r', encoding='utf-8') as f:
 #if args.verbose:
 #   print "verbosity turned on"
 
+print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "Checking Dependencies and Configure"
+print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
 print "[INFO] Checking all Dependencies..."
 
 try:
@@ -99,6 +103,10 @@ tc_mountpoint = tempfile.mkdtemp()
 parser.set('truecrypting', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
 parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
 
+print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "Mounting and Truecrypting"
+print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
 print "[INFO] Mounting USB Stick to", mountpoint
 
 try:
@@ -109,16 +117,13 @@ except:
 print "[INFO] Creating Truecrypt Container on USB-Stick"
 
 print "[INFO] Creating", parser.get('truecrypting', 'container_path')
-tc = parser.get('truecrypting', 'create')
-tc_create = shlex.split(tc)
-subprocess.check_call(tc_create)
+
+subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
 
 print "[INFO] Mounting Truecrypt Container"
 
+subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 
-tc = parser.get('truecrypting', 'mount')
-tc_mount = shlex.split(tc)
-subprocess.check_call(tc_mount)
 
 #print "[INFO] Creating Folders in Truecrypt Container"
 
@@ -138,11 +143,13 @@ subprocess.check_call(tc_mount)
 #print "[INFO] Extracting Thunderbird [Mac OS]"
 #print "[INFO] Configure Extensions and Profile Folder"
 
+print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "Unmounting Truecrypt and Stick"
+print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
 print "[INFO] Unmounting Truecrypt Container"
 
-tc = parser.get('truecrypting', 'unmount')
-tc_unmount = shlex.split(tc)
-subprocess.check_call(tc_unmount)
+subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
 print "[INFO] Unmounting USB-Stick"
 
