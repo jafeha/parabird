@@ -9,7 +9,8 @@ import sys
 import os
 import tempfile
 import shlex
-
+import shutil
+import tarfile
 
 def dependency_check(checked_app):
 
