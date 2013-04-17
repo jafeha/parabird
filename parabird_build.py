@@ -61,6 +61,10 @@ def download_application(progname, url):
     try:
         # This Line works. if we need to deal more with the filename, i consider 
         # using  >>> os.path.basename('http://sub.domain.com/filename.zip') 'filename.zip'
+        
+        # why dont we save to /tmpdir/progname ??? this seems saver to me! procname can be
+        # thunderbird_linux or smthng. sure we loose the ending, but that's not important imo
+        
         returnobject = urllib.urlretrieve(url, filename=tempdir+"/"+url.split('/')[-1].split('#')[0].split('?')[0])
     except:
         print "[ERROR] Could not download", progname
@@ -135,12 +139,10 @@ except NameError:
 
 # Setting Path Parameters given by tempfile
 
-mountpoint = os.path.realpath(tempfile.mkdtemp())
+
 tempdir = os.path.realpath(tempfile.mkdtemp())
 tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
 
-parser.set('truecrypting', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
-parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
 
 print "%" * 30, "\nMounting and Truecrypting\n", "%" * 30
 
@@ -151,7 +153,7 @@ if (not(os.access(str(stick['mountpoint']), os.W_OK))):
     #aka we cant write or stick detection did not work
     #question is: does it make sense to continue at this point?
     #which scenarios are possible (except detection not working)
-    
+    mountpoint = os.path.realpath(tempfile.mkdtemp())
     print "Stick detection did not work, try to run with what you specified"
     print "[INFO] Mounting USB Stick to", mountpoint
 
@@ -163,8 +165,13 @@ else:
     parser.set('DEFAULT', "device", stick['device'])
     mountpoint = stick['mountpoint']
 
+parser.set('truecrypting', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
+parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
+
+
 print "[INFO] Creating Container",  parser.get('truecrypting', 'container_name'), "on USB-Stick:", parser.get('DEFAULT', 'device')
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
+mainLogger.info('Truecrypting create: '+ parser.get('truecrypting', 'create'))
 
 print "[INFO] Mounting Truecrypt Container"
 
