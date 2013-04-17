@@ -17,7 +17,7 @@ import logging
 #from http://docs.python.org/2/howto/logging-cookbook.html explainations there
 
 tempdir = tempfile.mkdtemp()
-logfile = tempdir+"parabirdy_log.txt"
+logfile = os.path.realpath(tempdir+"parabirdy_log.txt")
 print logfile
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
@@ -135,9 +135,9 @@ except NameError:
 
 # Setting Path Parameters given by tempfile
 
-mountpoint = tempfile.mkdtemp()
-tempdir = tempfile.mkdtemp()
-tc_mountpoint = tempfile.mkdtemp()
+mountpoint = os.path.realpath(tempfile.mkdtemp())
+tempdir = os.path.realpath(tempfile.mkdtemp())
+tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
 
 parser.set('truecrypting', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
 parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
@@ -204,7 +204,12 @@ print "[INFO] Unmounting USB-Stick"
 try:
     subprocess.check_call(["umount", mountpoint])
 except:
-    print "[Error] Unmounting", mountpoint, "failed"
+    
+    if (sys.platform=="darwin"):
+        print "please unmount your stick via the finder."
+    else:
+        print "[Error] Unmounting", mountpoint, "failed"
+        
 
 
 #print "[INFO] Cleaning up Temporary Directories"
