@@ -18,7 +18,7 @@ import logging
 
 tempdir = tempfile.mkdtemp()
 logfile = os.path.realpath(tempdir+"parabirdy_log.txt")
-print logfile
+
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%m-%d %H:%M',
@@ -27,11 +27,13 @@ logging.basicConfig(level=logging.DEBUG,
                     
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
-formatter = logging.Formatter('%(name)-6s: %(levelname)-6s %(message)s')
+#formatter = logging.Formatter('%(name)-6s: %(levelname)-6s %(message)s')
+formatter = logging.Formatter('[%(levelname)s::%(name)s]: %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
 mainLogger = logging.getLogger('main')
-# mainLogger.info('FOO! BAR!')
+
+
 
 mainLogger.info('Logfile: ' + logfile)
 
@@ -48,11 +50,12 @@ def dependency_check(checked_app):
 def update_config(section, key, value_from_argparser):
         
     if value_from_argparser:
-        print "[INFO] Parameter given, device or container is:", value_from_argparser
+        mainLogger.info('Parameter given, device or container is: ' + value_from_argparser)
         parser.set(section, key, value_from_argparser)
 
     if value_from_argparser == None:
-        print "[INFO] Setting", section, key, "to Parameter from Config File:", parser.get(section, key)
+        #print "[INFO] Setting", section, key, "to Parameter from Config File:", parser.get(section, key)                
+        mainLogger.info("Taking %s %s from Config: %s" % (section, key, parser.get(section, key) ))
 
 
 def download_application(progname, url):
@@ -109,7 +112,8 @@ print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 print "Checking Dependencies and Configure"
 print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 
-print "[INFO] Checking all Dependencies..."
+
+mainLogger.info("[INFO] Checking all Dependencies...")
 
 try:
     dependency_check([parser.get('truecrypting', 'tc_binary'), "--text", "--version"])
@@ -121,8 +125,7 @@ except:
 
 
 
-
-print "[INFO] Configuring..."
+mainLogger.info("[INFO] Configuring...")
 
 # Setting Parameters given from argparse
 
@@ -147,7 +150,8 @@ tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
 print "%" * 30, "\nMounting and Truecrypting\n", "%" * 30
 
 stick = detect_stick()
-print stick
+#print stick
+
 #if we can write to the mountpoint of the stick, no need to re-mount it
 if (not(os.access(str(stick['mountpoint']), os.W_OK))): 
     #aka we cant write or stick detection did not work
@@ -168,12 +172,14 @@ else:
 parser.set('truecrypting', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
 parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
 
+#Multiple Variables like this, because the logger only takes 1 argument:
+#print "[INFO] Creating Container",  parser.get('truecrypting', 'container_name'), "on USB-Stick:", parser.get('DEFAULT', 'device')
+mainLogger.info("[INFO] Creating Container" + parser.get('truecrypting', 'container_name') + "on USB-Stick: " + parser.get('DEFAULT', 'device'))
 
-print "[INFO] Creating Container",  parser.get('truecrypting', 'container_name'), "on USB-Stick:", parser.get('DEFAULT', 'device')
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
 mainLogger.info('Truecrypting create: '+ parser.get('truecrypting', 'create'))
 
-print "[INFO] Mounting Truecrypt Container"
+mainLogger.info("[INFO] Mounting Truecrypt Container")
 
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 
@@ -200,9 +206,9 @@ print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 print "Unmounting Truecrypt and Stick"
 print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 
-print "[INFO] Unmounting Truecrypt Container"
+mainLogger.info("[INFO] Unmounting Truecrypt Container")
 
-mainLogger.info('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
+mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
 
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
@@ -213,7 +219,7 @@ try:
 except:
     
     if (sys.platform=="darwin"):
-        print "please unmount your stick via the finder."
+        mainLogger.info("[INFO] please unmount your stick via the finder.")
     else:
         print "[Error] Unmounting", mountpoint, "failed"
         
