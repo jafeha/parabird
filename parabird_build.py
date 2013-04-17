@@ -11,38 +11,64 @@ import tempfile
 import shlex
 import shutil
 import tarfile
+from utils import detect_stick
+import logging
+
+#from http://docs.python.org/2/howto/logging-cookbook.html explainations there
+
+tempdir = tempfile.mkdtemp()
+logfile = os.path.realpath(tempdir+"parabirdy_log.txt")
+print logfile
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    datefmt='%m-%d %H:%M',
+                    filename=tempdir+"parabirdy_log.txt",
+                    filemode='w')
+                    
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+formatter = logging.Formatter('%(name)-6s: %(levelname)-6s %(message)s')
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)
+mainLogger = logging.getLogger('main')
+# mainLogger.info('FOO! BAR!')
+
+mainLogger.info('Logfile: ' + logfile)
 
 def dependency_check(checked_app):
+    try:
+        FNULL = open(os.devnull, 'w')
+        subprocess.check_call(checked_app, stdout=FNULL)
 
-	try:
-		FNULL = open(os.devnull, 'w')
-		subprocess.check_call(checked_app, stdout=FNULL)
-
-	except OSError:
-		print "[ERROR] Missing Depedencies:", checked_app, "not installed, exiting..."
-		from sys import exit
-		exit()
+    except OSError:
+        print "[ERROR] Missing Depedencies:", checked_app, "not installed, exiting..."
+        from sys import exit
+        exit()
 
 def update_config(section, key, value_from_argparser):
         
-	if value_from_argparser:
-		print "[INFO] Parameter given, device or container is:", value_from_argparser
-		parser.set(section, key, value_from_argparser)
+    if value_from_argparser:
+        print "[INFO] Parameter given, device or container is:", value_from_argparser
+        parser.set(section, key, value_from_argparser)
 
-	if value_from_argparser == None:
-		print "[INFO] Setting", section, key, "to Parameter from Config File:", parser.get(section, key)
+    if value_from_argparser == None:
+        print "[INFO] Setting", section, key, "to Parameter from Config File:", parser.get(section, key)
 
 
 def download_application(progname, url):
-	print "[INFO] Downloading", progname
-	
-	try:
-		# This Line works. if we need to deal more with the filename, i consider 
-		# using  >>> os.path.basename('http://sub.domain.com/filename.zip') 'filename.zip'
-		returnobject = urllib.urlretrieve(url, filename=tempdir+"/"+url.split('/')[-1].split('#')[0].split('?')[0])
-	except:
-		print "[ERROR] Could not download", progname
-		return None
+    print "[INFO] Downloading", progname
+    
+    try:
+        # This Line works. if we need to deal more with the filename, i consider 
+        # using  >>> os.path.basename('http://sub.domain.com/filename.zip') 'filename.zip'
+        
+        # why dont we save to /tmpdir/progname ??? this seems saver to me! procname can be
+        # thunderbird_linux or smthng. sure we loose the ending, but that's not important imo
+        
+        returnobject = urllib.urlretrieve(url, filename=tempdir+"/"+url.split('/')[-1].split('#')[0].split('?')[0])
+    except:
+        print "[ERROR] Could not download", progname
+        return None
 
 parser = argparse.ArgumentParser()
 parser = argparse.ArgumentParser(description='')
@@ -62,7 +88,20 @@ parser = SafeConfigParser()
 with codecs.open('config.ini', 'r', encoding='utf-8') as f:
     parser.readfp(f)
 
+##### PLATFORM SPECIFIC SHIT
+##http://docs.python.org/2/library/sys.html#sys.platform
+## another path to the truecrypt binary, also tc is NOT in the path
+if (sys.platform=="darwin"):
+    parser.set('truecrypting','tc_binary',parser.get('truecrypting','tc_mac_binary'))
+elif (sys.platform=="win32"):
+    print """parabirdy does'nt run on windows. by us a windows license (and some gifts)
+or reboot in linux. virtualisation might also work"""
+    exit()
+
+
+
 # Removed, because there is no verbosity support, could be reimplemented later.
+# see the logging module for built in verbosity support
 #if args.verbose:
 #   print "verbosity turned on"
 
@@ -73,51 +112,66 @@ print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 print "[INFO] Checking all Dependencies..."
 
 try:
-	dependency_check(["truecrypt", "--text", "--version"])
-	dependency_check("7z")
+    dependency_check([parser.get('truecrypting', 'tc_binary'), "--text", "--version"])
+    dependency_check("7z")
 except: 
-	print "[ERROR] Dependency Checks failed large scale, exiting..."
-	from sys import exit
-	exit()
+    print "[ERROR] Dependency Checks failed large scale, exiting..."
+    from sys import exit
+    exit()
+
+
+
 
 print "[INFO] Configuring..."
 
 # Setting Parameters given from argparse
 
 try:
-	update_config("DEFAULT", "device", args.device)
-#	update_config("thunderbird", "version", args.thunder)
-#	update_config("torbirdy", "version", args.torbirdy)
-#	update_config("enigmail", "version", args.enigmail)
-#	update_config("vidalia", "version", args.vidalia)
-	update_config("DEFAULT", "container_name", args.container_name)
+    update_config("DEFAULT", "device", args.device)
+    #update_config("thunderbird", "version", args.thunder)
+    #update_config("torbirdy", "version", args.torbirdy)
+    #update_config("enigmail", "version", args.enigmail)
+    #update_config("vidalia", "version", args.vidalia)
+    update_config("DEFAULT", "container_name", args.container_name)
 
 except NameError: 
-	print "[ERROR] Hier ist was ganz arg schiefgelaufen"
+    print "[ERROR] Hier ist was ganz arg schiefgelaufen"
 
 # Setting Path Parameters given by tempfile
 
-mountpoint = tempfile.mkdtemp()
-tempdir = tempfile.mkdtemp()
-tc_mountpoint = tempfile.mkdtemp()
+
+tempdir = os.path.realpath(tempfile.mkdtemp())
+tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
+
+
+print "%" * 30, "\nMounting and Truecrypting\n", "%" * 30
+
+stick = detect_stick()
+print stick
+#if we can write to the mountpoint of the stick, no need to re-mount it
+if (not(os.access(str(stick['mountpoint']), os.W_OK))): 
+    #aka we cant write or stick detection did not work
+    #question is: does it make sense to continue at this point?
+    #which scenarios are possible (except detection not working)
+    mountpoint = os.path.realpath(tempfile.mkdtemp())
+    print "Stick detection did not work, try to run with what you specified"
+    print "[INFO] Mounting USB Stick to", mountpoint
+
+    try:
+        subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
+    except:
+        print "[ERROR] Mounting", parser.get('DEFAULT', 'device'), "to", mountpoint, "failed"
+else:
+    parser.set('DEFAULT', "device", stick['device'])
+    mountpoint = stick['mountpoint']
 
 parser.set('truecrypting', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
 parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
 
-print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-print "Mounting and Truecrypting"
-print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-
-print "[INFO] Mounting USB Stick to", mountpoint
-
-try:
-	subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
-except:
-	print "[ERROR] Mounting", parser.get('DEFAULT', 'device'), "to", mountpoint, "failed"
 
 print "[INFO] Creating Container",  parser.get('truecrypting', 'container_name'), "on USB-Stick:", parser.get('DEFAULT', 'device')
-
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
+mainLogger.info('Truecrypting create: '+ parser.get('truecrypting', 'create'))
 
 print "[INFO] Mounting Truecrypt Container"
 
@@ -148,14 +202,21 @@ print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 
 print "[INFO] Unmounting Truecrypt Container"
 
+mainLogger.info('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
+
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
 print "[INFO] Unmounting USB-Stick"
 
 try:
-        subprocess.check_call(["umount", mountpoint])
+    subprocess.check_call(["umount", mountpoint])
 except:
+    
+    if (sys.platform=="darwin"):
+        print "please unmount your stick via the finder."
+    else:
         print "[Error] Unmounting", mountpoint, "failed"
+        
 
 
 #print "[INFO] Cleaning up Temporary Directories"
