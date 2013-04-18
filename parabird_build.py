@@ -38,28 +38,31 @@ mainLogger = logging.getLogger('main')
 mainLogger.info('Logfile: ' + logfile)
 
 def dependency_check(checked_app):
+# This function tests dependencies. All stdout is send to devnull
     try:
         FNULL = open(os.devnull, 'w')
         subprocess.check_call(checked_app, stdout=FNULL)
 
     except OSError:
-#        print "[ERROR] Missing Depedencies:", checked_app, "not installed, exiting..."
         mainLogger.error("[ERROR] Missing Depedencies:", checked_app,+"not installed, exiting...")
         from sys import exit
         exit()
 
 def update_config(section, key, value_from_argparser):
-        
+# This function checks if there is any parameter given, 
+# If there is a parameter given, it updates the config 
+# if not it uses default values from config.ini
     if value_from_argparser:
         mainLogger.info('Parameter given, device or container is: ' + value_from_argparser)
         parser.set(section, key, value_from_argparser)
 
     if value_from_argparser == None:
-        #print "[INFO] Setting", section, key, "to Parameter from Config File:", parser.get(section, key)                
         mainLogger.info("Taking %s %s from Config: %s" % (section, key, parser.get(section, key) ))
 
 
 def download_application(progname, url):
+# This function tries to downloads all the programs we 
+# want to install. 
     print "[INFO] Downloading", progname
     
     try:
@@ -74,6 +77,7 @@ def download_application(progname, url):
         mainLogger.error("[ERROR] Could not download", progname)
         return None
 
+# Parsing Arguments given as Parameter from Shell
 parser = argparse.ArgumentParser()
 parser = argparse.ArgumentParser(description='')
 parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
@@ -86,23 +90,22 @@ parser.add_argument("-n", "--container_name", help="Specify Container Name")
 
 args = parser.parse_args()
 
+# Importing Config File: config.ini
 from ConfigParser import SafeConfigParser
-
 parser = SafeConfigParser()
 with codecs.open('config.ini', 'r', encoding='utf-8') as f:
     parser.readfp(f)
 
-##### PLATFORM SPECIFIC SHIT
-##http://docs.python.org/2/library/sys.html#sys.platform
-## another path to the truecrypt binary, also tc is NOT in the path
+# PLATFORM SPECIFIC SHIT
+# http://docs.python.org/2/library/sys.html#sys.platform
+# There exists another path to the truecrypt binary, also tc 
+# is NOT in the path. We don't support Win32.
 if (sys.platform=="darwin"):
     parser.set('truecrypting','tc_binary',parser.get('truecrypting','tc_mac_binary'))
 elif (sys.platform=="win32"):
     print """parabirdy does'nt run on windows. by us a windows license (and some gifts)
 or reboot in linux. virtualisation might also work"""
     exit()
-
-
 
 # Removed, because there is no verbosity support, could be reimplemented later.
 # see the logging module for built in verbosity support
@@ -112,7 +115,6 @@ or reboot in linux. virtualisation might also work"""
 print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 print "Checking Dependencies and Configure"
 print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-
 
 mainLogger.info("[INFO] Checking all Dependencies...")
 
@@ -140,15 +142,16 @@ try:
 
 except NameError: 
     mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
+
+
 # Setting Path Parameters given by tempfile
-
-
 tempdir = os.path.realpath(tempfile.mkdtemp())
 tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
 
 
 print "%" * 30, "\nMounting and Truecrypting\n", "%" * 30
 
+# Use an USB-Stick given by a Parameter or a detected one:
 if args.device:
     try:
         mountpoint = os.path.realpath(tempfile.mkdtemp())
@@ -177,29 +180,28 @@ else:
         parser.set('DEFAULT', "device", stick['device'])
         mountpoint = stick['mountpoint']
 
+# Setting the Path for Truecrypt
 parser.set('truecrypting', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
 parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
 
 #Multiple Variables like this, because the logger only takes 1 argument:
-#print "[INFO] Creating Container",  parser.get('truecrypting', 'container_name'), "on USB-Stick:", parser.get('DEFAULT', 'device')
 mainLogger.info("[INFO] Creating Container" + parser.get('truecrypting', 'container_name') + "on USB-Stick: " + parser.get('DEFAULT', 'device'))
 
+# Exit if the container already exists
 if os.path.exists(parser.get('truecrypting', 'container_path')):
     print "The Container given ("+ parser.get('truecrypting', 'container_path')+") already exists. Exiting..."
     exit()
 
-subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
+# Create Container
 mainLogger.info('Truecrypting create: '+ parser.get('truecrypting', 'create'))
+subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
 
+# Mount Container
 mainLogger.info("[INFO] Mounting Truecrypt Container")
-
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 
-
-#print "[INFO] Creating Folders in Truecrypt Container"
-
+# Create Folders
 mainLogger.info("[INFO] Creating Folders in Truecrypt Container:")
-print parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/thunderbird/"
 
 try:
     os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/thunderbird/")
@@ -213,7 +215,9 @@ try:
 	
 except OSError:
     mainLogger.error("[ERROR] Folder already exists")
-	
+
+
+# Download Applications	
 #print "[INFO] Starting to download Applications to:", tempdir
 
 #download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
@@ -230,17 +234,15 @@ except OSError:
 #print "[INFO] Extracting Thunderbird [Mac OS]"
 #print "[INFO] Configure Extensions and Profile Folder"
 
-print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-#print "Unmounting Truecrypt and Stick"
-print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 
+# Unmounting Truecrypt
 mainLogger.info("[INFO] Unmounting Truecrypt Container")
-
 mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
 
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
-#print "[INFO] Unmounting USB-Stick"
+# Unmounting USB-Stick
+#mainLogger.info("[INFO] Unmounting USB-Stick")
 
 #try:
 #    subprocess.check_call(["umount", mountpoint])
@@ -252,7 +254,7 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
  #       print "[Error] Unmounting", mountpoint, "failed"
         
 
-
+# Removing Temporary folders
 print "[INFO] Cleaning up Temporary Directories"
 
 try:
