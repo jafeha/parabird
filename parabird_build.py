@@ -44,7 +44,7 @@ def dependency_check(checked_app):
 
     except OSError:
 #        print "[ERROR] Missing Depedencies:", checked_app, "not installed, exiting..."
-        mainLogger.error("[ERROR] Missing Depedencies:", checked_app, "not installed, exiting...")
+        mainLogger.error("[ERROR] Missing Depedencies:", checked_app,+"not installed, exiting...")
         from sys import exit
         exit()
 
@@ -71,7 +71,7 @@ def download_application(progname, url):
         
         returnobject = urllib.urlretrieve(url, filename=tempdir+"/"+url.split('/')[-1].split('#')[0].split('?')[0])
     except:
-        print "[ERROR] Could not download", progname
+        mainLogger.error("[ERROR] Could not download", progname)
         return None
 
 parser = argparse.ArgumentParser()
@@ -120,7 +120,7 @@ try:
     dependency_check([parser.get('truecrypting', 'tc_binary'), "--text", "--version"])
     dependency_check("7z")
 except: 
-    print "[ERROR] Dependency Checks failed large scale, exiting..."
+    mainLogger.error("[ERROR] Dependency Checks failed large scale, exiting...")
     from sys import exit
     exit()
 
@@ -139,8 +139,7 @@ try:
     update_config("DEFAULT", "container_name", args.container_name)
 
 except NameError: 
-    print "[ERROR] Hier ist was ganz arg schiefgelaufen"
-
+    mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
 # Setting Path Parameters given by tempfile
 
 
@@ -156,7 +155,7 @@ if args.device:
 		update_config("DEFAULT", "device", args.device)
 	
 	except NameError:
-    		print "[ERROR] Hier ist was ganz arg schiefgelaufen"	
+    		mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
 else: 
 
 	stick = detect_stick()
@@ -174,7 +173,7 @@ else:
 	    try:
 	        subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
 	    except:
-	        print "[ERROR] Mounting", parser.get('DEFAULT', 'device'), "to", mountpoint, "failed"
+	        mainLogger.error("[ERROR] Mounting", + parser.get('DEFAULT', 'device'), + "to", mountpoint, + "failed")
 	else:
 	    parser.set('DEFAULT', "device", stick['device'])
 	    mountpoint = stick['mountpoint']
@@ -186,6 +185,10 @@ parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
 #print "[INFO] Creating Container",  parser.get('truecrypting', 'container_name'), "on USB-Stick:", parser.get('DEFAULT', 'device')
 mainLogger.info("[INFO] Creating Container" + parser.get('truecrypting', 'container_name') + "on USB-Stick: " + parser.get('DEFAULT', 'device'))
 
+if os.path.exists(parser.get('truecrypting', 'container_path')):
+	print "The Container given ("+ parser.get('truecrypting', 'container_path')+") already exists. Exiting..."
+	exit()
+
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
 mainLogger.info('Truecrypting create: '+ parser.get('truecrypting', 'create'))
 
@@ -196,11 +199,21 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 
 #print "[INFO] Creating Folders in Truecrypt Container"
 
-mainLogger.info("[INFO] Creating Folders in Truecrypt Container")
+mainLogger.info("[INFO] Creating Folders in Truecrypt Container:")
+print parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/thunderbird/"
+
 try:
-	os.makedirs(parser.get('truecrypting', 'container_path')+"/apps/linux/thunderbird/")
+	os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/thunderbird/")
+	os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/vidalia/")
+
+	os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/win/thunderbird/")
+	os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/win/vidalia/")
+
+	os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/mac/thunderbird/")
+	os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/mac/vidalia/")
+	
 except OSError:
-	print "[ERROR] Folder already exists"
+	mainLogger.error("[ERROR] Folder already exists")
 	
 #print "[INFO] Starting to download Applications to:", tempdir
 
@@ -243,9 +256,9 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
 print "[INFO] Cleaning up Temporary Directories"
 
-# Removed for debugging purposes, should be reenabled in release:
 try:
-	os.removedirs(mountpoint)
+	if args.device:
+		os.removedirs(mountpoint)
 	os.removedirs(tempdir)
 	os.removedirs(tc_mountpoint)
 except OSError:
