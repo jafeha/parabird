@@ -10,7 +10,7 @@ Requirements:
 * USB-Stick with at least 4GB free space
 * Internet Connection
 * Linux based Host
-
+* Depending on your Host you might need adminstrator priviledges for un/mounting the tc container
 There are some Depedencies:
 
 * Python >= Python2.7
