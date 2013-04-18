@@ -150,33 +150,32 @@ tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
 print "%" * 30, "\nMounting and Truecrypting\n", "%" * 30
 
 if args.device:
-	try:
-	    	mountpoint = os.path.realpath(tempfile.mkdtemp())
-		update_config("DEFAULT", "device", args.device)
+    try:
+        mountpoint = os.path.realpath(tempfile.mkdtemp())
+        update_config("DEFAULT", "device", args.device)
 	
-	except NameError:
-    		mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
+    except NameError:
+        mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
 else: 
+    stick = detect_stick()
+    #print stick
 
-	stick = detect_stick()
-	#print stick
+    #if we can write to the mountpoint of the stick, no need to re-mount it
+    if (not(os.access(str(stick['mountpoint']), os.W_OK))): 
+        #aka we cant write or stick detection did not work
+        #question is: does it make sense to continue at this point?
+        #which scenarios are possible (except detection not working)
+        mountpoint = os.path.realpath(tempfile.mkdtemp())
+        print "Stick detection did not work, try to run with what you specified"
+        print "[INFO] Mounting USB Stick to", mountpoint
 
-	#if we can write to the mountpoint of the stick, no need to re-mount it
-	if (not(os.access(str(stick['mountpoint']), os.W_OK))): 
-	    #aka we cant write or stick detection did not work
-	    #question is: does it make sense to continue at this point?
-	    #which scenarios are possible (except detection not working)
-	    mountpoint = os.path.realpath(tempfile.mkdtemp())
-	    print "Stick detection did not work, try to run with what you specified"
-	    print "[INFO] Mounting USB Stick to", mountpoint
-
-	    try:
-	        subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
-	    except:
-	        mainLogger.error("[ERROR] Mounting", + parser.get('DEFAULT', 'device'), + "to", mountpoint, + "failed")
-	else:
-	    parser.set('DEFAULT', "device", stick['device'])
-	    mountpoint = stick['mountpoint']
+        try:
+            subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
+        except:
+            mainLogger.error("[ERROR] Mounting", + parser.get('DEFAULT', 'device'), + "to", mountpoint, + "failed")
+    else:
+        parser.set('DEFAULT', "device", stick['device'])
+        mountpoint = stick['mountpoint']
 
 parser.set('truecrypting', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
 parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
@@ -186,8 +185,8 @@ parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
 mainLogger.info("[INFO] Creating Container" + parser.get('truecrypting', 'container_name') + "on USB-Stick: " + parser.get('DEFAULT', 'device'))
 
 if os.path.exists(parser.get('truecrypting', 'container_path')):
-	print "The Container given ("+ parser.get('truecrypting', 'container_path')+") already exists. Exiting..."
-	exit()
+    print "The Container given ("+ parser.get('truecrypting', 'container_path')+") already exists. Exiting..."
+    exit()
 
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
 mainLogger.info('Truecrypting create: '+ parser.get('truecrypting', 'create'))
@@ -203,17 +202,17 @@ mainLogger.info("[INFO] Creating Folders in Truecrypt Container:")
 print parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/thunderbird/"
 
 try:
-	os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/thunderbird/")
-	os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/vidalia/")
+    os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/thunderbird/")
+    os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/vidalia/")
 
-	os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/win/thunderbird/")
-	os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/win/vidalia/")
+    os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/win/thunderbird/")
+    os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/win/vidalia/")
 
-	os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/mac/thunderbird/")
-	os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/mac/vidalia/")
+    os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/mac/thunderbird/")
+    os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/mac/vidalia/")
 	
 except OSError:
-	mainLogger.error("[ERROR] Folder already exists")
+    mainLogger.error("[ERROR] Folder already exists")
 	
 #print "[INFO] Starting to download Applications to:", tempdir
 
@@ -257,9 +256,9 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 print "[INFO] Cleaning up Temporary Directories"
 
 try:
-	if args.device:
-		os.removedirs(mountpoint)
-	os.removedirs(tempdir)
-	os.removedirs(tc_mountpoint)
+    if args.device:
+        os.removedirs(mountpoint)
+    os.removedirs(tempdir)
+    os.removedirs(tc_mountpoint)
 except OSError:
-	print "Some temporary Directories could not be removed"
+    print "Some temporary Directories could not be removed"
