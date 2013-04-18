@@ -43,7 +43,8 @@ def dependency_check(checked_app):
         subprocess.check_call(checked_app, stdout=FNULL)
 
     except OSError:
-        print "[ERROR] Missing Depedencies:", checked_app, "not installed, exiting..."
+#        print "[ERROR] Missing Depedencies:", checked_app, "not installed, exiting..."
+        mainLogger.error("[ERROR] Missing Depedencies:", checked_app, "not installed, exiting...")
         from sys import exit
         exit()
 
@@ -149,25 +150,34 @@ tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
 
 print "%" * 30, "\nMounting and Truecrypting\n", "%" * 30
 
-stick = detect_stick()
-#print stick
+if args.device:
+	try:
+	    	mountpoint = os.path.realpath(tempfile.mkdtemp())
+		update_config("DEFAULT", "device", args.device)
+	
+	except NameError:
+    		print "[ERROR] Hier ist was ganz arg schiefgelaufen"	
+else: 
 
-#if we can write to the mountpoint of the stick, no need to re-mount it
-if (not(os.access(str(stick['mountpoint']), os.W_OK))): 
-    #aka we cant write or stick detection did not work
-    #question is: does it make sense to continue at this point?
-    #which scenarios are possible (except detection not working)
-    mountpoint = os.path.realpath(tempfile.mkdtemp())
-    print "Stick detection did not work, try to run with what you specified"
-    print "[INFO] Mounting USB Stick to", mountpoint
+	stick = detect_stick()
+	#print stick
 
-    try:
-        subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
-    except:
-        print "[ERROR] Mounting", parser.get('DEFAULT', 'device'), "to", mountpoint, "failed"
-else:
-    parser.set('DEFAULT', "device", stick['device'])
-    mountpoint = stick['mountpoint']
+	#if we can write to the mountpoint of the stick, no need to re-mount it
+	if (not(os.access(str(stick['mountpoint']), os.W_OK))): 
+	    #aka we cant write or stick detection did not work
+	    #question is: does it make sense to continue at this point?
+	    #which scenarios are possible (except detection not working)
+	    mountpoint = os.path.realpath(tempfile.mkdtemp())
+	    print "Stick detection did not work, try to run with what you specified"
+	    print "[INFO] Mounting USB Stick to", mountpoint
+
+	    try:
+	        subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
+	    except:
+	        print "[ERROR] Mounting", parser.get('DEFAULT', 'device'), "to", mountpoint, "failed"
+	else:
+	    parser.set('DEFAULT', "device", stick['device'])
+	    mountpoint = stick['mountpoint']
 
 parser.set('truecrypting', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
 parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
@@ -186,9 +196,15 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 
 #print "[INFO] Creating Folders in Truecrypt Container"
 
+mainLogger.info("[INFO] Creating Folders in Truecrypt Container")
+try:
+	os.makedirs(parser.get('truecrypting', 'container_path')+"/apps/linux/thunderbird/")
+except OSError:
+	print "[ERROR] Folder already exists"
+	
 #print "[INFO] Starting to download Applications to:", tempdir
 
-download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
+#download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
 #download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows_url'))
 #download_application("Thunderbird [Mac OS]", parser.get('thunderbird', 'mac_url'))
 #download_application("Torbirdy", parser.get('torbirdy', 'url'))
@@ -203,7 +219,7 @@ download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url
 #print "[INFO] Configure Extensions and Profile Folder"
 
 print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-print "Unmounting Truecrypt and Stick"
+#print "Unmounting Truecrypt and Stick"
 print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
 
 mainLogger.info("[INFO] Unmounting Truecrypt Container")
@@ -212,22 +228,25 @@ mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
 
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
-print "[INFO] Unmounting USB-Stick"
+#print "[INFO] Unmounting USB-Stick"
 
-try:
-    subprocess.check_call(["umount", mountpoint])
-except:
+#try:
+#    subprocess.check_call(["umount", mountpoint])
+#except:
     
-    if (sys.platform=="darwin"):
-        mainLogger.info("[INFO] please unmount your stick via the finder.")
-    else:
-        print "[Error] Unmounting", mountpoint, "failed"
+#    if (sys.platform=="darwin"):
+ #       mainLogger.info("[INFO] please unmount your stick via the finder.")
+ #   else:
+ #       print "[Error] Unmounting", mountpoint, "failed"
         
 
 
-#print "[INFO] Cleaning up Temporary Directories"
+print "[INFO] Cleaning up Temporary Directories"
 
 # Removed for debugging purposes, should be reenabled in release:
-#os.removedirs(mountpoint)
-#os.removedirs(tempdir)
-#os.removedirs(tc_mountpoint)
+try:
+	os.removedirs(mountpoint)
+	os.removedirs(tempdir)
+	os.removedirs(tc_mountpoint)
+except OSError:
+	print "Some temporary Directories could not be removed"
