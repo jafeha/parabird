@@ -208,14 +208,13 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 mainLogger.info("[INFO] Creating Folders in Truecrypt Container:")
 
 try:
-    os.makedirs(parser.get('DEFAULT', 'tc_mountpoint')+"/apps/linux/thunderbird/")
-    os.makedirs(parser.get('DEFAULT', 'tc_mountpoint')+"/apps/linux/vidalia/")
+    os.makedirs(parser.get('thunderbird_linux', 'path'))
+    os.makedirs(parser.get('vidalia_linux', 'path'))
 
-    os.makedirs(parser.get('DEFAULT', 'tc_mountpoint')+"/apps/win/thunderbird/")
-    os.makedirs(parser.get('DEFAULT', 'tc_mountpoint')+"/apps/win/vidalia/")
+    os.makedirs(parser.get('thunderbird_windows', 'path'))
+    os.makedirs(parser.get('vidalia_windows', 'path'))
 
-    os.makedirs(parser.get('DEFAULT', 'tc_mountpoint')+"/apps/mac/thunderbird/")
-#    os.makedirs(parser.get('DEFAULT', 'tc_mountpoint')+"/apps/mac/vidalia/")
+    os.makedirs(parser.get('thunderbird_mac', 'path'))
     os.makedirs(parser.get('vidalia_mac', 'path'))
 	
 except OSError:
@@ -227,16 +226,17 @@ mainLogger.info('[INFO] Starting to download Applications to: ' + tempdir)
 
 download_application("Thunderbird [Linux]", parser.get('thunderbird_linux', 'url'))
 download_application("Thunderbird [Windows]", parser.get('thunderbird_windows', 'url'))
-#download_application("Thunderbird [Mac OS]", parser.get('thunderbird_mac', 'url'))
-#download_application("Torbirdy", parser.get('torbirdy', 'url'))
-#download_application("Enigmail", parser.get('enigmail', 'url'))
-#download_application("Vidalia [Linux]", parser.get('vidalia_linux', 'url'))
-#download_application("Vidalia [Windows]", parser.get('vidalia_windows', 'url'))
-#download_application("Vidalia [Mac OS]", parser.get('vidalia_mac', 'url'))
+download_application("Thunderbird [Mac OS]", parser.get('thunderbird_mac', 'url'))
+download_application("Torbirdy", parser.get('torbirdy', 'url'))
+download_application("Enigmail", parser.get('enigmail', 'url'))
+download_application("Vidalia [Linux]", parser.get('vidalia_linux', 'url'))
+download_application("Vidalia [Windows]", parser.get('vidalia_windows', 'url'))
+download_application("Vidalia [Mac OS]", parser.get('vidalia_mac', 'url'))
 
 mainLogger.info("[INFO] Extracting Thunderbird [Linux]")
 try:
-    extract_files(tempdir+"/"+"thunderbird-17.0.5.tar.bz2", parser.get('DEFAULT', 'tc_mountpoint')+"/apps/linux/")
+#    extract_files(tempdir+"/"+"thunderbird-17.0.5.tar.bz2", parser.get('DEFAULT', 'tc_mountpoint')+"/apps/linux/")
+    extract_files(tempdir+"/"+parser.get('thunderbird_linux', 'file'), parser.get('thunderbird_linux', 'path'))
 except:
     mainLogger.error("[ERROR] Could not extract Thunderbird [Linux]")
 
