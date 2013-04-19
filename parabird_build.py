@@ -11,6 +11,7 @@ import tempfile
 import shlex
 import shutil
 import tarfile
+import zipfile
 from utils import detect_stick
 import logging
 
@@ -76,6 +77,30 @@ def download_application(progname, url):
     except:
         mainLogger.error("[ERROR] Could not download", progname)
         return None
+
+def extract_file(filename, destination):
+# This function is used to extract the downloaded achives. 
+# http://code.activestate.com/recipes/576714-extract-a-compressed-file/
+    if filename.endswith('.zip'):
+        opener, mode = zipfile.ZipFile, 'r'
+    elif filename.endswith('.tar.gz') or filename.endswith('.tgz'):
+        opener, mode = tarfile.open, 'r:gz'
+    elif filename.endswith('.tar.bz2') or filename.endswith('.tbz'):
+        opener, mode = tarfile.open, 'r:bz2'
+    else: 
+        raise ValueError, "Could not extract `%s` as no appropriate extractor is found for" % filename
+
+    cwd = os.getcwd()
+    os.chdir(destination)
+    
+    try:
+        file = opener(filename, mode)
+        try: file.extractall()
+        finally: file.close()
+    finally:
+        os.chdir(cwd)
+
+
 
 # Parsing Arguments given as Parameter from Shell
 parser = argparse.ArgumentParser()
@@ -218,9 +243,9 @@ except OSError:
 
 
 # Download Applications	
-#print "[INFO] Starting to download Applications to:", tempdir
+print "[INFO] Starting to download Applications to:", tempdir
 
-#download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
+download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
 #download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows_url'))
 #download_application("Thunderbird [Mac OS]", parser.get('thunderbird', 'mac_url'))
 #download_application("Torbirdy", parser.get('torbirdy', 'url'))
@@ -229,7 +254,16 @@ except OSError:
 #download_application("Vidalia [Windows]", parser.get('vidalia', 'windows_url'))
 #download_application("Vidalia [Mac OS]", parser.get('vidalia', 'mac_url'))
 
-#print "[INFO] Extracting Thunderbird [Linux]"
+print "[INFO] Extracting Thunderbird [Linux]"
+#try:
+#extract_file(tempdir+"/"+"thunderbird-17.0.5.tar.bz2", "/tmp/lala")
+
+# This works for me for simple extracting within the current directory (./)
+tar = tarfile.open(tempdir+"/"+"thunderbird-17.0.5.tar.bz2")
+tar.extractall()
+tar.close()
+#except:
+#	print "FEEEEHLER!!!!"
 #print "[INFO] Extracting Thunderbird [Windows]"
 #print "[INFO] Extracting Thunderbird [Mac OS]"
 #print "[INFO] Configure Extensions and Profile Folder"
