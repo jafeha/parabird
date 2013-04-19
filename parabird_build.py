@@ -60,19 +60,13 @@ def update_config(section, key, value_from_argparser):
     if value_from_argparser == None:
         mainLogger.info("Taking %s %s from Config: %s" % (section, key, parser.get(section, key) ))
 
-def download_application(progname, url):
+def download_application(progname, url, filename):
 # This function tries to downloads all the programs we 
 # want to install. 
     mainLogger.info('[INFO] Downloading: ' + progname)
     
     try:
-        # This Line works. if we need to deal more with the filename, i consider 
-        # using  >>> os.path.basename('http://sub.domain.com/filename.zip') 'filename.zip'
-        
-        # why dont we save to /tmpdir/progname ??? this seems saver to me! procname can be
-        # thunderbird_linux or smthng. sure we loose the ending, but that's not important imo
-        
-        returnobject = urllib.urlretrieve(url, filename=tempdir+"/"+url.split('/')[-1].split('#')[0].split('?')[0])
+        returnobject = urllib.urlretrieve(url, filename=tempdir+"/"+filename)
     except:
         mainLogger.error("[ERROR] Could not download", progname)
         return None
@@ -151,7 +145,6 @@ except NameError:
 # Setting Path Parameters given by tempfile
 tempdir = os.path.realpath(tempfile.mkdtemp())
 tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
-#tc_mountpoint = "/tmp/tc_mountpoint"
 
 print "%" * 30, "\nMounting and Truecrypting\n", "%" * 30
 
@@ -224,7 +217,7 @@ except OSError:
 # Download Applications	
 mainLogger.info('[INFO] Starting to download Applications to: ' + tempdir)
 
-download_application("Thunderbird [Linux]", parser.get('thunderbird_linux', 'url'))
+download_application("Thunderbird [Linux]", parser.get('thunderbird_linux', 'url'), parser.get('thunderbird_linux', 'file'))
 download_application("Thunderbird [Windows]", parser.get('thunderbird_windows', 'url'))
 download_application("Thunderbird [Mac OS]", parser.get('thunderbird_mac', 'url'))
 download_application("Torbirdy", parser.get('torbirdy', 'url'))
@@ -235,46 +228,42 @@ download_application("Vidalia [Mac OS]", parser.get('vidalia_mac', 'url'))
 
 mainLogger.info("[INFO] Extracting Thunderbird [Linux]")
 try:
-#    extract_files(tempdir+"/"+"thunderbird-17.0.5.tar.bz2", parser.get('DEFAULT', 'tc_mountpoint')+"/apps/linux/")
     extract_files(tempdir+"/"+parser.get('thunderbird_linux', 'file'), parser.get('thunderbird_linux', 'path'))
 except:
     mainLogger.error("[ERROR] Could not extract Thunderbird [Linux]")
 
 mainLogger.info("[INFO] Extracting Thunderbird [Windows]")
 
-#subprocess.check_call(shlex.split(parser.get('extracting', 'extract')))
-
-
-
 #mainLogger.info("[INFO] Extracting Thunderbird [Mac OS]")
 #mainLogger.info("[INFO] Configure Extensions and Profile Folder")
 
 
 # Unmounting Truecrypt
-#mainLogger.info("[INFO] Unmounting Truecrypt Container")
-#mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
-#subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
+mainLogger.info("[INFO] Unmounting Truecrypt Container")
+mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
+subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
 # Unmounting USB-Stick
-#mainLogger.info("[INFO] Unmounting USB-Stick")
+mainLogger.info("[INFO] Unmounting USB-Stick")
 
-#try:
-#    subprocess.check_call(["umount", mountpoint])
-#except:
+try:
+    subprocess.check_call(["umount", mountpoint])
+
+except:
     
-#    if (sys.platform=="darwin"):
- #       mainLogger.info("[INFO] please unmount your stick via the finder.")
- #   else:
- #       mainLogger.error("[Error] Unmounting", + mountpoint, + "failed")
+    if (sys.platform=="darwin"):
+       mainLogger.info("[INFO] please unmount your stick via the finder.")
+    else:
+        mainLogger.error("[Error] Unmounting", + mountpoint, + "failed")
         
 
 # Removing Temporary folders
-#mainLogger.info("[INFO] Cleaning up Temporary Directories")
+mainLogger.info("[INFO] Cleaning up Temporary Directories")
 
-#try:
-#    if args.device:
-#        os.removedirs(mountpoint)
-#    os.removedirs(tempdir)
-#    os.removedirs(tc_mountpoint)
-#except OSError:
-#    mainLogger.error("Some temporary Directories could not be removed")
+try:
+    if args.device:
+        os.removedirs(mountpoint)
+    os.removedirs(tempdir)
+    os.removedirs(tc_mountpoint)
+except OSError:
+    mainLogger.error("Some temporary Directories could not be removed")
