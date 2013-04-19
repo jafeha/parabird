@@ -185,15 +185,15 @@ else:
         mountpoint = stick['mountpoint']
 
 # Setting the Path for Truecrypt
-parser.set('truecrypting', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
-parser.set('truecrypting', 'tc_mountpoint', tc_mountpoint)
+parser.set('DEFAULT', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
+parser.set('DEFAULT', 'tc_mountpoint', tc_mountpoint)
 
 #Multiple Variables like this, because the logger only takes 1 argument:
-mainLogger.info("[INFO] Creating Container" + parser.get('truecrypting', 'container_name') + "on USB-Stick: " + parser.get('DEFAULT', 'device'))
+mainLogger.info("[INFO] Creating Container " + parser.get('DEFAULT', 'container_name') + " on USB-Stick: " + parser.get('DEFAULT', 'device'))
 
 # Exit if the container already exists
-if os.path.exists(parser.get('truecrypting', 'container_path')):
-    mainLogger.info("The Container given ("+ parser.get('truecrypting', 'container_path')+") already exists. Exiting...")
+if os.path.exists(parser.get('DEFAULT', 'container_path')):
+    mainLogger.info("The Container given ("+ parser.get('DEFAULT', 'container_path')+") already exists. Exiting...")
     exit()
 
 # Create Container
@@ -208,14 +208,15 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 mainLogger.info("[INFO] Creating Folders in Truecrypt Container:")
 
 try:
-    os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/thunderbird/")
-    os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/vidalia/")
+    os.makedirs(parser.get('DEFAULT', 'tc_mountpoint')+"/apps/linux/thunderbird/")
+    os.makedirs(parser.get('DEFAULT', 'tc_mountpoint')+"/apps/linux/vidalia/")
 
-    os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/win/thunderbird/")
-    os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/win/vidalia/")
+    os.makedirs(parser.get('DEFAULT', 'tc_mountpoint')+"/apps/win/thunderbird/")
+    os.makedirs(parser.get('DEFAULT', 'tc_mountpoint')+"/apps/win/vidalia/")
 
-    os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/mac/thunderbird/")
-    os.makedirs(parser.get('truecrypting', 'tc_mountpoint')+"/apps/mac/vidalia/")
+    os.makedirs(parser.get('DEFAULT', 'tc_mountpoint')+"/apps/mac/thunderbird/")
+#    os.makedirs(parser.get('DEFAULT', 'tc_mountpoint')+"/apps/mac/vidalia/")
+    os.makedirs(parser.get('vidalia_mac', 'path'))
 	
 except OSError:
     mainLogger.error("[ERROR] Folder already exists")
@@ -224,18 +225,18 @@ except OSError:
 # Download Applications	
 mainLogger.info('[INFO] Starting to download Applications to: ' + tempdir)
 
-download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
-download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows_url'))
-#download_application("Thunderbird [Mac OS]", parser.get('thunderbird', 'mac_url'))
+download_application("Thunderbird [Linux]", parser.get('thunderbird_linux', 'url'))
+download_application("Thunderbird [Windows]", parser.get('thunderbird_windows', 'url'))
+#download_application("Thunderbird [Mac OS]", parser.get('thunderbird_mac', 'url'))
 #download_application("Torbirdy", parser.get('torbirdy', 'url'))
 #download_application("Enigmail", parser.get('enigmail', 'url'))
-#download_application("Vidalia [Linux]", parser.get('vidalia', 'linux_url'))
-#download_application("Vidalia [Windows]", parser.get('vidalia', 'windows_url'))
-#download_application("Vidalia [Mac OS]", parser.get('vidalia', 'mac_url'))
+#download_application("Vidalia [Linux]", parser.get('vidalia_linux', 'url'))
+#download_application("Vidalia [Windows]", parser.get('vidalia_windows', 'url'))
+#download_application("Vidalia [Mac OS]", parser.get('vidalia_mac', 'url'))
 
 mainLogger.info("[INFO] Extracting Thunderbird [Linux]")
 try:
-    extract_files(tempdir+"/"+"thunderbird-17.0.5.tar.bz2", parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/")
+    extract_files(tempdir+"/"+"thunderbird-17.0.5.tar.bz2", parser.get('DEFAULT', 'tc_mountpoint')+"/apps/linux/")
 except:
     mainLogger.error("[ERROR] Could not extract Thunderbird [Linux]")
 
