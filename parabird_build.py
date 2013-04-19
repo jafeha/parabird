@@ -78,28 +78,11 @@ def download_application(progname, url):
         mainLogger.error("[ERROR] Could not download", progname)
         return None
 
-def extract_file(filename, destination):
-# This function is used to extract the downloaded achives. 
-# http://code.activestate.com/recipes/576714-extract-a-compressed-file/
-    if filename.endswith('.zip'):
-        opener, mode = zipfile.ZipFile, 'r'
-    elif filename.endswith('.tar.gz') or filename.endswith('.tgz'):
-        opener, mode = tarfile.open, 'r:gz'
-    elif filename.endswith('.tar.bz2') or filename.endswith('.tbz'):
-        opener, mode = tarfile.open, 'r:bz2'
-    else: 
-        raise ValueError, "Could not extract `%s` as no appropriate extractor is found for" % filename
-
-    cwd = os.getcwd()
-    os.chdir(destination)
-    
-    try:
-        file = opener(filename, mode)
-        try: file.extractall()
-        finally: file.close()
-    finally:
-        os.chdir(cwd)
-
+def extract_files(path, destination):
+# This function obviously extracts the file in path to destination
+	tar = tarfile.open(path)
+	tar.extractall(destination)
+	tar.close()
 
 
 # Parsing Arguments given as Parameter from Shell
@@ -246,7 +229,7 @@ except OSError:
 print "[INFO] Starting to download Applications to:", tempdir
 
 download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
-#download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows_url'))
+download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows_url'))
 #download_application("Thunderbird [Mac OS]", parser.get('thunderbird', 'mac_url'))
 #download_application("Torbirdy", parser.get('torbirdy', 'url'))
 #download_application("Enigmail", parser.get('enigmail', 'url'))
@@ -255,25 +238,25 @@ download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url
 #download_application("Vidalia [Mac OS]", parser.get('vidalia', 'mac_url'))
 
 print "[INFO] Extracting Thunderbird [Linux]"
-#try:
-#extract_file(tempdir+"/"+"thunderbird-17.0.5.tar.bz2", "/tmp/lala")
+try:
+    extract_files(tempdir+"/"+"thunderbird-17.0.5.tar.bz2", parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/")
+except:
+    mainLogger.error("[ERROR] Could not extract Thunderbird [Linux]")
 
-# This works for me for simple extracting within the current directory (./)
-tar = tarfile.open(tempdir+"/"+"thunderbird-17.0.5.tar.bz2")
-tar.extractall()
-tar.close()
-#except:
-#	print "FEEEEHLER!!!!"
-#print "[INFO] Extracting Thunderbird [Windows]"
+print "[INFO] Extracting Thunderbird [Windows]"
+
+#subprocess.check_call(shlex.split(parser.get('extracting', 'extract')))
+
+
+
 #print "[INFO] Extracting Thunderbird [Mac OS]"
 #print "[INFO] Configure Extensions and Profile Folder"
 
 
 # Unmounting Truecrypt
-mainLogger.info("[INFO] Unmounting Truecrypt Container")
-mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
-
-subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
+#mainLogger.info("[INFO] Unmounting Truecrypt Container")
+#mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
+#subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
 # Unmounting USB-Stick
 #mainLogger.info("[INFO] Unmounting USB-Stick")
@@ -289,12 +272,12 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
         
 
 # Removing Temporary folders
-print "[INFO] Cleaning up Temporary Directories"
+#print "[INFO] Cleaning up Temporary Directories"
 
-try:
-    if args.device:
-        os.removedirs(mountpoint)
-    os.removedirs(tempdir)
-    os.removedirs(tc_mountpoint)
-except OSError:
-    print "Some temporary Directories could not be removed"
+#try:
+#    if args.device:
+#        os.removedirs(mountpoint)
+#    os.removedirs(tempdir)
+#    os.removedirs(tc_mountpoint)
+#except OSError:
+#    print "Some temporary Directories could not be removed"
