@@ -45,8 +45,7 @@ def dependency_check(checked_app):
         subprocess.check_call(checked_app, stdout=FNULL)
 
     except OSError:
-        #mainLogger.error("[ERROR] Missing Depedencies:", checked_app,+"not installed, exiting...")
-        print "[ERROR] Missing Depedencies:", checked_app,+"not installed, exiting..."
+        mainLogger.error("[ERROR] Missing Depedencies:", checked_app,+"not installed, exiting...")
         from sys import exit
         exit()
 
@@ -64,8 +63,7 @@ def update_config(section, key, value_from_argparser):
 def download_application(progname, url):
 # This function tries to downloads all the programs we 
 # want to install. 
-    print '[INFO] Downloading: ' + progname
-    #main.Logger.info('[INFO] Downloading: ' + progname)
+    mainLogger.info('[INFO] Downloading: ' + progname)
     
     try:
         # This Line works. if we need to deal more with the filename, i consider 
@@ -76,8 +74,7 @@ def download_application(progname, url):
         
         returnobject = urllib.urlretrieve(url, filename=tempdir+"/"+url.split('/')[-1].split('#')[0].split('?')[0])
     except:
-#        mainLogger.error("[ERROR] Could not download", progname)
-        print "[ERROR] Could not download", progname
+        mainLogger.error("[ERROR] Could not download", progname)
         return None
 
 def extract_files(path, destination):
