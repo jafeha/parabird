@@ -218,13 +218,13 @@ except OSError:
 mainLogger.info('[INFO] Starting to download Applications to: ' + tempdir)
 
 download_application("Thunderbird [Linux]", parser.get('thunderbird_linux', 'url'), parser.get('thunderbird_linux', 'file'))
-#download_application("Thunderbird [Windows]", parser.get('thunderbird_windows', 'url'))
-#download_application("Thunderbird [Mac OS]", parser.get('thunderbird_mac', 'url'))
-#download_application("Torbirdy", parser.get('torbirdy', 'url'))
-#download_application("Enigmail", parser.get('enigmail', 'url'))
-#download_application("Vidalia [Linux]", parser.get('vidalia_linux', 'url'))
-#download_application("Vidalia [Windows]", parser.get('vidalia_windows', 'url'))
-#download_application("Vidalia [Mac OS]", parser.get('vidalia_mac', 'url'))
+download_application("Thunderbird [Windows]", parser.get('thunderbird_windows', 'url'), parser.get('thunderbird_windows', 'file'))
+download_application("Thunderbird [Mac OS]", parser.get('thunderbird_mac', 'url'), parser.get('thunderbird_mac', 'file'))
+download_application("Torbirdy", parser.get('torbirdy', 'url'), parser.get('torbirdy', 'file'))
+download_application("Enigmail", parser.get('enigmail', 'url'), parser.get('enigmail', 'file'))
+download_application("Vidalia [Linux]", parser.get('vidalia_linux', 'url'), parser.get('vidalia_linux', 'file'))
+download_application("Vidalia [Windows]", parser.get('vidalia_windows', 'url'), parser.get('vidalia_windows', 'file'))
+download_application("Vidalia [Mac OS]", parser.get('vidalia_mac', 'url'), parser.get('vidalia_mac', 'file'))
 
 mainLogger.info("[INFO] Extracting Thunderbird [Linux]")
 try:
