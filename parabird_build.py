@@ -45,7 +45,8 @@ def dependency_check(checked_app):
         subprocess.check_call(checked_app, stdout=FNULL)
 
     except OSError:
-        mainLogger.error("[ERROR] Missing Depedencies:", checked_app,+"not installed, exiting...")
+        #mainLogger.error("[ERROR] Missing Depedencies:", checked_app,+"not installed, exiting...")
+        print "[ERROR] Missing Depedencies:", checked_app,+"not installed, exiting..."
         from sys import exit
         exit()
 
@@ -60,11 +61,11 @@ def update_config(section, key, value_from_argparser):
     if value_from_argparser == None:
         mainLogger.info("Taking %s %s from Config: %s" % (section, key, parser.get(section, key) ))
 
-
 def download_application(progname, url):
 # This function tries to downloads all the programs we 
 # want to install. 
-    print "[INFO] Downloading", progname
+    print '[INFO] Downloading: ' + progname
+    #main.Logger.info('[INFO] Downloading: ' + progname)
     
     try:
         # This Line works. if we need to deal more with the filename, i consider 
@@ -75,7 +76,8 @@ def download_application(progname, url):
         
         returnobject = urllib.urlretrieve(url, filename=tempdir+"/"+url.split('/')[-1].split('#')[0].split('?')[0])
     except:
-        mainLogger.error("[ERROR] Could not download", progname)
+#        mainLogger.error("[ERROR] Could not download", progname)
+        print "[ERROR] Could not download", progname
         return None
 
 def extract_files(path, destination):
@@ -111,18 +113,15 @@ with codecs.open('config.ini', 'r', encoding='utf-8') as f:
 if (sys.platform=="darwin"):
     parser.set('truecrypting','tc_binary',parser.get('truecrypting','tc_mac_binary'))
 elif (sys.platform=="win32"):
-    print """parabirdy does'nt run on windows. by us a windows license (and some gifts)
-or reboot in linux. virtualisation might also work"""
+    mainLogger.error("parabirdy does'nt run on windows. by us a windows license (and some gifts) or reboot in linux. virtualisation might also work")
     exit()
 
 # Removed, because there is no verbosity support, could be reimplemented later.
 # see the logging module for built in verbosity support
 #if args.verbose:
-#   print "verbosity turned on"
+#   mainLogger.info("verbosity turned on")
 
-print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-print "Checking Dependencies and Configure"
-print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+print "%" * 30, "\nChecking Dependencies and Configure\n", "%" * 30
 
 mainLogger.info("[INFO] Checking all Dependencies...")
 
@@ -155,7 +154,7 @@ except NameError:
 # Setting Path Parameters given by tempfile
 tempdir = os.path.realpath(tempfile.mkdtemp())
 tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
-
+#tc_mountpoint = "/tmp/tc_mountpoint"
 
 print "%" * 30, "\nMounting and Truecrypting\n", "%" * 30
 
@@ -177,8 +176,8 @@ else:
         #question is: does it make sense to continue at this point?
         #which scenarios are possible (except detection not working)
         mountpoint = os.path.realpath(tempfile.mkdtemp())
-        print "Stick detection did not work, try to run with what you specified"
-        print "[INFO] Mounting USB Stick to", mountpoint
+        mainLogger.error("Stick detection did not work, try to run with what you specified")
+        mainLogger.info('[INFO] Mounting USB Stick to' + mountpoint)
 
         try:
             subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
@@ -197,7 +196,7 @@ mainLogger.info("[INFO] Creating Container" + parser.get('truecrypting', 'contai
 
 # Exit if the container already exists
 if os.path.exists(parser.get('truecrypting', 'container_path')):
-    print "The Container given ("+ parser.get('truecrypting', 'container_path')+") already exists. Exiting..."
+    mainLogger.info("The Container given ("+ parser.get('truecrypting', 'container_path')+") already exists. Exiting...")
     exit()
 
 # Create Container
@@ -226,7 +225,7 @@ except OSError:
 
 
 # Download Applications	
-print "[INFO] Starting to download Applications to:", tempdir
+mainLogger.info('[INFO] Starting to download Applications to: ' + tempdir)
 
 download_application("Thunderbird [Linux]", parser.get('thunderbird', 'linux_url'))
 download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows_url'))
@@ -237,20 +236,20 @@ download_application("Thunderbird [Windows]", parser.get('thunderbird', 'windows
 #download_application("Vidalia [Windows]", parser.get('vidalia', 'windows_url'))
 #download_application("Vidalia [Mac OS]", parser.get('vidalia', 'mac_url'))
 
-print "[INFO] Extracting Thunderbird [Linux]"
+mainLogger.info("[INFO] Extracting Thunderbird [Linux]")
 try:
     extract_files(tempdir+"/"+"thunderbird-17.0.5.tar.bz2", parser.get('truecrypting', 'tc_mountpoint')+"/apps/linux/")
 except:
     mainLogger.error("[ERROR] Could not extract Thunderbird [Linux]")
 
-print "[INFO] Extracting Thunderbird [Windows]"
+mainLogger.info("[INFO] Extracting Thunderbird [Windows]")
 
 #subprocess.check_call(shlex.split(parser.get('extracting', 'extract')))
 
 
 
-#print "[INFO] Extracting Thunderbird [Mac OS]"
-#print "[INFO] Configure Extensions and Profile Folder"
+#mainLogger.info("[INFO] Extracting Thunderbird [Mac OS]")
+#mainLogger.info("[INFO] Configure Extensions and Profile Folder")
 
 
 # Unmounting Truecrypt
@@ -268,11 +267,11 @@ print "[INFO] Extracting Thunderbird [Windows]"
 #    if (sys.platform=="darwin"):
  #       mainLogger.info("[INFO] please unmount your stick via the finder.")
  #   else:
- #       print "[Error] Unmounting", mountpoint, "failed"
+ #       mainLogger.error("[Error] Unmounting", + mountpoint, + "failed")
         
 
 # Removing Temporary folders
-#print "[INFO] Cleaning up Temporary Directories"
+#mainLogger.info("[INFO] Cleaning up Temporary Directories")
 
 #try:
 #    if args.device:
@@ -280,4 +279,4 @@ print "[INFO] Extracting Thunderbird [Windows]"
 #    os.removedirs(tempdir)
 #    os.removedirs(tc_mountpoint)
 #except OSError:
-#    print "Some temporary Directories could not be removed"
+#    mainLogger.error("Some temporary Directories could not be removed")
