@@ -1,17 +1,17 @@
 parabird
 ========
 
-Simple script written in python to build an os independent truecrypt encrypted usb-stick containing a portable thunderbird, enigmail, torbirdy and vidalia.
+Python script for building an os independent [Linux, Windows and Mac OS] truecrypt encrypted usb-stick containing a portable thunderbird, enigmail, torbirdy and vidalia.
 
-NOTE: The script is not yet functional, it's pre-pre-pre-alpha. Give me a litte time to figure things out because it is also a python learning script for me.
+**NOTE:** The script is not yet functional, it's pre-pre-alpha. Give me a litte time to figure things out because it is also some kind of a python learning script for me.
 
 Requirements:
 -------------
 
-* USB-Stick with at least 4GB free space
+* USB-Stick with at least 4GB free space (The programs won't take that much space, but we need some space for storing mails later.
 * Internet Connection
-* Linux based Host
-* Depending on your Host you might need adminstrator priviledges for un/mounting the tc container
+* Linux or Mac OS based Host for building the Stick
+* Depending on your Host it's very likly that you need adminstrator priviledges for un/mounting the tc container
 
 Depedencies:
 ------------
@@ -37,6 +37,7 @@ So far we  haven't reached a fully working state yet, but this is the functional
 - [ ] Extracting all applications to the
 - [ ] Configuring all applications
 - [ ] Writing startup scripts for all supported Operation systems
+- [ ] Better truecrypt configuration: specify container size and dynamic volumes
 - [ ] Support for torified USB-Stick creation (won't happen before first release)
 - [ ] Release Party
 
