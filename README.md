@@ -19,5 +19,26 @@ There are some Depedencies:
 
 Depedency checks are done automatically. The Script should exit if any Dependency won't match.
 
+Usage:
+======
+python parabird_build.py --help
 
+usage: parabird_build.py [-h] [-v] [-d DEVICE] [-t THUNDER] [-b TORBIRDY]
+                         [-e ENIGMAIL] [-a VIDALIA] [-n CONTAINER_NAME]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         increase output verbosity
+  -d DEVICE, --device DEVICE
+                        Device Flag to specify USB Stick
+  -t THUNDER, --thunder THUNDER
+                        Specify Thunderbird version to download
+  -b TORBIRDY, --torbirdy TORBIRDY
+                        Specify Torbirdy Version
+  -e ENIGMAIL, --enigmail ENIGMAIL
+                        Specify Enigmail Version
+  -a VIDALIA, --vidalia VIDALIA
+                        Specify Vidalia Version
+  -n CONTAINER_NAME, --container_name CONTAINER_NAME
+                        Specify Container Name
 
