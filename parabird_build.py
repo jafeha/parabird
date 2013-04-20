@@ -249,9 +249,9 @@ except:
 mainLogger.info("[INFO] Extracting Thunderbird [Mac OS]")
 
 #try:
-#subprocess.check_call(["dmg2img", tempdir+"/"+parser.get('thunderbird_mac', 'file')])
-#subprocess.check_call(["mount -t hfsplus -o loop", tempdir+"/"+parser.get('thunderbird_mac', 'uncompressedfile'), tempdir+"/dmg/"])
-#shutil.copytree(tempdir+"/dmg/", parser.get('thunderbird_mac', 'path'))
+subprocess.check_call(["dmg2img", tempdir+"/"+parser.get('thunderbird_mac', 'file')])
+subprocess.check_call(shlex.split("mount -t hfsplus -o loop " + tempdir+"/"+parser.get('thunderbird_mac', 'uncompressedfile'), + tempdir+"/dmg/"))
+shutil.copytree(tempdir+"/dmg/", parser.get('thunderbird_mac', 'path'))
 #except:
     # mainLogger.error("[ERROR] Could not Extract Thunderbird [Mac OS]")
 
