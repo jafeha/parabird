@@ -6,12 +6,15 @@ Simple script written in python to build an os independent truecrypt encrypted u
 NOTE: The script is not yet functional, it's pre-pre-pre-alpha. Give me a litte time to figure things out because it is also a python learning script for me.
 
 Requirements:
+-------------
 
 * USB-Stick with at least 4GB free space
 * Internet Connection
 * Linux based Host
 * Depending on your Host you might need adminstrator priviledges for un/mounting the tc container
-There are some Depedencies:
+
+Depedencies:
+------------
 
 * Python >= Python2.7
 * You should have Truecrypt installed, it doesen't matter if it gui or console based, both versions should work.
@@ -20,8 +23,25 @@ There are some Depedencies:
 
 Depedency checks are done automatically. The Script should exit if any Dependency won't match.
 
+Implementation:
+---------------
+So far we  haven't reached a fully working state yet, but this is the functionality working so far:
+
+- [x] Detecting mounting and unmounting an USB-Stick  
+- [x] Creating a Truecrypt container on the USB-Stick
+- [x] Downloading all necessary applications
+- [x] Creating a file stucture within the container
+- [x] Full Logging support
+- [x] Configurable using a Configparser (see config.ini)
+- [x] Dependency checks
+- [ ] Extracting all applications to the
+- [ ] Configuring all applications
+- [ ] Writing startup scripts for all supported Operation systems
+- [ ] Support for torified USB-Stick creation (won't happen before first release)
+- [ ] Release Party
+
 Usage:
-======
+------
 
 ```
 python parabird_build.py --help
