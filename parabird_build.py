@@ -14,6 +14,9 @@ import tarfile
 import zipfile
 from utils import detect_stick
 import logging
+import extract_files
+from extract_files import extract_tarfile
+from extract_files import extract_zipfile
 
 #from http://docs.python.org/2/howto/logging-cookbook.html explainations there
 
@@ -71,11 +74,11 @@ def download_application(progname, url, filename):
         mainLogger.error("[ERROR] Could not download", progname)
         return None
 
-def extract_files(path, destination):
+#def extract_files(path, destination):
 # This function obviously extracts the file in path to destination
-	tar = tarfile.open(path)
-	tar.extractall(destination)
-	tar.close()
+#	tar = tarfile.open(path)
+#	tar.extractall(destination)
+#	tar.close()
 
 
 # Parsing Arguments given as Parameter from Shell
@@ -119,6 +122,7 @@ mainLogger.info("[INFO] Checking all Dependencies...")
 try:
     dependency_check([parser.get('truecrypting', 'tc_binary'), "--text", "--version"])
     dependency_check("7z")
+    dependency_check("dmg2img")
 except: 
     mainLogger.error("[ERROR] Dependency Checks failed large scale, exiting...")
     from sys import exit
@@ -209,7 +213,14 @@ try:
 
     os.makedirs(parser.get('thunderbird_mac', 'path'))
     os.makedirs(parser.get('vidalia_mac', 'path'))
-	
+
+    os.makedirs(parser.get('enigmail', 'path'))
+    os.makedirs(parser.get('torbirdy', 'path'))	
+
+    # for extracting tb for mac os, we need to mount a dmg
+    # i create an subfolder in tempdir for doing this
+    os.makedirs(tempdir+"/dmg")
+
 except OSError:
     mainLogger.error("[ERROR] Folder already exists")
 
@@ -228,15 +239,46 @@ download_application("Vidalia [Mac OS]", parser.get('vidalia_mac', 'url'), parse
 
 mainLogger.info("[INFO] Extracting Thunderbird [Linux]")
 try:
-    extract_files(tempdir+"/"+parser.get('thunderbird_linux', 'file'), parser.get('thunderbird_linux', 'path'))
+#    extract_files(tempdir+"/"+parser.get('thunderbird_linux', 'file'), parser.get('thunderbird_linux', 'path'))
+    extract_tarfile(tempdir+"/"+parser.get('thunderbird_linux', 'file'), parser.get('thunderbird_linux', 'path'))
 except:
     mainLogger.error("[ERROR] Could not extract Thunderbird [Linux]")
 
-mainLogger.info("[INFO] Extracting Thunderbird [Windows]")
+#mainLogger.info("[INFO] Extracting Thunderbird [Windows]")
 
-#mainLogger.info("[INFO] Extracting Thunderbird [Mac OS]")
-#mainLogger.info("[INFO] Configure Extensions and Profile Folder")
+mainLogger.info("[INFO] Extracting Thunderbird [Mac OS]")
 
+#try:
+#subprocess.check_call(["dmg2img", tempdir+"/"+parser.get('thunderbird_mac', 'file')])
+#subprocess.check_call(["mount -t hfsplus -o loop", tempdir+"/"+parser.get('thunderbird_mac', 'uncompressedfile'), tempdir+"/dmg/"])
+#shutil.copytree(tempdir+"/dmg/", parser.get('thunderbird_mac', 'path'))
+#except:
+    # mainLogger.error("[ERROR] Could not Extract Thunderbird [Mac OS]")
+
+mainLogger.info("[INFO] Extracting Vidalia [Linux]")
+try:
+    extract_tarfile(tempdir+"/"+parser.get('vidalia_linux', 'file'), parser.get('vidalia_linux', 'path'))
+except:
+    mainLogger.error("[ERROR] Could not extract Vidalia [Linux]")
+
+#mainLogger.info("[INFO] Extracting Vidalia [Windows"]
+mainLogger.info("[INFO] Extracting Vidalia [Mac OS]")
+try: 
+    extract_zipfile(tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
+except:
+    mainLogger.error("[ERROR] Could not extract Vidalia [Mac OS]")
+
+mainLogger.info("[INFO] Extracting Torbirdy to Profile Folder")
+try:
+    extract_zipfile(tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
+except:
+    mainLogger.error("[ERROR] Could not extract Torbirdy")
+
+mainLogger.info("[INFO] Extracting Enigmail to Profile Folder")
+try:
+    extract_zipfile(tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
+except:
+    mainLogger.error("[ERROR] Could not extract Enigmail")
 
 # Unmounting Truecrypt
 mainLogger.info("[INFO] Unmounting Truecrypt Container")
