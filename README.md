@@ -21,6 +21,8 @@ Depedency checks are done automatically. The Script should exit if any Dependenc
 
 Usage:
 ======
+
+```
 python parabird_build.py --help
 
 usage: parabird_build.py [-h] [-v] [-d DEVICE] [-t THUNDER] [-b TORBIRDY]
@@ -41,4 +43,4 @@ optional arguments:
                         Specify Vidalia Version
   -n CONTAINER_NAME, --container_name CONTAINER_NAME
                         Specify Container Name
-
+```
