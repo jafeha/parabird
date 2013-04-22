@@ -12,7 +12,8 @@ import tarfile
 import zipfile
 import logging
 import extract_files
- 
+import re
+  
 def mountparse(line_from_mount):
     '''
     give it a line from mount(not /etc/fstab!) as a string and it return a dict
