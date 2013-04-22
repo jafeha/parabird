@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8 
+
 import argparse
 import ConfigParser
 import codecs
@@ -17,88 +18,7 @@ import logging
 import extract_files
 from extract_files import extract_tarfile
 from extract_files import extract_zipfile
-
-#from http://docs.python.org/2/howto/logging-cookbook.html explainations there
-
-tempdir = tempfile.mkdtemp()
-logfile = os.path.realpath(tempdir+"parabirdy_log.txt")
-
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                    datefmt='%m-%d %H:%M',
-                    filename=tempdir+"parabirdy_log.txt",
-                    filemode='w')
-                    
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
-#formatter = logging.Formatter('%(name)-6s: %(levelname)-6s %(message)s')
-formatter = logging.Formatter('[%(levelname)s::%(name)s]: %(message)s')
-console.setFormatter(formatter)
-logging.getLogger('').addHandler(console)
-mainLogger = logging.getLogger('main')
-
-
-
-mainLogger.info('Logfile: ' + logfile)
-
-def dependency_check(checked_app):
-# This function tests dependencies. All stdout is send to devnull
-    try:
-        FNULL = open(os.devnull, 'w')
-        subprocess.check_call(checked_app, stdout=FNULL)
-
-    except OSError:
-        mainLogger.error("[ERROR] Missing Depedencies:", checked_app,+"not installed, exiting...")
-        from sys import exit
-        exit()
-
-def update_config(section, key, value_from_argparser):
-# This function checks if there is any parameter given, 
-# If there is a parameter given, it updates the config 
-# if not it uses default values from config.ini
-    if value_from_argparser:
-        mainLogger.info('Parameter given, device or container is: ' + value_from_argparser)
-        parser.set(section, key, value_from_argparser)
-
-    if value_from_argparser == None:
-        mainLogger.info("Taking %s %s from Config: %s" % (section, key, parser.get(section, key) ))
-
-def download_application(progname, url, filename):
-# This function tries to downloads all the programs we 
-# want to install. 
-    mainLogger.info('[INFO] Downloading: ' + progname)
-    
-    try:
-        returnobject = urllib.urlretrieve(url, filename=tempdir+"/"+filename)
-    except:
-        mainLogger.error("[ERROR] Could not download", progname)
-        return None
-
-#def extract_files(path, destination):
-# This function obviously extracts the file in path to destination
-#	tar = tarfile.open(path)
-#	tar.extractall(destination)
-#	tar.close()
-
-
-# Parsing Arguments given as Parameter from Shell
-parser = argparse.ArgumentParser()
-parser = argparse.ArgumentParser(description='')
-parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
-parser.add_argument("-d", "--device", help="Device Flag to specify USB Stick")
-parser.add_argument("-t", "--thunder", help="Specify Thunderbird version to download")
-parser.add_argument("-b", "--torbirdy", help="Specify Torbirdy Version")
-parser.add_argument("-e", "--enigmail", help="Specify Enigmail Version") 
-parser.add_argument("-a", "--vidalia", help="Specify Vidalia Version")
-parser.add_argument("-n", "--container_name", help="Specify Container Name")
-
-args = parser.parse_args()
-
-# Importing Config File: config.ini
-from ConfigParser import SafeConfigParser
-parser = SafeConfigParser()
-with codecs.open('config.ini', 'r', encoding='utf-8') as f:
-    parser.readfp(f)
+from utils import *
 
 # PLATFORM SPECIFIC SHIT
 # http://docs.python.org/2/library/sys.html#sys.platform
@@ -211,7 +131,7 @@ try:
     os.makedirs(parser.get('thunderbird_windows', 'path'))
     os.makedirs(parser.get('vidalia_windows', 'path'))
 
-    os.makedirs(parser.get('thunderbird_mac', 'path'))
+#    os.makedirs(parser.get('thunderbird_mac', 'path'))
     os.makedirs(parser.get('vidalia_mac', 'path'))
 
     os.makedirs(parser.get('enigmail', 'path'))
@@ -248,13 +168,19 @@ except:
 
 mainLogger.info("[INFO] Extracting Thunderbird [Mac OS]")
 
-#try:
-subprocess.check_call(["dmg2img", tempdir+"/"+parser.get('thunderbird_mac', 'file')])
-subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', tempdir+"/"+parser.get('thunderbird_mac', 'uncompressedfile'), tempdir+"/dmg/"])
-#subprocess.check_call(shlex.split("mount -t hfsplus -o loop " + tempdir+"/"+parser.get('thunderbird_mac', 'uncompressedfile'), + tempdir+"/dmg/"))
-shutil.copytree(tempdir+"/dmg/", parser.get('thunderbird_mac', 'path'))
-#except:
-    # mainLogger.error("[ERROR] Could not Extract Thunderbird [Mac OS]")
+try:
+
+    subprocess.check_call(["dmg2img", tempdir+"/"+parser.get('thunderbird_mac', 'file')])
+    subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', tempdir+"/"+parser.get('thunderbird_mac', 'uncompressedfile'), tempdir+"/dmg/"])
+
+# This line fails for unknown reasons: 
+# shutil.Error: [('/tmp/tmp5grVcT/dmg/ ', u'/tmp/tmpu5_8ts/apps/mac/thunderbird/ ', "[Errno 2] No such file or directory: '/tmp/tmp5grVcT/dmg/ '")]
+# We have to fix this somehow. I'm quite sure this comes from the space in the filename, but i have no idea where that comes from. As long as we can't copy the tree, we can't put tb for mac os on the stick.
+
+##shutil.copytree(tempdir+"/dmg", parser.get('thunderbird_mac', 'path'))
+
+except:
+    mainLogger.error("[ERROR] Could not Extract Thunderbird [Mac OS]")
 
 mainLogger.info("[INFO] Extracting Vidalia [Linux]")
 try:
