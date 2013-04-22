@@ -97,7 +97,11 @@ def detect_stick():
 
 #from http://docs.python.org/2/howto/logging-cookbook.html explainations there
 
-tempdir = tempfile.mkdtemp()
+#tempdir = tempfile.mkdtemp()
+
+tempdir = os.path.realpath(tempfile.mkdtemp())
+tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
+
 logfile = os.path.realpath(tempdir+"parabirdy_log.txt")
 
 logging.basicConfig(level=logging.DEBUG,
@@ -144,12 +148,30 @@ def download_application(progname, url, filename):
 # This function tries to downloads all the programs we 
 # want to install. 
     mainLogger.info('[INFO] Downloading: ' + progname)
-    
+
     try:
-        returnobject = urllib.urlretrieve(url, filename=tempdir+"/"+filename)
+        for r in range(3):
+            returnobject, header = urllib.urlretrieve(url, filename=tempdir+"/"+filename)
+            if header.get('status') == '200 OK':
+                break
+        else:
+            mainLogger.error("[ERROR] Could not download %s. exiting " %(progname))
+            exit()
     except:
-        mainLogger.error("[ERROR] Could not download", progname)
+        mainLogger.error("[ERROR] Could not download %s" %(progname))
         return None
+    
+#    try:
+#        returnobject, header = urllib.urlretrieve(url, filename=tempdir+"/"+filename)
+#        status = header.get('status')
+#        if status == 404:
+#            mainLogger.error("[ERROR] Could not download", progname)
+#            exit()
+#    except:
+#        mainLogger.error("[ERROR] Could not download", progname)
+#        return None
+
+
 
 # Parsing Arguments given as Parameter from Shell
 parser = argparse.ArgumentParser()
