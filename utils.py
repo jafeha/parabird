@@ -123,8 +123,8 @@ mainLogger = logging.getLogger('main')
 
 mainLogger.info('Logfile: ' + logfile)
 
-def dependency_check(checked_app):
 # This function tests dependencies. All stdout is send to devnull
+def dependency_check(checked_app):
     try:
         FNULL = open(os.devnull, 'w')
         subprocess.check_call(checked_app, stdout=FNULL)
@@ -134,10 +134,10 @@ def dependency_check(checked_app):
         from sys import exit
         exit()
 
-def update_config(section, key, value_from_argparser):
 # This function checks if there is any parameter given, 
 # If there is a parameter given, it updates the config 
 # if not it uses default values from config.ini
+def update_config(section, key, value_from_argparser):
     if value_from_argparser:
         mainLogger.info('Parameter given, device or container is: ' + value_from_argparser)
         parser.set(section, key, value_from_argparser)
@@ -145,23 +145,8 @@ def update_config(section, key, value_from_argparser):
     if value_from_argparser == None:
         mainLogger.info("Taking %s %s from Config: %s" % (section, key, parser.get(section, key) ))
 
-#def download_application(progname, url, filename):
 # This function tries to downloads all the programs we 
 # want to install. 
-#    mainLogger.info("[INFO] Downloading %s" %(progname))
-
-#    try:
- #       for r in range(3):
- #           returnobject, header = urllib.urlretrieve(url, filename=tempdir+"/"+filename)
-  #          if header.get('status') == '200 OK':
-  #              break
-  #      else:
-  #          mainLogger.error("[ERROR] Could not download %s. exiting " %(progname))
-  #          exit()
-  #  except:
- #       mainLogger.error("[ERROR] Could not download %s" %(progname))
-#        return None
-
 def download_application(progname, url, filename):
     mainLogger.info("INFO Downloading %s" %(progname))
 
