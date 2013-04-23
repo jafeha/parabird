@@ -158,6 +158,9 @@ download_application("Enigmail", parser.get('enigmail', 'url'), parser.get('enig
 download_application("Vidalia [Linux]", parser.get('vidalia_linux', 'url'), parser.get('vidalia_linux', 'file'))
 download_application("Vidalia [Windows]", parser.get('vidalia_windows', 'url'), parser.get('vidalia_windows', 'file'))
 download_application("Vidalia [Mac OS]", parser.get('vidalia_mac', 'url'), parser.get('vidalia_mac', 'file'))
+download_application("GPG 4 Thunderbird [Windows]", parser.get('gpg4tb', 'url'), parser.get('gpg4tb', 'file'))
+download_application("GPG 4 USB [Linux]", parser.get('gpg4usb', 'url'), parser.get('gpg4usb', 'file'))
+download_application("GPG Tools [Mac OS]", parser.get('gpg4mac', 'url'), parser.get('gpg4mac', 'file'))
 
 mainLogger.info("[INFO] Extracting Thunderbird [Linux]")
 try:

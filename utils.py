@@ -108,7 +108,7 @@ logfile = os.path.realpath(tempdir+"/"+"parabirdy_log.txt")
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%m-%d %H:%M',
-                    filename=tempdir+"parabirdy_log.txt",
+                    filename=tempdir+"/"+"parabirdy_log.txt",
                     filemode='w')
                     
 console = logging.StreamHandler()
