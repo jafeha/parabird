@@ -15,9 +15,6 @@ import tarfile
 import zipfile
 from utils import detect_stick
 import logging
-import extract_files
-from extract_files import extract_tarfile
-from extract_files import extract_zipfile
 from utils import *
 
 # PLATFORM SPECIFIC SHIT
@@ -162,19 +159,15 @@ download_application("GPG 4 Thunderbird [Windows]", parser.get('gpg4tb', 'url'),
 download_application("GPG 4 USB [Linux]", parser.get('gpg4usb', 'url'), parser.get('gpg4usb', 'file'))
 download_application("GPG Tools [Mac OS]", parser.get('gpg4mac', 'url'), parser.get('gpg4mac', 'file'))
 
-mainLogger.info("[INFO] Extracting Thunderbird [Linux]")
-try:
-#    extract_files(tempdir+"/"+parser.get('thunderbird_linux', 'file'), parser.get('thunderbird_linux', 'path'))
-    extract_tarfile(tempdir+"/"+parser.get('thunderbird_linux', 'file'), parser.get('thunderbird_linux', 'path'))
-except:
-    mainLogger.error("[ERROR] Could not extract Thunderbird [Linux]")
+extract_tarfile("Thunderbird [Linux]", tempdir+"/"+parser.get('thunderbird_linux', 'file'), parser.get('thunderbird_linux', 'path'))
 
 #mainLogger.info("[INFO] Extracting Thunderbird [Windows]")
+
+# extract_dmg("Thunderbird [Mac OS]", ... , ...)
 
 mainLogger.info("[INFO] Extracting Thunderbird [Mac OS]")
 
 try:
-
     subprocess.check_call(["dmg2img", tempdir+"/"+parser.get('thunderbird_mac', 'file')])
     subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', tempdir+"/"+parser.get('thunderbird_mac', 'uncompressedfile'), tempdir+"/dmg/"])
 
@@ -187,30 +180,18 @@ try:
 except:
     mainLogger.error("[ERROR] Could not Extract Thunderbird [Mac OS]")
 
-mainLogger.info("[INFO] Extracting Vidalia [Linux]")
-try:
-    extract_tarfile(tempdir+"/"+parser.get('vidalia_linux', 'file'), parser.get('vidalia_linux', 'path'))
-except:
-    mainLogger.error("[ERROR] Could not extract Vidalia [Linux]")
+extract_tarfile("Vidalia [Linux]", tempdir+"/"+parser.get('vidalia_linux', 'file'), parser.get('vidalia_linux', 'path'))
 
 #mainLogger.info("[INFO] Extracting Vidalia [Windows"]
-mainLogger.info("[INFO] Extracting Vidalia [Mac OS]")
-try: 
-    extract_zipfile(tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
-except:
-    mainLogger.error("[ERROR] Could not extract Vidalia [Mac OS]")
+# extract_7zfile("Vidalia [Windows]", ..., ...)
 
-mainLogger.info("[INFO] Extracting Torbirdy to Profile Folder")
-try:
-    extract_zipfile(tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
-except:
-    mainLogger.error("[ERROR] Could not extract Torbirdy")
+extract_zipfile("Vidalia [Mac OS]", tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
+extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
+extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
 
-mainLogger.info("[INFO] Extracting Enigmail to Profile Folder")
-try:
-    extract_zipfile(tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
-except:
-    mainLogger.error("[ERROR] Could not extract Enigmail")
+# extract_zip("GPG 4 USB [Linux]", ..., ...)
+# extract_7z("GPG 4 Thunderbird [Windows]", ..., ...)
+# extract_dmg("GPG Tools [Mac OS]", ..., ...)
 
 # Unmounting Truecrypt
 mainLogger.info("[INFO] Unmounting Truecrypt Container")
