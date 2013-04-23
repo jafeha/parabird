@@ -197,7 +197,13 @@ def extract_tarfile(progname, filename, path):
         exit()
 
 
-#def extract_7z(file, path):
+def extract_7z(progname, filename, path):
+    mainLogger.info("[INFO] Extracting %s" %(progname))
+    try:
+        subprocess.check_call(['7z', 'e', filename, '-o',+path])
+    except:
+        mainLogger.error("[ERROR] Could not extract %s. exiting" %(progname))
+        exit()
 
 
 def extract_zipfile(progname, filename, path):
@@ -210,5 +216,19 @@ def extract_zipfile(progname, filename, path):
         mainLogger.error("[ERROR] Could not extract %s. exiting " %(progname))
         exit()
 
-# def extract_dmg
-                        
+def extract_dmg(progname, dmg, img, path):
+    mainLogger.info("[INFO] Extracting %s" %(progname))
+    try:
+        subprocess.check_call(["dmg2img", tempdir+"/"+dmg])
+        subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', tempdir+"/"+img, tempdir+"/dmg/"])
+
+# This line fails for unknown reasons: 
+# shutil.Error: [('/tmp/tmp5grVcT/dmg/ ', u'/tmp/tmpu5_8ts/apps/mac/thunderbird/ ', "[Errno 2] No such file or directory: '/tmp/tmp5grVcT/dmg/ '")]
+# We have to fix this somehow. I'm quite sure this comes from the space in the filename, but i have no idea where that comes from. As long as we can't copy the tree, we can't put tb for mac os on the stick.
+
+        sutil.copytree(tempdir+"/dmg", path)
+        shutil.rmtree(tempdir+"/dmg/")
+
+    except:
+        mainLogger.error("[ERROR] Could not extract %s. exiting " %(progname))
+        exit()                        

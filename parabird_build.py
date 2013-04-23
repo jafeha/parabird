@@ -163,7 +163,7 @@ extract_tarfile("Thunderbird [Linux]", tempdir+"/"+parser.get('thunderbird_linux
 
 #mainLogger.info("[INFO] Extracting Thunderbird [Windows]")
 
-# extract_dmg("Thunderbird [Mac OS]", ... , ...)
+# extract_dmg("Thunderbird [Mac OS]", dmg , img, path)
 
 mainLogger.info("[INFO] Extracting Thunderbird [Mac OS]")
 
@@ -176,6 +176,7 @@ try:
 # We have to fix this somehow. I'm quite sure this comes from the space in the filename, but i have no idea where that comes from. As long as we can't copy the tree, we can't put tb for mac os on the stick.
 
 ##shutil.copytree(tempdir+"/dmg", parser.get('thunderbird_mac', 'path'))
+
 
 except:
     mainLogger.error("[ERROR] Could not Extract Thunderbird [Mac OS]")
