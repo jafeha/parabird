@@ -17,6 +17,7 @@ Depedencies:
 ------------
 
 * Python >= Python2.7
+* python-requests
 * You should have Truecrypt installed, it doesen't matter if it gui or console based, both versions should work.
 * Mozilla uses 7z to pack Thunderbird for Windows, you'll need it for extracting. 
 * Unfortunately we need the package dmg2img to deal with compressed dmg files

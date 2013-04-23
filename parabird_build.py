@@ -37,6 +37,8 @@ elif (sys.platform=="win32"):
 
 print "%" * 30, "\nChecking Dependencies and Configure\n", "%" * 30
 
+print "Tempdir is:", tempdir
+
 mainLogger.info("[INFO] Checking all Dependencies...")
 
 try:
@@ -67,8 +69,8 @@ except NameError:
 
 
 # Setting Path Parameters given by tempfile
-tempdir = os.path.realpath(tempfile.mkdtemp())
-tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
+#tempdir = os.path.realpath(tempfile.mkdtemp())
+#tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
 
 print "%" * 30, "\nMounting and Truecrypting\n", "%" * 30
 

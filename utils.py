@@ -13,7 +13,8 @@ import zipfile
 import logging
 import extract_files
 import re
-  
+import requests
+
 def mountparse(line_from_mount):
     '''
     give it a line from mount(not /etc/fstab!) as a string and it return a dict
@@ -102,7 +103,7 @@ def detect_stick():
 tempdir = os.path.realpath(tempfile.mkdtemp())
 tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
 
-logfile = os.path.realpath(tempdir+"parabirdy_log.txt")
+logfile = os.path.realpath(tempdir+"/"+"parabirdy_log.txt")
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
@@ -144,33 +145,40 @@ def update_config(section, key, value_from_argparser):
     if value_from_argparser == None:
         mainLogger.info("Taking %s %s from Config: %s" % (section, key, parser.get(section, key) ))
 
-def download_application(progname, url, filename):
+#def download_application(progname, url, filename):
 # This function tries to downloads all the programs we 
 # want to install. 
-    mainLogger.info('[INFO] Downloading: ' + progname)
+#    mainLogger.info("[INFO] Downloading %s" %(progname))
+
+#    try:
+ #       for r in range(3):
+ #           returnobject, header = urllib.urlretrieve(url, filename=tempdir+"/"+filename)
+  #          if header.get('status') == '200 OK':
+  #              break
+  #      else:
+  #          mainLogger.error("[ERROR] Could not download %s. exiting " %(progname))
+  #          exit()
+  #  except:
+ #       mainLogger.error("[ERROR] Could not download %s" %(progname))
+#        return None
+
+def download_application(progname, url, filename):
+    mainLogger.info("INFO Downloading %s" %(progname))
 
     try:
         for r in range(3):
-            returnobject, header = urllib.urlretrieve(url, filename=tempdir+"/"+filename)
-            if header.get('status') == '200 OK':
+            down = requests.get(url)
+            with open(tempdir+"/"+filename, "wb") as code:
+                code.write(down.content)
+            if down.status_code == 200:
                 break
         else:
             mainLogger.error("[ERROR] Could not download %s. exiting " %(progname))
             exit()
+
     except:
         mainLogger.error("[ERROR] Could not download %s" %(progname))
         return None
-    
-#    try:
-#        returnobject, header = urllib.urlretrieve(url, filename=tempdir+"/"+filename)
-#        status = header.get('status')
-#        if status == 404:
-#            mainLogger.error("[ERROR] Could not download", progname)
-#            exit()
-#    except:
-#        mainLogger.error("[ERROR] Could not download", progname)
-#        return None
-
 
 
 # Parsing Arguments given as Parameter from Shell
