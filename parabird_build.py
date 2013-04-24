@@ -67,6 +67,7 @@ try:
     #update_config("enigmail", "version", args.enigmail)
     #update_config("vidalia", "version", args.vidalia)
     update_config("DEFAULT", "container_name", args.container_name)
+    update_config("truecrypting", "size", args.container_size)
 
 except NameError: 
     mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
