@@ -16,6 +16,7 @@ import re
 import requests
 import plistlib
 import glob
+from xml.dom import minidom
 
 def mountparse(line_from_mount):
     '''
@@ -291,4 +292,29 @@ def extract_dmg(progname, dmg, path):
 
     except:
         mainLogger.error("[ERROR] Could not extract %s. exiting " %(progname))
-        exit()                        
+        exit()      
+
+
+def get_extension_id(rdffile):
+    '''
+    gets the extension id.
+
+    parameters:
+    rdffile: path to a rdffile
+
+    returns the 
+    '''
+    try:
+        from xml.dom import minidom
+        xmldoc = minidom.parse(rdffile)
+        extension_id = xmldoc.getElementsByTagName('em:id')[0].firstChild.nodeValue
+        mainLogger.debug("ID for {} is {}".format(rdffile, extension_id))
+        return extension_id
+    except IOError:
+        mainLogger.error("Could not access file {}".format(rdffile))
+        mainLogger.exception("Could not access file {}".format(rdffile))
+        return None
+    except IndexError:
+        mainLogger.error("Not a valid install.rdf File: {}".format(rdffile))
+        mainLogger.exception("Not a valid install.rdf File: {}".format(rdffile))
+        return None
