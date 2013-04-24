@@ -16,6 +16,7 @@ import zipfile
 from utils import detect_stick
 import logging
 from utils import *
+from sys import exit
 
 # PLATFORM SPECIFIC SHIT
 # http://docs.python.org/2/library/sys.html#sys.platform
@@ -36,15 +37,19 @@ print "%" * 30, "\nChecking Dependencies and Configure\n", "%" * 30
 
 print "Tempdir is:", tempdir
 
-mainLogger.info("[INFO] Checking all Dependencies...")
+mainLogger.info("Checking all Dependencies...")
 
 try:
+    mainLogger.debug("truerypt binary is >{}<".format(parser.get('truecrypting', 'tc_binary')))
     dependency_check([parser.get('truecrypting', 'tc_binary'), "--text", "--version"])
     dependency_check("7z")
-    dependency_check("dmg2img")
-except: 
-    mainLogger.error("[ERROR] Dependency Checks failed large scale, exiting...")
-    from sys import exit
+    if (sys.platform=="darwin"):
+        dependency_check(["hdiutil", "info"])
+    else:
+        dependency_check("dmg2img")
+except : 
+    mainLogger.error("Dependency Checks failed large scale, exiting...")
+    raise
     exit()
 
 

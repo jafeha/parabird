@@ -130,9 +130,8 @@ def dependency_check(checked_app):
         subprocess.check_call(checked_app, stdout=FNULL)
 
     except OSError:
-        mainLogger.error("[ERROR] Missing Depedencies:", checked_app,+"not installed, exiting...")
-        from sys import exit
-        exit()
+        mainLogger.error("Missing Depedencies: {} not installed, exiting...".format(checked_app))
+        sys.exit()
 
 # This function checks if there is any parameter given, 
 # If there is a parameter given, it updates the config 
