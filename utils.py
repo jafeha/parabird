@@ -134,6 +134,7 @@ def dependency_check(checked_app):
 
     except OSError:
         mainLogger.error("Missing Depedencies: {} not installed, exiting...".format(checked_app))
+        mainLogger.exception("Missing Depedencies: {} not installed, exiting...".format(checked_app))
         sys.exit()
 
 # This function checks if there is any parameter given, 
@@ -145,12 +146,12 @@ def update_config(section, key, value_from_argparser):
         parser.set(section, key, value_from_argparser)
 
     if value_from_argparser == None:
-        mainLogger.info("Taking %s %s from Config: %s" % (section, key, parser.get(section, key) ))
+        mainLogger.info("Taking {} {} from Config: {}" .format(section, key, parser.get(section, key) ))
 
 # This function tries to downloads all the programs we 
 # want to install. 
 def download_application(progname, url, filename):
-    mainLogger.info("[INFO] Downloading %s" %(progname))
+    mainLogger.info("[INFO] Downloading {}" .format(progname))
 
     try:
         for r in range(3):
@@ -160,11 +161,12 @@ def download_application(progname, url, filename):
             if down.status_code == 200:
                 break
         else:
-            mainLogger.error("[ERROR] Could not download %s. exiting " %(progname))
+            mainLogger.error("[ERROR] Could not download {}. exiting " .format(progname))
             exit()
 
     except IOError:
-        mainLogger.error("[ERROR] Could not download %s" %(progname))
+        mainLogger.error("[ERROR] Could not download {}" .format(progname))
+        mainLogger.exception("[ERROR] Could not download {}" .format(progname))
         raise
         sys.exit()
         return None
@@ -191,33 +193,35 @@ with codecs.open('config.ini', 'r', encoding='utf-8') as f:
 
 
 def extract_tarfile(progname, filename, path):
-    mainLogger.info("[INFO] Extracting %s" %(progname))
+    mainLogger.info("[INFO] Extracting {}" .format(progname))
     try:
         tar = tarfile.open(filename)
         tar.extractall(path)
         tar.close()
     except:
-        mainLogger.error("[ERROR] Could not extract %s. exiting " %(progname))
+        mainLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
+        mainLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))
         exit()
 
 
 def extract_7z(progname, filename, path):
-    mainLogger.info("[INFO] Extracting %s" %(progname))
+    mainLogger.info("[INFO] Extracting {}" .format(progname))
     try:
         subprocess.check_call(['7z', 'e', filename, '-o',+path])
     except:
-        mainLogger.error("[ERROR] Could not extract %s. exiting" %(progname))
+        mainLogger.error("[ERROR] Could not extract {}. exiting" .format(progname))
+        mainLogger.exception("[ERROR] Could not extract {}. exiting" .format(progname))
         exit()
 
 
 def extract_zipfile(progname, filename, path):
-    mainLogger.info("[INFO] Extracting %s" %(progname))
+    mainLogger.info("[INFO] Extracting {}" .format(progname))
     try:
         zip = zipfile.ZipFile(filename)
         zip.extractall(path)
         zip.close()
     except:
-        mainLogger.error("Could not extract %s. exiting " %(progname))
+        mainLogger.error("Could not extract {}. exiting " .format(progname))
         logging.exception("extract_zipfile did not work:")
         raise
         exit()
@@ -262,6 +266,7 @@ def extract_dmg_mac(progname, filename, path):
 
     except OSError:
         mainLogger.error("Mac Extract: hdiutil not installed. quitting")
+        mainLogger.exception("Mac Extract: hdiutil not installed. quitting")
         raise
         sys.exit()
         
@@ -273,7 +278,7 @@ def extract_dmg_mac(progname, filename, path):
 
 
 def extract_dmg(progname, dmg, path):
-    mainLogger.info("[INFO] Extracting %s" %(progname))
+    mainLogger.info("[INFO] Extracting {}" .format(progname))
     try:
         mainLogger.debug("Linux DMG Extract: img2dmg: {} {} {}".format("dmg2img", dmg, dmg+".img"))
         subprocess.check_call(["dmg2img", dmg, dmg+".img"])
@@ -291,7 +296,8 @@ def extract_dmg(progname, dmg, path):
         shutil.rmtree(tempdir+"/dmg/")
 
     except:
-        mainLogger.error("[ERROR] Could not extract %s. exiting " %(progname))
+        mainLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
+        mainLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))
         exit()      
 
 

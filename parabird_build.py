@@ -50,6 +50,7 @@ try:
         dependency_check("dmg2img")
 except: 
     mainLogger.error("Dependency Checks failed large scale, exiting...")
+    mainLogger.exception("Dependency Checks failed large scale, exiting...")
     raise
     exit()
 
@@ -69,6 +70,7 @@ try:
 
 except NameError: 
     mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
+    mainLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
 
 
 # Setting Path Parameters given by tempfile
@@ -85,6 +87,7 @@ if args.device:
 	
     except NameError:
         mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
+        mainLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
 else: 
     stick = detect_stick()
     #print stick
@@ -103,6 +106,7 @@ else:
             subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
         except:
             mainLogger.error("Mounting {} to {} failed".format(parser.get('DEFAULT', 'device', mountpoint)))
+            mainLogger.exception("Mounting {} to {} failed".format(parser.get('DEFAULT', 'device', mountpoint)))
             raise
 
     #ok, we can write to the stick        
@@ -156,6 +160,7 @@ try:
 
 except OSError:
     mainLogger.error("[ERROR] Folder already exists")
+    mainLogger.exception("[ERROR] Folder already exists")
 
 
 # Download Applications	
@@ -224,3 +229,4 @@ try:
     os.removedirs(tc_mountpoint)
 except OSError:
     mainLogger.error("Some temporary Directories could not be removed")
+    mainLogger.exception("Some temporary Directories could not be removed")
