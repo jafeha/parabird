@@ -1,20 +1,12 @@
 #!/usr/bin/env python
 # encoding: utf-8 
 
-import argparse
-import ConfigParser
-import codecs
-import urllib
 import subprocess
 import sys
 import os
 import tempfile
 import shlex
 import shutil
-import tarfile
-import zipfile
-from utils import detect_stick
-import logging
 from utils import *
 from sys import exit
 
@@ -72,11 +64,6 @@ try:
 except NameError: 
     mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
     mainLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
-
-
-# Setting Path Parameters given by tempfile
-#tempdir = os.path.realpath(tempfile.mkdtemp())
-#tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
 
 print "%" * 30, "\nMounting and Truecrypting\n", "%" * 30
 
