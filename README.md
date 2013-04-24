@@ -8,7 +8,7 @@ Python script for building an os independent [Linux, Windows and Mac OS] truecry
 Requirements:
 -------------
 
-* USB-Stick with a maximum of 4GB space (limit for FAT32 formatted sticks). The programs won't take that much space and there should be enough space left for mails. we don't force users to use an NTFS formatted USB-Stick, so you won't be able to use a container bigger than 4GB on a FAT32 formatted USB-Stick
+* USB-Stick or any other removable device with a maximum of 4GB space (limit for FAT32 formatted sticks). The programs won't take that much space and there should be enough space left for mails. we don't force users to use an NTFS formatted USB-Stick, so you won't be able to use a container bigger than 4GB on a FAT32 formatted USB-Stick
 * Internet Connection
 * Linux or Mac OS based Host for building the Stick
 * Depending on your Host it's very likly that you need adminstrator priviledges for un/mounting the tc container
@@ -35,7 +35,8 @@ So far we  haven't reached a fully working state yet, but this is the functional
 - [x] Full Logging support
 - [x] Configurable using a Configparser (see config.ini)
 - [x] Dependency checks
-- [ ] Extracting all applications to the
+- [ ] Extracting all applications to tempdir
+- [ ] Write make_portable() functions
 - [ ] Configuring all applications
 - [ ] Writing startup scripts for all supported Operation systems
 - [ ] Better truecrypt configuration: specify container size and dynamic volumes
