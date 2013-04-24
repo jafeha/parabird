@@ -182,6 +182,7 @@ parser.add_argument("-b", "--torbirdy", help="Specify Torbirdy Version")
 parser.add_argument("-e", "--enigmail", help="Specify Enigmail Version") 
 parser.add_argument("-a", "--vidalia", help="Specify Vidalia Version")
 parser.add_argument("-n", "--container_name", help="Specify Container Name")
+parser.add_argument("-s", "--container_size", help="Specify Container Size in Bytes")
 
 args = parser.parse_args()
 
