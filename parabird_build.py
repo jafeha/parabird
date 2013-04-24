@@ -16,6 +16,7 @@ import zipfile
 from utils import detect_stick
 import logging
 from utils import *
+from sys import exit
 
 # PLATFORM SPECIFIC SHIT
 # http://docs.python.org/2/library/sys.html#sys.platform
@@ -23,6 +24,7 @@ from utils import *
 # is NOT in the path. We don't support Win32.
 if (sys.platform=="darwin"):
     parser.set('truecrypting','tc_binary',parser.get('truecrypting','tc_mac_binary'))
+    extract_dmg = extract_dmg_mac
 elif (sys.platform=="win32"):
     mainLogger.error("parabirdy does'nt run on windows. by us a windows license (and some gifts) or reboot in linux. virtualisation might also work")
     exit()
@@ -36,15 +38,19 @@ print "%" * 30, "\nChecking Dependencies and Configure\n", "%" * 30
 
 print "Tempdir is:", tempdir
 
-mainLogger.info("[INFO] Checking all Dependencies...")
+mainLogger.info("Checking all Dependencies...")
 
 try:
+    mainLogger.debug("truerypt binary is {}".format(parser.get('truecrypting', 'tc_binary')))
     dependency_check([parser.get('truecrypting', 'tc_binary'), "--text", "--version"])
     dependency_check("7z")
-    dependency_check("dmg2img")
+    if (sys.platform=="darwin"):
+        dependency_check(["hdiutil", "info"])
+    else:
+        dependency_check("dmg2img")
 except: 
-    mainLogger.error("[ERROR] Dependency Checks failed large scale, exiting...")
-    from sys import exit
+    mainLogger.error("Dependency Checks failed large scale, exiting...")
+    raise
     exit()
 
 
@@ -83,8 +89,9 @@ else:
     stick = detect_stick()
     #print stick
 
+    #did autodetection work? and can we write?
     #if we can write to the mountpoint of the stick, no need to re-mount it
-    if (not(os.access(str(stick['mountpoint']), os.W_OK))): 
+    if stick['mountpoint'] and (not(os.access(str(stick['mountpoint']), os.W_OK))): 
         #aka we cant write or stick detection did not work
         #question is: does it make sense to continue at this point?
         #which scenarios are possible (except detection not working)
@@ -95,14 +102,21 @@ else:
         try:
             subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
         except:
-            mainLogger.error("[ERROR] Mounting", + parser.get('DEFAULT', 'device'), + "to", mountpoint, + "failed")
+            mainLogger.error("Mounting {} to {} failed".format(parser.get('DEFAULT', 'device', mountpoint)))
+            raise
+
+    #ok, we can write to the stick        
     else:
         parser.set('DEFAULT', "device", stick['device'])
         mountpoint = stick['mountpoint']
 
 # Setting the Path for Truecrypt
 parser.set('DEFAULT', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
+mainLogger.debug("Container Path is: {}".format(parser.get('DEFAULT', 'container_path')))
+
 parser.set('DEFAULT', 'tc_mountpoint', tc_mountpoint)
+mainLogger.debug("TC Mountpoint is: {}".format(parser.get('DEFAULT', 'tc_mountpoint')))
+
 
 #Multiple Variables like this, because the logger only takes 1 argument:
 mainLogger.info("[INFO] Creating Container " + parser.get('DEFAULT', 'container_name') + " on USB-Stick: " + parser.get('DEFAULT', 'device'))
@@ -166,20 +180,7 @@ extract_tarfile("Thunderbird [Linux]", tempdir+"/"+parser.get('thunderbird_linux
 # extract_dmg("Thunderbird [Mac OS]", dmg , img, path)
 
 mainLogger.info("[INFO] Extracting Thunderbird [Mac OS]")
-
-try:
-    subprocess.check_call(["dmg2img", tempdir+"/"+parser.get('thunderbird_mac', 'file')])
-    subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', tempdir+"/"+parser.get('thunderbird_mac', 'uncompressedfile'), tempdir+"/dmg/"])
-
-# This line fails for unknown reasons: 
-# shutil.Error: [('/tmp/tmp5grVcT/dmg/ ', u'/tmp/tmpu5_8ts/apps/mac/thunderbird/ ', "[Errno 2] No such file or directory: '/tmp/tmp5grVcT/dmg/ '")]
-# We have to fix this somehow. I'm quite sure this comes from the space in the filename, but i have no idea where that comes from. As long as we can't copy the tree, we can't put tb for mac os on the stick.
-
-##shutil.copytree(tempdir+"/dmg", parser.get('thunderbird_mac', 'path'))
-
-
-except:
-    mainLogger.error("[ERROR] Could not Extract Thunderbird [Mac OS]")
+extract_dmg("Thunderbird [Mac OS]",os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path') )
 
 extract_tarfile("Vidalia [Linux]", tempdir+"/"+parser.get('vidalia_linux', 'file'), parser.get('vidalia_linux', 'path'))
 
