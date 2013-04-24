@@ -8,6 +8,7 @@ import tempfile
 import shlex
 import shutil
 from utils import *
+from extract_files import *
 from sys import exit
 
 # PLATFORM SPECIFIC SHIT
