@@ -26,7 +26,7 @@ def extract_tarfile(progname, filename, path):
     except:
         mainLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
         mainLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))
-        exit()
+        sys.exit()
 
 
 def extract_7z(progname, filename, path):
@@ -36,7 +36,7 @@ def extract_7z(progname, filename, path):
     except:
         mainLogger.error("[ERROR] Could not extract {}. exiting" .format(progname))
         mainLogger.exception("[ERROR] Could not extract {}. exiting" .format(progname))
-        exit()
+        sys.exit()
 
 
 def extract_zipfile(progname, filename, path):
@@ -49,7 +49,7 @@ def extract_zipfile(progname, filename, path):
         mainLogger.error("Could not extract {}. exiting " .format(progname))
         logging.exception("extract_zipfile did not work:")
         raise
-        exit()
+        sys.exit()
 
 def extract_dmg_mac(progname, filename, path):
     '''
@@ -116,4 +116,4 @@ def extract_dmg(progname, dmg, path):
     except:
         mainLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
         mainLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))
-        exit()      
+        sys.exit()      
