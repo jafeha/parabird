@@ -171,7 +171,8 @@ def download_application(progname, url, filename):
     try:
         for r in range(3):
             down = requests.get(url)
-            with open(tempdir+"/"+filename, "wb") as code:
+            mainLogger.debug("Writing {} ".format(tempdir+"/"+filename))
+            with codecs.open(tempdir+"/"+filename, "wb") as code:
                 code.write(down.content)
             if down.status_code == 200:
                 break
