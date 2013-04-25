@@ -80,9 +80,10 @@ def detect_stick(user_interface='console'):
 
 
     mainLogger.debug("trying to guess usb stick")
+    mainLogger.warning("Pleaze insert stick, and wait till is it mountet")
+    sys.stdout.flush()
     for i in range(400):
         if user_interface == 'console':
-            print "Pleaze insert stick, and wait till is it mountet"
             time.sleep(0.5)
             sys.stdout.write(".")
             sys.stdout.flush()
