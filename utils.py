@@ -18,6 +18,7 @@ import re
 import requests
 import plistlib
 import glob
+import time
 from xml.dom import minidom
 
 def mountparse(line_from_mount):
@@ -79,21 +80,29 @@ def detect_stick():
 
 
     print "Pleaze insert stick, and wait thill is it mountet, then press ENTER"
-    for i in range(10):
+    for i in range(60):
+        time.sleep(0.5)
+        print "."
+        #sys.stdout.flush()
         #read from mount for the second time
         output_second,error_second = subprocess.Popen("mount",stdout = subprocess.PIPE,
             stderr= subprocess.PIPE).communicate()
         #convert it to sets
         output_first_set = set(output_first.split("\n"))
         output_second_set = set(output_second.split("\n"))
-        if output_first_set.difference(output_second_set):
+        if output_second_set.difference(output_first_set):
+            print "found",
             #iterate through the items, which are not in both sets (e.g. new lines)
             for i in output_first_set.symmetric_difference(output_second_set):
                 mp = mountparse(i)
                 if (mp):
+                    print mp['mountpoint']
                     return mp
+                    break
                 else:
                     return None
+                    break
+            break
 
 #from http://docs.python.org/2/howto/logging-cookbook.html
 #explainations there
