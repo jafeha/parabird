@@ -79,7 +79,7 @@ if args.device:
         mainLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
 else: 
     stick = detect_stick()
-    #print stick
+    print stick
 
     #did autodetection work? and can we write?
     #if we can write to the mountpoint of the stick, no need to re-mount it
