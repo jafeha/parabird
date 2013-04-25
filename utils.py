@@ -69,7 +69,7 @@ def mountparse(line_from_mount):
 
     return ret
     
-def detect_stick():
+def detect_stick(user_interface='console'):
     '''
     detects if a stick is plugged in, returns a dict with infos about the stick. see 
     mountparse for a description of the dict
@@ -79,11 +79,15 @@ def detect_stick():
         stderr= subprocess.PIPE).communicate()
 
 
-    print "Pleaze insert stick, and wait thill is it mountet, then press ENTER"
-    for i in range(60):
-        time.sleep(0.5)
-        print "."
-        #sys.stdout.flush()
+    mainLogger.debug("trying to guess usb stick")
+    for i in range(400):
+        if user_interface == 'console':
+            print "Pleaze insert stick, and wait till is it mountet"
+            time.sleep(0.5)
+            sys.stdout.write(".")
+            sys.stdout.flush()
+        else:
+            pass
         #read from mount for the second time
         output_second,error_second = subprocess.Popen("mount",stdout = subprocess.PIPE,
             stderr= subprocess.PIPE).communicate()
@@ -91,18 +95,25 @@ def detect_stick():
         output_first_set = set(output_first.split("\n"))
         output_second_set = set(output_second.split("\n"))
         if output_second_set.difference(output_first_set):
-            print "found",
             #iterate through the items, which are not in both sets (e.g. new lines)
             for i in output_first_set.symmetric_difference(output_second_set):
                 mp = mountparse(i)
                 if (mp):
-                    print mp['mountpoint']
+                    if mp['type'] != ('msdos' or 'fat' or 'vfat'):
+                        mainLogger.warning(
+                        "is {} mounted on {} really a usb stick where you want to write?"
+                        .format(mp['device'], mp['mountpoint']))
+                    else:
+                        mainLogger.info("found new Device: {}".format(mp['mountpoint']))
                     return mp
                     break
                 else:
                     return None
                     break
             break
+    else:
+        mainLogger.error("No USB stick in 200 seconds")
+        return None
 
 #from http://docs.python.org/2/howto/logging-cookbook.html
 #explainations there
