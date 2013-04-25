@@ -110,9 +110,9 @@ def detect_stick(user_interface='console'):
                     break
                 else:
                     return None
-                    break
             break
     else:
+        #else from the for loop
         mainLogger.error("No USB stick in 200 seconds")
         return None
 

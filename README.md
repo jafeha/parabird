@@ -37,7 +37,8 @@ So far we  haven't reached a fully working state yet, but this is the functional
 - [x] Dependency checks
 - [ ] Extracting all applications to tempdir
 - [ ] Write make_portable() functions
-- [ ] Configuring all applications
+- [ ] Configure Linux applications
+- [ ] Configuring other applications
 - [ ] Writing startup scripts for all supported Operation systems
 - [x] Truecrypt configuration: specify container size
 - [ ] Better truecrypt configuration: dynamic volumes
