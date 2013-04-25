@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 import argparse
 import ConfigParser
 import codecs

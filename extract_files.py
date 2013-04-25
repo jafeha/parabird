@@ -1,3 +1,6 @@
+# encoding: utf-8
+
+from utils import *
 import os.path
 import tarfile
 import zipfile
@@ -13,7 +16,6 @@ import requests
 import plistlib
 import glob
 from xml.dom import minidom
-from utils import *
 
 def extract_tarfile(progname, filename, path):
     mainLogger.info("[INFO] Extracting {}" .format(progname))
