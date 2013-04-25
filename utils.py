@@ -79,57 +79,49 @@ def detect_stick():
 
 
     print "Pleaze insert stick, and wait thill is it mountet, then press ENTER"
-    raw_input()
+    for i in range(10):
+        #read from mount for the second time
+        output_second,error_second = subprocess.Popen("mount",stdout = subprocess.PIPE,
+            stderr= subprocess.PIPE).communicate()
+        #convert it to sets
+        output_first_set = set(output_first.split("\n"))
+        output_second_set = set(output_second.split("\n"))
+        if output_first_set.difference(output_second_set):
+            #iterate through the items, which are not in both sets (e.g. new lines)
+            for i in output_first_set.symmetric_difference(output_second_set):
+                mp = mountparse(i)
+                if (mp):
+                    return mp
+                else:Ì
+                    return None
 
-    #read from mount for the second time
-    output_second,error_second = subprocess.Popen("mount",stdout = subprocess.PIPE,
-        stderr= subprocess.PIPE).communicate()
-
-    #convert it to sets
-    output_first_set = set(output_first.split("\n"))
-    output_second_set = set(output_second.split("\n"))
-
-    #iterate through the items, which are not in both sets (e.g. new lines)
-
-    for i in output_first_set.symmetric_difference(output_second_set):
-        mp = mountparse(i)
-        if (mp):
-            return mp
-        else:
-            return None
-
-
-
-
-#from http://docs.python.org/2/howto/logging-cookbook.html explainations there
-
-#tempdir = tempfile.mkdtemp()
-
+#from http://docs.python.org/2/howto/logging-cookbook.html
+#explainations there
 tempdir = os.path.realpath(tempfile.mkdtemp())
 tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
 
 logfile = os.path.realpath(tempdir+"/"+"parabirdy_log.txt")
 
 logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                    datefmt='%m-%d %H:%M',
-                    filename=tempdir+"/"+"parabirdy_log.txt",
-                    filemode='w')
+    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+    datefmt='%m-%d %H:%M',
+    filename=tempdir+"/"+"parabirdy_log.txt",
+    filemode='w')
                     
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
-#formatter = logging.Formatter('%(name)-6s: %(levelname)-6s %(message)s')
 formatter = logging.Formatter('[%(levelname)s::%(name)s]: %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
 mainLogger = logging.getLogger('main')
-
-
-
 mainLogger.info('Logfile: ' + logfile)
 
 # This function tests dependencies. All stdout is send to devnull
 def dependency_check(checked_app):
+    '''
+    Checks if a command is available by simply running it and looking it
+    is available in the path
+    '''
     try:
         FNULL = open(os.devnull, 'w')
         subprocess.check_call(checked_app, stdout=FNULL)
