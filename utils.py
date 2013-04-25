@@ -92,7 +92,7 @@ def detect_stick():
                 mp = mountparse(i)
                 if (mp):
                     return mp
-                else:Ì
+                else:
                     return None
 
 #from http://docs.python.org/2/howto/logging-cookbook.html
