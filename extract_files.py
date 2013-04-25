@@ -16,7 +16,7 @@ import requests
 import plistlib
 import glob
 from xml.dom import minidom
-
+extractLogger=logging.getLogger('extract')
 def extract_tarfile(progname, filename, path):
     mainLogger.info("[INFO] Extracting {}" .format(progname))
     try:
@@ -30,12 +30,12 @@ def extract_tarfile(progname, filename, path):
 
 
 def extract_7z(progname, filename, path):
-    mainLogger.info("[INFO] Extracting {}" .format(progname))
+    extractLogger.info("[INFO] Extracting {}" .format(progname))
     try:
         subprocess.check_call(['7z', 'e', filename, '-o',+path])
     except:
-        mainLogger.error("[ERROR] Could not extract {}. exiting" .format(progname))
-        mainLogger.exception("[ERROR] Could not extract {}. exiting" .format(progname))
+        extractLogger.error("[ERROR] Could not extract {}. exiting" .format(progname))
+        extractLogger.exception("[ERROR] Could not extract {}. exiting" .format(progname))
         sys.exit()
 
 
