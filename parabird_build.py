@@ -9,7 +9,6 @@ import shlex
 import shutil
 from utils import *
 from extract_files import *
-from sys import exit
 
 # PLATFORM SPECIFIC SHIT
 # http://docs.python.org/2/library/sys.html#sys.platform
@@ -20,7 +19,7 @@ if (sys.platform=="darwin"):
     extract_dmg = extract_dmg_mac
 elif (sys.platform=="win32"):
     mainLogger.error("parabirdy does'nt run on windows. by us a windows license (and some gifts) or reboot in linux. virtualisation might also work")
-    exit()
+    sys.exit()
 
 # Removed, because there is no verbosity support, could be reimplemented later.
 # see the logging module for built in verbosity support
@@ -44,8 +43,7 @@ try:
 except: 
     mainLogger.error("Dependency Checks failed large scale, exiting...")
     mainLogger.exception("Dependency Checks failed large scale, exiting...")
-    raise
-    exit()
+    sys.exit()
 
 
 

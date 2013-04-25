@@ -231,3 +231,33 @@ def get_extension_id(rdffile):
         mainLogger.error("Not a valid install.rdf File: {}".format(rdffile))
         mainLogger.exception("Not a valid install.rdf File: {}".format(rdffile))
         return None
+
+def download_all(suite):
+    '''
+    downloads all files from the specified suite (see config)
+    suite can be all, linux, mac, win
+    returns True if all worked
+    '''
+    
+    #we need to remove duplicates!
+    suite = list(set(parser.get('suite', suite).split(" ")))
+    for progname in suite:
+        mainLogger.info("Downloading {}".format(progname))
+        download_application(progname, parser.get(progname, 'url'), parser.get(progname, 'file'))
+    else:
+        return True
+
+def copy_from_cache(progname, url, archived_file):
+    '''
+    copy files from ~/.parabirdy/cache/ to tmpdir
+    returns True on success
+    TODO stub von jonas:
+    expand user
+    test
+    '''
+    #yeah, ~/.parabirdy/cache/ is hardcoded and tmpdir is from the parser...
+    #yeah, you got the files 3 times: in ~/.pbdy/cache/, 
+    #in the tmpdir and then extracted....
+    
+    tmpdir = parser.get('DEFAULT', 'tmpdir')
+    shutil.copy2(os.path.join("~/.parabirdy/cache", archived_file), os.path.join(tmpdir, archived_file))
