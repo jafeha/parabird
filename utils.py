@@ -247,13 +247,17 @@ def download_all(suite):
     else:
         return True
 
-def copy_from_cache(progname, url, file):
+def copy_from_cache(progname, url, archived_file):
     '''
     copy files from ~/.parabirdy/cache/ to tmpdir
     returns True on success
+    TODO stub von jonas:
+    expand user
+    test
     '''
     #yeah, ~/.parabirdy/cache/ is hardcoded and tmpdir is from the parser...
     #yeah, you got the files 3 times: in ~/.pbdy/cache/, 
     #in the tmpdir and then extracted....
     
-    parser.get('DEFAULT', 'tmpdir')
+    tmpdir = parser.get('DEFAULT', 'tmpdir')
+    shutil.copy2(os.path.join("~/.parabirdy/cache", archived_file), os.path.join(tmpdir, archived_file))
