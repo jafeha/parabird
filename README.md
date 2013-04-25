@@ -39,7 +39,8 @@ So far we  haven't reached a fully working state yet, but this is the functional
 - [ ] Write make_portable() functions
 - [ ] Configuring all applications
 - [ ] Writing startup scripts for all supported Operation systems
-- [ ] Better truecrypt configuration: specify container size and dynamic volumes
+- [x] Truecrypt configuration: specify container size
+- [ ] Better truecrypt configuration: dynamic volumes
 - [ ] Support for torified USB-Stick creation (won't happen before first release)
 - [ ] Release Party
 
