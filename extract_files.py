@@ -15,7 +15,6 @@ import glob
 from xml.dom import minidom
 from utils import *
 
-
 def extract_tarfile(progname, filename, path):
     mainLogger.info("[INFO] Extracting {}" .format(progname))
     try:
