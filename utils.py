@@ -245,3 +245,14 @@ def download_all(suite):
         download_application(progname, parser.get(progname, 'url'), parser.get(progname, 'file'))
     else:
         return True
+
+def copy_from_cache(progname, url, file):
+    '''
+    copy files from ~/.parabirdy/cache/ to tmpdir
+    returns True on success
+    '''
+    #yeah, ~/.parabirdy/cache/ is hardcoded and tmpdir is from the parser...
+    #yeah, you got the files 3 times: in ~/.pbdy/cache/, 
+    #in the tmpdir and then extracted....
+    
+    parser.get('DEFAULT', 'tmpdir')
