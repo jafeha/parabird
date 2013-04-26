@@ -13,13 +13,57 @@ import shutil
 import tarfile
 import zipfile
 import logging
-import extract_files
+#import extract_files
 import re
 import requests
 import plistlib
 import glob
 import time
 from xml.dom import minidom
+
+
+#
+# Creation of tempdirs. imo we should put them into parser
+#
+
+tempdir = os.path.realpath(tempfile.mkdtemp())
+parser.set('DEFAULT', 'tmpdir', tempdir)
+tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
+
+logfile = os.path.realpath(tempdir+"/"+"parabirdy_log.txt")
+
+
+#
+# Logging Class
+#
+
+class ParaLogger(object):
+    #the stuff at this level only gets executed once
+    logging.basicConfig(level=logging.DEBUG,
+        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+        datefmt='%m-%d %H:%M',
+        filename=tempdir+"/"+"parabirdy_log.txt",
+        filemode='w')
+                    
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    formatter = logging.Formatter('[%(levelname)s::%(name)s]: %(message)s')
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
+    def __init__(self):
+        #since we use __new__, init isn't used
+        pass
+    def __new__(cls, loggername):
+        #here is the new logger born
+        #do it like this: fooLogger = ParaLogger('foo')
+        return  logging.getLogger(loggername)   
+
+utilsLogger = ParaLogger('utils')
+
+utilsLogger.info('Logfile: ' + logfile)
+
+
+
 
 def mountparse(line_from_mount):
     '''
@@ -79,8 +123,8 @@ def detect_stick(user_interface='console'):
         stderr= subprocess.PIPE).communicate()
 
 
-    mainLogger.debug("trying to guess usb stick")
-    mainLogger.warning("Pleaze insert stick, and wait till is it mountet")
+    utilsLogger.debug("trying to guess usb stick")
+    utilsLogger.warning("Pleaze insert stick, and wait till is it mountet")
     sys.stdout.flush()
     for i in range(400):
         if user_interface == 'console':
@@ -101,11 +145,11 @@ def detect_stick(user_interface='console'):
                 mp = mountparse(i)
                 if (mp):
                     if mp['type'] != ('msdos' or 'fat' or 'vfat'):
-                        mainLogger.warning(
+                        utilsLogger.warning(
                         "is {} mounted on {} really a usb stick where you want to write?"
                         .format(mp['device'], mp['mountpoint']))
                     else:
-                        mainLogger.info("found new Device: {}".format(mp['mountpoint']))
+                        utilsLogger.info("found new Device: {}".format(mp['mountpoint']))
                     return mp
                     break
                 else:
@@ -113,29 +157,9 @@ def detect_stick(user_interface='console'):
             break
     else:
         #else from the for loop
-        mainLogger.error("No USB stick in 200 seconds")
+        utilsLogger.error("No USB stick in 200 seconds")
         return None
 
-#from http://docs.python.org/2/howto/logging-cookbook.html
-#explainations there
-tempdir = os.path.realpath(tempfile.mkdtemp())
-tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
-
-logfile = os.path.realpath(tempdir+"/"+"parabirdy_log.txt")
-
-logging.basicConfig(level=logging.DEBUG,
-    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-    datefmt='%m-%d %H:%M',
-    filename=tempdir+"/"+"parabirdy_log.txt",
-    filemode='w')
-                    
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
-formatter = logging.Formatter('[%(levelname)s::%(name)s]: %(message)s')
-console.setFormatter(formatter)
-logging.getLogger('').addHandler(console)
-mainLogger = logging.getLogger('main')
-mainLogger.info('Logfile: ' + logfile)
 
 # This function tests dependencies. All stdout is send to devnull
 def dependency_check(checked_app):
@@ -148,8 +172,8 @@ def dependency_check(checked_app):
         subprocess.check_call(checked_app, stdout=FNULL)
 
     except OSError:
-        mainLogger.error("Missing Depedencies: {} not installed, exiting...".format(checked_app))
-        mainLogger.exception("Missing Depedencies: {} not installed, exiting...".format(checked_app))
+        utilsLogger.error("Missing Depedencies: {} not installed, exiting...".format(checked_app))
+        utilsLogger.exception("Missing Depedencies: {} not installed, exiting...".format(checked_app))
         sys.exit()
 
 # This function checks if there is any parameter given, 
@@ -157,32 +181,32 @@ def dependency_check(checked_app):
 # if not it uses default values from config.ini
 def update_config(section, key, value_from_argparser):
     if value_from_argparser:
-        mainLogger.info('Parameter given, device or container is: ' + value_from_argparser)
+        utilsLogger.info('Parameter given, device or container is: ' + value_from_argparser)
         parser.set(section, key, value_from_argparser)
 
     if value_from_argparser == None:
-        mainLogger.info("Taking {} {} from Config: {}" .format(section, key, parser.get(section, key) ))
+        utilsLogger.info("Taking {} {} from Config: {}" .format(section, key, parser.get(section, key) ))
 
 # This function tries to downloads all the programs we 
 # want to install. 
 def download_application(progname, url, filename):
-    mainLogger.info("[INFO] Downloading {}" .format(progname))
+    utilsLogger.info("[INFO] Downloading {}" .format(progname))
 
     try:
         for r in range(3):
             down = requests.get(url)
-            mainLogger.debug("Writing {} ".format(tempdir+"/"+filename))
+            utilsLogger.debug("Writing {} ".format(tempdir+"/"+filename))
             with codecs.open(tempdir+"/"+filename, "wb") as code:
                 code.write(down.content)
             if down.status_code == 200:
                 break
         else:
-            mainLogger.error("[ERROR] Could not download {}. exiting " .format(progname))
+            utilsLogger.error("[ERROR] Could not download {}. exiting " .format(progname))
             exit()
 
     except IOError:
-        mainLogger.error("[ERROR] Could not download {}" .format(progname))
-        mainLogger.exception("[ERROR] Could not download {}" .format(progname))
+        utilsLogger.error("[ERROR] Could not download {}" .format(progname))
+        utilsLogger.exception("[ERROR] Could not download {}" .format(progname))
         raise
         sys.exit()
         return None
@@ -221,15 +245,15 @@ def get_extension_id(rdffile):
         from xml.dom import minidom
         xmldoc = minidom.parse(rdffile)
         extension_id = xmldoc.getElementsByTagName('em:id')[0].firstChild.nodeValue
-        mainLogger.debug("ID for {} is {}".format(rdffile, extension_id))
+        utilsLogger.debug("ID for {} is {}".format(rdffile, extension_id))
         return extension_id
     except IOError:
-        mainLogger.error("Could not access file {}".format(rdffile))
-        mainLogger.exception("Could not access file {}".format(rdffile))
+        utilsLogger.error("Could not access file {}".format(rdffile))
+        utilsLogger.exception("Could not access file {}".format(rdffile))
         return None
     except IndexError:
-        mainLogger.error("Not a valid install.rdf File: {}".format(rdffile))
-        mainLogger.exception("Not a valid install.rdf File: {}".format(rdffile))
+        utilsLogger.error("Not a valid install.rdf File: {}".format(rdffile))
+        utilsLogger.exception("Not a valid install.rdf File: {}".format(rdffile))
         return None
 
 def download_all(suite):
@@ -242,7 +266,7 @@ def download_all(suite):
     #we need to remove duplicates!
     suite = list(set(parser.get('suite', suite).split(" ")))
     for progname in suite:
-        mainLogger.info("Downloading {}".format(progname))
+        utilsLogger.info("Downloading {}".format(progname))
         download_application(progname, parser.get(progname, 'url'), parser.get(progname, 'file'))
     else:
         return True
@@ -260,4 +284,7 @@ def copy_from_cache(progname, url, archived_file):
     #in the tmpdir and then extracted....
     
     tmpdir = parser.get('DEFAULT', 'tmpdir')
-    shutil.copy2(os.path.join("~/.parabirdy/cache", archived_file), os.path.join(tmpdir, archived_file))
+    src = os.path.join(os.path.expanduser('~'), ".parabirdy/cache", os.path.basename(archived_file))
+    dst = os.path.join(tmpdir, os.path.basename(archived_file))
+    print src, dst
+    shutil.copy2(src, dst)

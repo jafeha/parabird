@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-from utils import *
 import os.path
 import tarfile
 import zipfile
@@ -16,16 +15,21 @@ import requests
 import plistlib
 import glob
 from xml.dom import minidom
-extractLogger=logging.getLogger('extract')
+
+#from utils import *
+from utils import ParaLogger
+
+extractLogger=ParaLogger('extract')
+
 def extract_tarfile(progname, filename, path):
-    mainLogger.info("[INFO] Extracting {}" .format(progname))
+    extractLogger.info("[INFO] Extracting {}" .format(progname))
     try:
         tar = tarfile.open(filename)
         tar.extractall(path)
         tar.close()
     except:
-        mainLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
-        mainLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))
+        extractLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
+        extractLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))
         sys.exit()
 
 
@@ -40,13 +44,13 @@ def extract_7z(progname, filename, path):
 
 
 def extract_zipfile(progname, filename, path):
-    mainLogger.info("[INFO] Extracting {}" .format(progname))
+    extractLogger.info("[INFO] Extracting {}" .format(progname))
     try:
         zip = zipfile.ZipFile(filename)
         zip.extractall(path)
         zip.close()
     except:
-        mainLogger.error("Could not extract {}. exiting " .format(progname))
+        extractLogger.error("Could not extract {}. exiting " .format(progname))
         logging.exception("extract_zipfile did not work:")
         raise
         sys.exit()
@@ -63,44 +67,44 @@ def extract_dmg_mac(progname, filename, path):
 
     returns the path
     '''
-    mainLogger.info("Extracting {} with extract_dmg_mac".format(progname))
+    extractLogger.info("Extracting {} with extract_dmg_mac".format(progname))
     try:   
         outplist = subprocess.Popen(['hdiutil', 'attach', '-plist', filename], stdout=subprocess.PIPE).communicate()[0]
         pldict = plistlib.readPlistFromString(outplist)
         for se in pldict['system-entities']:
             if se.get('mount-point'):
                 dmg_mountpoint =  se.get('mount-point')+"/"
-                mainLogger.info("Mac Extract: DMG Mountpoint is {}".format(dmg_mountpoint))
+                extractLogger.info("Mac Extract: DMG Mountpoint is {}".format(dmg_mountpoint))
                 break
         else:
             dmg_mountpoint = None
-            mainLogger.error('Mac Extract: Mac mountpoint could not be figured out.')
+            extractLogger.error('Mac Extract: Mac mountpoint could not be figured out.')
             return False
 
         for i in glob.glob(dmg_mountpoint+"/*.app"):
             shutil.copytree(i, os.path.join(path, os.path.basename(i)))
-            mainLogger.info('Mac Extract: Copying from {} to {}'.format
+            extractLogger.info('Mac Extract: Copying from {} to {}'.format
                 (i, os.path.join(path, os.path.basename(i))))
         
         try:
-            mainLogger.info('Mac Extract: Copying for {} done'.format(progname))
+            extractLogger.info('Mac Extract: Copying for {} done'.format(progname))
             return i
         except NameError:
             #aka no i
             return False
 
     except OSError:
-        mainLogger.error("Mac Extract: hdiutil not installed. quitting")
-        mainLogger.exception("Mac Extract: hdiutil not installed. quitting")
+        extractLogger.error("Mac Extract: hdiutil not installed. quitting")
+        extractLogger.exception("Mac Extract: hdiutil not installed. quitting")
         raise
         sys.exit()
         
 def extract_dmg(progname, dmg, path):
-    mainLogger.info("[INFO] Extracting {}" .format(progname))
+    extractLogger.info("[INFO] Extracting {}" .format(progname))
     try:
-        mainLogger.debug("Linux DMG Extract: img2dmg: {} {} {}".format("dmg2img", dmg, dmg+".img"))
+        extractLogger.debug("Linux DMG Extract: img2dmg: {} {} {}".format("dmg2img", dmg, dmg+".img"))
         subprocess.check_call(["dmg2img", dmg, dmg+".img"])
-        mainLogger.debug(
+        extractLogger.debug(
             "Linux DMG Extract: mounting: {} {} {} {} {} {} {}".format(
             'mount', '-t', 'hfsplus', '-o', 'loop', dmg+".img",
             tempdir+"/dmg/"))
@@ -112,10 +116,10 @@ def extract_dmg(progname, dmg, path):
 
         for i in glob.glob(tempdir+"/dmg/*.app"):
             shutil.copytree(i, os.path.join(path, os.path.basename(i)))
-            mainLogger.info('Mac Extract: Copying from {} to {}'.format
+            extractLogger.info('Mac Extract: Copying from {} to {}'.format
                 (i, os.path.join(path, os.path.basename(i))))
 
     except:
-        mainLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
-        mainLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))
+        extractLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
+        extractLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))
         sys.exit()      
