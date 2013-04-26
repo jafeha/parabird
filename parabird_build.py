@@ -159,7 +159,11 @@ try:
     os.makedirs(parser.get('vidalia_mac', 'path'))
 
     os.makedirs(parser.get('enigmail', 'path'))
-    os.makedirs(parser.get('torbirdy', 'path'))	
+    os.makedirs(parser.get('torbirdy', 'path'))
+
+    os.makedirs(parser.get('gpg4tb', 'path'))
+    os.makedirs(parser.get('gpg4usb', 'path'))
+    os.makedirs(parser.get('gpg4mac', 'path'))
 
     # for extracting tb for mac os, we need to mount a dmg
     # i create an subfolder in tempdir for doing this
@@ -202,24 +206,24 @@ download_application("GPG Tools [Mac OS]", parser.get('gpg4mac', 'url'), parser.
 extract_tarfile("Thunderbird [Linux]", tempdir+"/"+parser.get('thunderbird_linux', 'file'), parser.get('thunderbird_linux', 'path'))
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
 extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
-# extract_zip("GPG 4 USB [Linux]", ..., ...)
+extract_zip("GPG 4 USB [Linux]", tempdir+"/"+parser.get('gpg4usb', 'file'), parser.get('gpg4usb', 'path'))
 extract_tarfile("Vidalia [Linux]", tempdir+"/"+parser.get('vidalia_linux', 'file'), parser.get('vidalia_linux', 'path'))
 
 # Extract Mac Applications
 
-extract_dmg("Thunderbird [Mac OS]",os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path') )
+extract_dmg("Thunderbird [Mac OS]", os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path') )
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
 extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
-# extract_7z("GPG 4 Thunderbird [Windows]", ..., ...)
+extract_dmg("GPG Tools [Mac OS]", os.path.join(tempdir, parser.get('gpg4mac', 'file')), parser.get('gpg4mac', 'ath'))
 extract_zipfile("Vidalia [Mac OS]", tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
 
 # Extract Windows Applications
 
-# extract_7zfile("Thunderbird [Windows]", ..., ...)
-# extract_7zfile("Vidalia [Windows]", ..., ...)
+#extract_7z("Thunderbird [Windows]", ..., ...)
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
 extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
-# extract_dmg("GPG Tools [Mac OS]", ..., ...)
+# extract_7z("GPG 4 Thunderbird [Windows]", ..., ...)
+# extract_7z("Vidalia [Windows]", ..., ...)
 
 #
 # Unmounting Truecrypt
