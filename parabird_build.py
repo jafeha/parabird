@@ -7,15 +7,65 @@ import os
 import tempfile
 import shlex
 import shutil
-from utils import *
+import argparse
+
+
+
+
+from utils import ParaLogger, detect_stick, dependency_check, update_config, download_application, get_extension_id, download_all, copy_from_cache, configtransport
 from extract_files import extract_tarfile, extract_7z, extract_zipfile, extract_dmg_mac, extract_dmg
+
+
+#
+#getting the config
+#
+
+parser=configtransport()
+
+
+
+#
+# Creation of tempdirs.
+#
+
+tempdir = os.path.realpath(tempfile.mkdtemp())
+parser.set('DEFAULT', 'tempdir', tempdir)
+
+tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
+logfile = os.path.realpath(tempdir+"/"+"parabirdy_log.txt")
+
 
 mainLogger = ParaLogger('main')
 
-# PLATFORM SPECIFIC SHIT
-# http://docs.python.org/2/library/sys.html#sys.platform
-# There exists another path to the truecrypt binary, also tc 
-# is NOT in the path. We don't support Win32.
+
+#
+# Configuring Commandline Arguments and Config
+#
+
+
+#
+# Commandline Arguments
+#
+
+# Parsing Arguments given as Parameter from Shell
+clparser = argparse.ArgumentParser()
+clparser = argparse.ArgumentParser(description='')
+clparser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
+clparser.add_argument("-d", "--device", help="Device Flag to specify USB Stick")
+clparser.add_argument("-t", "--thunder", help="Specify Thunderbird version to download")
+clparser.add_argument("-b", "--torbirdy", help="Specify Torbirdy Version")
+clparser.add_argument("-e", "--enigmail", help="Specify Enigmail Version") 
+clparser.add_argument("-a", "--vidalia", help="Specify Vidalia Version")
+clparser.add_argument("-n", "--container_name", help="Specify Container Name")
+clparser.add_argument("-s", "--container_size", help="Specify Container Size in Bytes")
+
+args = clparser.parse_args()
+
+
+#
+# Upgrading the Config
+#
+
 if (sys.platform=="darwin"):
     parser.set('truecrypting','tc_binary',parser.get('truecrypting','tc_mac_binary'))
     extract_dmg = extract_dmg_mac
@@ -27,6 +77,9 @@ elif (sys.platform=="win32"):
 # see the logging module for built in verbosity support
 #if args.verbose:
 #   mainLogger.info("verbosity turned on")
+
+
+
 
 print "%" * 30, "\nChecking Dependencies and Configure\n", "%" * 30
 
@@ -50,6 +103,25 @@ except:
 
 
 mainLogger.info("[INFO] Configuring...")
+
+
+
+def update_config(section, key, value_from_argparser):
+    '''
+    This function checks if there is any parameter given, 
+    If there is a parameter given, it updates the config 
+    if not it uses default values from config.ini
+    '''
+    
+    if value_from_argparser:
+        utilsLogger.info('Parameter given, device or container is: ' + value_from_argparser)
+        parser.set(section, key, value_from_argparser)
+
+    if value_from_argparser == None:
+        utilsLogger.info("Taking {} {} from Config: {}" .format(section, key, parser.get(section, key) ))
+
+
+
 
 #
 # Setting Parameters given from argparse
@@ -84,7 +156,6 @@ if args.device:
         mainLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
 else: 
     stick = detect_stick()
-    print stick
 
     #did autodetection work? and can we write?
     #if we can write to the mountpoint of the stick, no need to re-mount it
@@ -133,8 +204,7 @@ if os.path.exists(parser.get('DEFAULT', 'container_path')):
 #
 # Create Container
 #
-
-mainLogger.info('Truecrypting create: '+ parser.get('truecrypting', 'create'))
+mainLogger.debug('Truecrypting create: '+ parser.get('truecrypting', 'create'))
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
 
 #
@@ -216,7 +286,7 @@ extract_tarfile("Vidalia [Linux]", tempdir+"/"+parser.get('vidalia_linux', 'file
 extract_dmg("Thunderbird [Mac OS]", os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path') )
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
 extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
-extract_dmg("GPG Tools [Mac OS]", os.path.join(tempdir, parser.get('gpg4mac', 'file')), parser.get('gpg4mac', 'ath'))
+extract_dmg("GPG Tools [Mac OS]", os.path.join(tempdir, parser.get('gpg4mac', 'file')), parser.get('gpg4mac', 'path'))
 extract_zipfile("Vidalia [Mac OS]", tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
 
 # Extract Windows Applications
