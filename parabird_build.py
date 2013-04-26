@@ -114,11 +114,11 @@ def update_config(section, key, value_from_argparser):
     '''
     
     if value_from_argparser:
-        utilsLogger.info('Parameter given, device or container is: ' + value_from_argparser)
+        mainLogger.info('Parameter given, device or container is: ' + value_from_argparser)
         parser.set(section, key, value_from_argparser)
 
     if value_from_argparser == None:
-        utilsLogger.info("Taking {} {} from Config: {}" .format(section, key, parser.get(section, key) ))
+        mainLogger.info("Taking {} {} from Config: {}" .format(section, key, parser.get(section, key) ))
 
 
 
