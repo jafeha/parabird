@@ -27,6 +27,7 @@ from xml.dom import minidom
 #
 
 tempdir = os.path.realpath(tempfile.mkdtemp())
+parser.set('DEFAULT', 'tmpdir', tempdir)
 tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
 
 logfile = os.path.realpath(tempdir+"/"+"parabirdy_log.txt")
@@ -283,4 +284,7 @@ def copy_from_cache(progname, url, archived_file):
     #in the tmpdir and then extracted....
     
     tmpdir = parser.get('DEFAULT', 'tmpdir')
-    shutil.copy2(os.path.join("~/.parabirdy/cache", archived_file), os.path.join(tmpdir, archived_file))
+    src = os.path.join(os.path.expanduser('~'), ".parabirdy/cache", os.path.basename(archived_file))
+    dst = os.path.join(tmpdir, os.path.basename(archived_file))
+    print src, dst
+    shutil.copy2(src, dst)
