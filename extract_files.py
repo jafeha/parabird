@@ -104,14 +104,16 @@ def extract_dmg(progname, dmg, path):
             "Linux DMG Extract: mounting: {} {} {} {} {} {} {}".format(
             'mount', '-t', 'hfsplus', '-o', 'loop', dmg+".img",
             tempdir+"/dmg/"))
-        #subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', dmg+".img", tempdir+"/dmg/"])
-        subprocess.check_call(["mount", "-t", "hfsplus", "-o", "loop", os.path.join(tempdir, parser.get ('thunderbird_mac', 'uncompressedfile')), os.path.join(tempdir,"/dmg/")])
-        # This line fails for unknown reasons: 
-        # shutil.Error: [('/tmp/tmp5grVcT/dmg/ ', u'/tmp/tmpu5_8ts/apps/mac/thunderbird/ ', "[Errno 2] No such file or directory: '/tmp/tmp5grVcT/dmg/ '")]
-        # We have to fix this somehow. I'm quite sure this comes from the space in the filename, but i have no idea where that comes from. As long as we can't copy the tree, we can't put tb for mac os on the stick.
 
-        sutil.copytree(tempdir+"/dmg", path)
-        shutil.rmtree(tempdir+"/dmg/")
+	# The following Code need testing: subprocess call worked in shell. 
+        # Copying based on Mac Code, hope this works here too.
+
+        subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', os.path.join(dmg+".img"), os.path.join(tempdir+"/dmg/")])
+
+        for i in glob.glob(tempdir+"/dmg/*.app"):
+            shutil.copytree(i, os.path.join(path, os.path.basename(i)))
+            mainLogger.info('Mac Extract: Copying from {} to {}'.format
+                (i, os.path.join(path, os.path.basename(i))))
 
     except:
         mainLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
