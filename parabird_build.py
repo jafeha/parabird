@@ -8,7 +8,9 @@ import tempfile
 import shlex
 import shutil
 from utils import *
-from extract_files import *
+from extract_files import extract_tarfile, extract_7z, extract_zipfile, extract_dmg_mac, extract_dmg
+
+mainLogger = ParaLogger('main')
 
 # PLATFORM SPECIFIC SHIT
 # http://docs.python.org/2/library/sys.html#sys.platform
