@@ -49,7 +49,9 @@ except:
 
 mainLogger.info("[INFO] Configuring...")
 
+#
 # Setting Parameters given from argparse
+#
 
 try:
     update_config("DEFAULT", "device", args.device)
@@ -66,7 +68,10 @@ except NameError:
 
 print "%" * 30, "\nMounting and Truecrypting\n", "%" * 30
 
+#
 # Use an USB-Stick given by a Parameter or a detected one:
+#
+
 if args.device:
     try:
         mountpoint = os.path.realpath(tempfile.mkdtemp())
@@ -101,7 +106,10 @@ else:
         parser.set('DEFAULT', "device", stick['device'])
         mountpoint = stick['mountpoint']
 
+#
 # Setting the Path for Truecrypt
+#
+
 parser.set('DEFAULT', 'container_path', mountpoint+"/"+parser.get('DEFAULT', 'container_name'))
 mainLogger.debug("Container Path is: {}".format(parser.get('DEFAULT', 'container_path')))
 
@@ -112,20 +120,32 @@ mainLogger.debug("TC Mountpoint is: {}".format(parser.get('DEFAULT', 'tc_mountpo
 #Multiple Variables like this, because the logger only takes 1 argument:
 mainLogger.info("[INFO] Creating Container " + parser.get('DEFAULT', 'container_name') + " on USB-Stick: " + parser.get('DEFAULT', 'device'))
 
+#
 # Exit if the container already exists
+#
+
 if os.path.exists(parser.get('DEFAULT', 'container_path')):
     mainLogger.info("The Container given ("+ parser.get('DEFAULT', 'container_path')+") already exists. Exiting...")
     exit()
 
+#
 # Create Container
+#
+
 mainLogger.info('Truecrypting create: '+ parser.get('truecrypting', 'create'))
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
 
+#
 # Mount Container
+#
+
 mainLogger.info("[INFO] Mounting Truecrypt Container")
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 
+#
 # Create Folders
+#
+
 mainLogger.info("[INFO] Creating Folders in Truecrypt Container:")
 
 try:
@@ -135,7 +155,7 @@ try:
     os.makedirs(parser.get('thunderbird_windows', 'path'))
     os.makedirs(parser.get('vidalia_windows', 'path'))
 
-#    os.makedirs(parser.get('thunderbird_mac', 'path'))
+    os.makedirs(parser.get('thunderbird_mac', 'path'))
     os.makedirs(parser.get('vidalia_mac', 'path'))
 
     os.makedirs(parser.get('enigmail', 'path'))
@@ -149,8 +169,10 @@ except OSError:
     mainLogger.error("[ERROR] Folder already exists")
     mainLogger.exception("[ERROR] Folder already exists")
 
-
+#
 # Download Applications	
+#
+
 mainLogger.info('[INFO] Starting to download Applications to: ' + tempdir)
 
 download_application("Thunderbird [Linux]", parser.get('thunderbird_linux', 'url'), parser.get('thunderbird_linux', 'file'))
@@ -165,38 +187,57 @@ download_application("GPG 4 Thunderbird [Windows]", parser.get('gpg4tb', 'url'),
 download_application("GPG 4 USB [Linux]", parser.get('gpg4usb', 'url'), parser.get('gpg4usb', 'file'))
 download_application("GPG Tools [Mac OS]", parser.get('gpg4mac', 'url'), parser.get('gpg4mac', 'file'))
 
+
+#
+# Extracting Applications
+# 
+# 1. Linux
+# 2. Mac
+# 3. Windows
+#
+
+
+# Extracting Linux Applications
+
 extract_tarfile("Thunderbird [Linux]", tempdir+"/"+parser.get('thunderbird_linux', 'file'), parser.get('thunderbird_linux', 'path'))
-
-#mainLogger.info("[INFO] Extracting Thunderbird [Windows]")
-
-# extract_dmg("Thunderbird [Mac OS]", dmg , img, path)
-
-mainLogger.info("[INFO] Extracting Thunderbird [Mac OS]")
-extract_dmg("Thunderbird [Mac OS]",os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path') )
-
-extract_tarfile("Vidalia [Linux]", tempdir+"/"+parser.get('vidalia_linux', 'file'), parser.get('vidalia_linux', 'path'))
-
-#mainLogger.info("[INFO] Extracting Vidalia [Windows"]
-# extract_7zfile("Vidalia [Windows]", ..., ...)
-
-extract_zipfile("Vidalia [Mac OS]", tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
 extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
-
 # extract_zip("GPG 4 USB [Linux]", ..., ...)
+extract_tarfile("Vidalia [Linux]", tempdir+"/"+parser.get('vidalia_linux', 'file'), parser.get('vidalia_linux', 'path'))
+
+# Extract Mac Applications
+
+extract_dmg("Thunderbird [Mac OS]",os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path') )
+extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
+extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
 # extract_7z("GPG 4 Thunderbird [Windows]", ..., ...)
+extract_zipfile("Vidalia [Mac OS]", tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
+
+# Extract Windows Applications
+
+# extract_7zfile("Thunderbird [Windows]", ..., ...)
+# extract_7zfile("Vidalia [Windows]", ..., ...)
+extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
+extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
 # extract_dmg("GPG Tools [Mac OS]", ..., ...)
 
+#
 # Unmounting Truecrypt
+#
+
 mainLogger.info("[INFO] Unmounting Truecrypt Container")
 mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
+#
 # Unmounting USB-Stick
+#
+
 mainLogger.info("[INFO] Unmounting USB-Stick")
 
 try:
-    subprocess.check_call(["umount", mountpoint])
+    if args.device:
+        subprocess.check_call(["umount", mountpoint])
 
 except:
     
@@ -205,8 +246,10 @@ except:
     else:
         mainLogger.error("[Error] Unmounting", + mountpoint, + "failed")
         
-
+#
 # Removing Temporary folders
+#
+
 mainLogger.info("[INFO] Cleaning up Temporary Directories")
 
 try:
