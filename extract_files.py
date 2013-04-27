@@ -102,7 +102,7 @@ def extract_dmg_mac(progname, filename, path):
 
 def extract_dmg(progname, dmgfile, path):
     extractLogger.info("[INFO] Extracting {}" .format(progname))
-    tempdir = dirname(dmgfile)
+    tempdir = os.path.dirname(dmgfile)
 
     try:
         extractLogger.debug("Linux DMG Extract: img2dmg: {} {} {}".format("dmg2img", dmg, dmg+".img"))

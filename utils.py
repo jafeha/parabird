@@ -44,52 +44,52 @@ class ParaLogger(object):
     logging.basicConfig(level=logging.DEBUG,
         format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
         datefmt='%m-%d %H:%M',
-        filename="/tmp/parabirdy_log.txt",
+        filename="/tmp/parabird_log.txt",
         filemode='w')
-                    
+
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
     formatter = logging.Formatter('[%(levelname)s::%(name)s]: %(message)s')
     console.setFormatter(formatter)
     logging.getLogger('').addHandler(console)
+
     def __init__(self):
         #since we use __new__, init isn't used
         pass
+
     def __new__(cls, loggername):
         #here is the new logger born
         #do it like this: fooLogger = ParaLogger('foo')
-        return  logging.getLogger(loggername)   
+        return logging.getLogger(loggername)
 
 utilsLogger = ParaLogger('utils')
 
-utilsLogger.info('Logfile: ' + "/tmp/parabirdy_log.txt" )
+utilsLogger.info("Logfile: /tmp/parabird_log.txt")
 #utilsLogger.info('TEMPDIR: '+ tempdir)
-
 
 
 def mountparse(line_from_mount):
     '''
     give it a line from mount(not /etc/fstab!) as a string and it return a dict
     with the following keys:
-        
+
     device(eg /dev/sdc), mountpoint /media/foo, os (linux or darwin),
     type (fstype), opts (mountoptions)
-    
+
     from jojoo, gplv3
     '''
-    ret={}
+    ret = {}
 
- 
     device_point = r'''
     ^       # beginning of the line
     (.+)    #   some chars until there is a whitespace and a on - DEVICE
     \s      #   whitespace
     on      #   on - valid at linux and osx
     \s      #   whitespace
-    (.+)\s  #   some chars until there is a whitespace and a "type" or ( - MPOINT            
+    (.+)\s  #   some chars until there is a whitespace and a "type" or ( - MPOINT
     (\(.*\s| #( with a whitespace after some time (mac) OR              )
     type\s) #type with a whitespace short after(linux)
-    (.*)\)           
+    (.*)\)
     '''
     d_p = re.compile(device_point, re.VERBOSE)
     try:
@@ -114,16 +114,17 @@ def mountparse(line_from_mount):
         ret['opts'] = ", ".join(temp[1:]) + dm_listet[3]
 
     return ret
-    
+
+
 def detect_stick(user_interface='console'):
     '''
-    detects if a stick is plugged in, returns a dict with infos about the stick. see 
-    mountparse for a description of the dict
-    '''    
+    detects if a stick is plugged in, returns a dict with infos about
+    the stick. see mountparse for a description of the dict
+    '''
     #read from mount for the first time
-    output_first,error_first = subprocess.Popen("mount",stdout = subprocess.PIPE,
-        stderr= subprocess.PIPE).communicate()
-
+    output_first, error_first = subprocess.Popen(
+        "mount", stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE).communicate()
 
     utilsLogger.debug("trying to guess usb stick")
     utilsLogger.warning("Pleaze insert stick, and wait till is it mountet")
@@ -136,13 +137,15 @@ def detect_stick(user_interface='console'):
         else:
             pass
         #read from mount for the second time
-        output_second,error_second = subprocess.Popen("mount",stdout = subprocess.PIPE,
-            stderr= subprocess.PIPE).communicate()
+        output_second, error_second = subprocess.Popen(
+            "mount", stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE).communicate()
         #convert it to sets
         output_first_set = set(output_first.split("\n"))
         output_second_set = set(output_second.split("\n"))
         if output_second_set.difference(output_first_set):
-            #iterate through the items, which are not in both sets (e.g. new lines)
+            #iterate through the items, which are not in both
+            #sets (e.g. new lines)
             for i in output_first_set.symmetric_difference(output_second_set):
                 mp = mountparse(i)
                 if (mp):
@@ -151,7 +154,8 @@ def detect_stick(user_interface='console'):
                         "is {} mounted on {} really a usb stick where you want to write?"
                         .format(mp['device'], mp['mountpoint']))
                     else:
-                        utilsLogger.info("found new Device: {}".format(mp['mountpoint']))
+                        utilsLogger.info("found new Device: {}"
+                                         .format(mp['mountpoint']))
                     return mp
                     break
                 else:
@@ -174,13 +178,17 @@ def dependency_check(checked_app):
         subprocess.check_call(checked_app, stdout=FNULL)
 
     except OSError:
-        utilsLogger.error("Missing Depedencies: {} not installed, exiting...".format(checked_app))
-        utilsLogger.exception("Missing Depedencies: {} not installed, exiting...".format(checked_app))
+        utilsLogger.error("Missing Depedencies: {} not installed, exiting..."
+                          .format(checked_app))
+        utilsLogger.exception(
+            "Missing Depedencies: {} not installed, exiting..."
+            .format(checked_app))
+
         sys.exit()
 
 
-# This function tries to downloads all the programs we 
-# want to install. 
+# This function tries to downloads all the programs we
+# want to install.
 def download_application(progname, url, filename):
     tempdir = parser.get('DEFAULT', 'tempdir')
     utilsLogger.info("[INFO] Downloading {}" .format(progname))
@@ -189,8 +197,14 @@ def download_application(progname, url, filename):
         for r in range(5):
             down = requests.get(url)
             utilsLogger.debug("Writing {} ".format(tempdir+"/"+filename))
-            with codecs.open(tempdir+"/"+filename, "wb") as code:
-                code.write(down.content)
+            try:
+                with codecs.open(tempdir+"/"+filename, "wb") as code:
+                    code.write(down.content)
+            except UnicodeEncodeError:
+                with open(tempdir+"/"+filename, "wb", ) as code:
+                    code.write(down.content)
+                    print code.encoding
+
             if down.status_code == 200:
                 break
         else:
@@ -200,7 +214,8 @@ def download_application(progname, url, filename):
 
     except IOError:
         utilsLogger.error("[ERROR] Could not download {}" .format(progname))
-        utilsLogger.exception("[ERROR] Could not download {}" .format(progname))
+        utilsLogger.exception("[ERROR] Could not download {}"
+                              .format(progname))
         raise
         sys.exit()
         return None
@@ -213,10 +228,9 @@ def get_extension_id(rdffile):
     parameters:
     rdffile: path to a rdffile
 
-    returns the 
+    returns the extension id as string
     '''
     try:
-        from xml.dom import minidom
         xmldoc = minidom.parse(rdffile)
         extension_id = xmldoc.getElementsByTagName('em:id')[0].firstChild.nodeValue
         utilsLogger.debug("ID for {} is {}".format(rdffile, extension_id))
@@ -257,7 +271,7 @@ def copy_from_cache(progname, url, archived_file):
     #yeah, you got the files 3 times: in ~/.pbdy/cache/,
     #in the tmpdir and then extracted....
     tempdir = parser.get('DEFAULT', 'tempdir')
-    src = os.path.join(os.path.expanduser('~'), ".parabirdy/cache",
+    src = os.path.join(os.path.expanduser('~'), ".parabird/cache",
                        os.path.basename(archived_file))
     dst = os.path.join(tempdir, os.path.basename(archived_file))
     shutil.copy2(src, dst)
