@@ -1,8 +1,6 @@
 # encoding: utf-8
 
-import argparse
-import ConfigParser
-import codecs
+
 import urllib
 import subprocess
 import sys
@@ -20,29 +18,39 @@ import plistlib
 import glob
 import time
 from xml.dom import minidom
+from ConfigParser import SafeConfigParser
+import codecs
+import weakref
 
 
 #
-# Creation of tempdirs. imo we should put them into parser
+# Config
 #
 
-tempdir = os.path.realpath(tempfile.mkdtemp())
-parser.set('DEFAULT', 'tmpdir', tempdir)
-tc_mountpoint = os.path.realpath(tempfile.mkdtemp())
-
-logfile = os.path.realpath(tempdir+"/"+"parabirdy_log.txt")
+# Importing Config File: config.ini
+parser = SafeConfigParser()
+with codecs.open('config.ini', 'r', encoding='utf-8') as f:
+    parser.readfp(f)
 
 
 #
-# Logging Class
+# smuggling the config in other programms
 #
+
+def configtransport():
+    return weakref.proxy(parser)
+
+
+
+
+
 
 class ParaLogger(object):
     #the stuff at this level only gets executed once
     logging.basicConfig(level=logging.DEBUG,
         format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
         datefmt='%m-%d %H:%M',
-        filename=tempdir+"/"+"parabirdy_log.txt",
+        filename="/tmp/parabirdy_log.txt",
         filemode='w')
                     
     console = logging.StreamHandler()
@@ -60,8 +68,8 @@ class ParaLogger(object):
 
 utilsLogger = ParaLogger('utils')
 
-utilsLogger.info('Logfile: ' + logfile)
-
+utilsLogger.info('Logfile: ' + "/tmp/parabirdy_log.txt" )
+#utilsLogger.info('TEMPDIR: '+ tempdir)
 
 
 
@@ -190,6 +198,7 @@ def update_config(section, key, value_from_argparser):
 # This function tries to downloads all the programs we 
 # want to install. 
 def download_application(progname, url, filename):
+    tempdir = parser.get('DEFAULT', 'tempdir')
     utilsLogger.info("[INFO] Downloading {}" .format(progname))
 
     try:
@@ -211,26 +220,6 @@ def download_application(progname, url, filename):
         sys.exit()
         return None
 
-
-# Parsing Arguments given as Parameter from Shell
-parser = argparse.ArgumentParser()
-parser = argparse.ArgumentParser(description='')
-parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
-parser.add_argument("-d", "--device", help="Device Flag to specify USB Stick")
-parser.add_argument("-t", "--thunder", help="Specify Thunderbird version to download")
-parser.add_argument("-b", "--torbirdy", help="Specify Torbirdy Version")
-parser.add_argument("-e", "--enigmail", help="Specify Enigmail Version") 
-parser.add_argument("-a", "--vidalia", help="Specify Vidalia Version")
-parser.add_argument("-n", "--container_name", help="Specify Container Name")
-parser.add_argument("-s", "--container_size", help="Specify Container Size in Bytes")
-
-args = parser.parse_args()
-
-# Importing Config File: config.ini
-from ConfigParser import SafeConfigParser
-parser = SafeConfigParser()
-with codecs.open('config.ini', 'r', encoding='utf-8') as f:
-    parser.readfp(f)
 
 def get_extension_id(rdffile):
     '''
@@ -273,7 +262,7 @@ def download_all(suite):
 
 def copy_from_cache(progname, url, archived_file):
     '''
-    copy files from ~/.parabirdy/cache/ to tmpdir
+    copy files from ~/.parabirdy/cache/ to tempdir
     returns True on success
     TODO stub von jonas:
     expand user
@@ -282,9 +271,7 @@ def copy_from_cache(progname, url, archived_file):
     #yeah, ~/.parabirdy/cache/ is hardcoded and tmpdir is from the parser...
     #yeah, you got the files 3 times: in ~/.pbdy/cache/, 
     #in the tmpdir and then extracted....
-    
-    tmpdir = parser.get('DEFAULT', 'tmpdir')
+    tempdir= parser.get('DEFAULT', 'tempdir')
     src = os.path.join(os.path.expanduser('~'), ".parabirdy/cache", os.path.basename(archived_file))
-    dst = os.path.join(tmpdir, os.path.basename(archived_file))
-    print src, dst
+    dst = os.path.join(tempdir, os.path.basename(archived_file))
     shutil.copy2(src, dst)
