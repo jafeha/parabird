@@ -11,7 +11,6 @@ import shutil
 import tarfile
 import zipfile
 import logging
-#import extract_files
 import re
 import requests
 import plistlib
