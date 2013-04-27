@@ -12,7 +12,7 @@ import argparse
 
 
 
-from utils import ParaLogger, detect_stick, dependency_check, update_config, download_application, get_extension_id, copy_from_cache, configtransport, suite
+from utils import ParaLogger, detect_stick, dependency_check, download_application, get_extension_id, copy_from_cache, configtransport, suite
 from extract_files import extract_tarfile, extract_7z, extract_zipfile, extract_dmg_mac, extract_dmg
 
 
