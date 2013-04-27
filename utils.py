@@ -21,7 +21,6 @@ from ConfigParser import SafeConfigParser
 import codecs
 import weakref
 
-
 #
 # Config
 #
