@@ -41,10 +41,6 @@ def configtransport():
     return weakref.proxy(parser)
 
 
-
-
-
-
 class ParaLogger(object):
     #the stuff at this level only gets executed once
     logging.basicConfig(level=logging.DEBUG,
@@ -184,16 +180,6 @@ def dependency_check(checked_app):
         utilsLogger.exception("Missing Depedencies: {} not installed, exiting...".format(checked_app))
         sys.exit()
 
-# This function checks if there is any parameter given, 
-# If there is a parameter given, it updates the config 
-# if not it uses default values from config.ini
-def update_config(section, key, value_from_argparser):
-    if value_from_argparser:
-        utilsLogger.info('Parameter given, device or container is: ' + value_from_argparser)
-        parser.set(section, key, value_from_argparser)
-
-    if value_from_argparser == None:
-        utilsLogger.info("Taking {} {} from Config: {}" .format(section, key, parser.get(section, key) ))
 
 # This function tries to downloads all the programs we 
 # want to install. 
