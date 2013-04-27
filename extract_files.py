@@ -105,11 +105,11 @@ def extract_dmg(progname, dmgfile, path):
     tempdir = os.path.dirname(dmgfile)
 
     try:
-        extractLogger.debug("Linux DMG Extract: img2dmg: {} {} {}".format("dmg2img", dmg, dmg+".img"))
-        subprocess.check_call(["dmg2img", dmg, dmg+".img"])
+        extractLogger.debug("Linux DMG Extract: img2dmg: {} {} {}".format("dmg2img", dmgfile, dmgfile+".img"))
+        subprocess.check_call(["dmg2img", dmgfile, dmgfile+".img"])
         extractLogger.debug(
             "Linux DMG Extract: mounting: {} {} {} {} {} {} {}".format(
-            'mount', '-t', 'hfsplus', '-o', 'loop', dmg+".img",
+            'mount', '-t', 'hfsplus', '-o', 'loop', dmgfile+".img",
             "/dmg/"))
 
 	# The following Code need testing: subprocess call worked in shell.
