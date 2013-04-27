@@ -11,7 +11,6 @@ import shutil
 import tarfile
 import zipfile
 import logging
-#import extract_files
 import re
 import requests
 import plistlib
@@ -21,7 +20,6 @@ from xml.dom import minidom
 from ConfigParser import SafeConfigParser
 import codecs
 import weakref
-
 
 #
 # Config
@@ -39,10 +37,6 @@ with codecs.open('config.ini', 'r', encoding='utf-8') as f:
 
 def configtransport():
     return weakref.proxy(parser)
-
-
-
-
 
 
 class ParaLogger(object):
@@ -184,16 +178,6 @@ def dependency_check(checked_app):
         utilsLogger.exception("Missing Depedencies: {} not installed, exiting...".format(checked_app))
         sys.exit()
 
-# This function checks if there is any parameter given, 
-# If there is a parameter given, it updates the config 
-# if not it uses default values from config.ini
-def update_config(section, key, value_from_argparser):
-    if value_from_argparser:
-        utilsLogger.info('Parameter given, device or container is: ' + value_from_argparser)
-        parser.set(section, key, value_from_argparser)
-
-    if value_from_argparser == None:
-        utilsLogger.info("Taking {} {} from Config: {}" .format(section, key, parser.get(section, key) ))
 
 # This function tries to downloads all the programs we 
 # want to install. 
@@ -242,23 +226,23 @@ def get_extension_id(rdffile):
         return None
     except IndexError:
         utilsLogger.error("Not a valid install.rdf File: {}".format(rdffile))
-        utilsLogger.exception("Not a valid install.rdf File: {}".format(rdffile))
+        utilsLogger.exception("Not a valid install.rdf File: {}"
+                              .format(rdffile))
         return None
 
-def download_all(suite):
+
+def suite(suitename):
     '''
-    downloads all files from the specified suite (see config)
+    downloads all files from the specified suitename (see config)
     suite can be all, linux, mac, win
     returns True if all worked
     '''
-    
+
     #we need to remove duplicates!
-    suite = list(set(parser.get('suite', suite).split(" ")))
-    for progname in suite:
-        utilsLogger.info("Downloading {}".format(progname))
-        download_application(progname, parser.get(progname, 'url'), parser.get(progname, 'file'))
-    else:
-        return True
+    suitename = list(set(parser.get('suite', suitename).split(" ")))
+    for progname in suitename:
+        yield progname
+
 
 def copy_from_cache(progname, url, archived_file):
     '''
@@ -269,9 +253,10 @@ def copy_from_cache(progname, url, archived_file):
     test
     '''
     #yeah, ~/.parabirdy/cache/ is hardcoded and tmpdir is from the parser...
-    #yeah, you got the files 3 times: in ~/.pbdy/cache/, 
+    #yeah, you got the files 3 times: in ~/.pbdy/cache/,
     #in the tmpdir and then extracted....
-    tempdir= parser.get('DEFAULT', 'tempdir')
-    src = os.path.join(os.path.expanduser('~'), ".parabirdy/cache", os.path.basename(archived_file))
+    tempdir = parser.get('DEFAULT', 'tempdir')
+    src = os.path.join(os.path.expanduser('~'), ".parabirdy/cache",
+                       os.path.basename(archived_file))
     dst = os.path.join(tempdir, os.path.basename(archived_file))
     shutil.copy2(src, dst)
