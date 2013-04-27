@@ -12,7 +12,7 @@ import argparse
 
 
 
-from utils import ParaLogger, detect_stick, dependency_check, update_config, download_application, get_extension_id, download_all, copy_from_cache, configtransport
+from utils import ParaLogger, detect_stick, dependency_check, update_config, download_application, get_extension_id, copy_from_cache, configtransport, suite
 from extract_files import extract_tarfile, extract_7z, extract_zipfile, extract_dmg_mac, extract_dmg
 
 
@@ -20,9 +20,7 @@ from extract_files import extract_tarfile, extract_7z, extract_zipfile, extract_
 #getting the config
 #
 
-parser=configtransport()
-
-
+parser = configtransport()
 
 #
 # Creation of tempdirs.
@@ -66,10 +64,10 @@ args = clparser.parse_args()
 # Upgrading the Config
 #
 
-if (sys.platform=="darwin"):
+if (sys.platform == "darwin"):
     parser.set('truecrypting','tc_binary',parser.get('truecrypting','tc_mac_binary'))
     extract_dmg = extract_dmg_mac
-elif (sys.platform=="win32"):
+elif (sys.platform == "win32"):
     mainLogger.error("parabirdy does'nt run on windows. by us a windows license (and some gifts) or reboot in linux. virtualisation might also work")
     sys.exit()
 
@@ -117,10 +115,9 @@ def update_config(section, key, value_from_argparser):
         mainLogger.info('Parameter given, device or container is: ' + value_from_argparser)
         parser.set(section, key, value_from_argparser)
 
-    if value_from_argparser == None:
-        mainLogger.info("Taking {} {} from Config: {}" .format(section, key, parser.get(section, key) ))
-
-
+    if value_from_argparser is None:
+        mainLogger.info("Taking {} {} from Config: {}"
+                        .format(section, key, parser.get(section, key)))
 
 
 #
@@ -136,7 +133,7 @@ try:
     update_config("DEFAULT", "container_name", args.container_name)
     update_config("truecrypting", "size", args.container_size)
 
-except NameError: 
+except NameError:
     mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
     mainLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
 
@@ -150,16 +147,16 @@ if args.device:
     try:
         mountpoint = os.path.realpath(tempfile.mkdtemp())
         update_config("DEFAULT", "device", args.device)
-	
+
     except NameError:
         mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
         mainLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
-else: 
+else:
     stick = detect_stick()
 
     #did autodetection work? and can we write?
     #if we can write to the mountpoint of the stick, no need to re-mount it
-    if stick['mountpoint'] and (not(os.access(str(stick['mountpoint']), os.W_OK))): 
+    if stick['mountpoint'] and (not(os.access(str(stick['mountpoint']), os.W_OK))):
         #aka we cant write or stick detection did not work
         #question is: does it make sense to continue at this point?
         #which scenarios are possible (except detection not working)
@@ -204,7 +201,7 @@ if os.path.exists(parser.get('DEFAULT', 'container_path')):
 #
 # Create Container
 #
-mainLogger.debug('Truecrypting create: '+ parser.get('truecrypting', 'create'))
+mainLogger.debug('Truecrypting create: ' + parser.get('truecrypting', 'create'))
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
 
 #
@@ -221,21 +218,8 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 mainLogger.info("[INFO] Creating Folders in Truecrypt Container:")
 
 try:
-    os.makedirs(parser.get('thunderbird_linux', 'path'))
-    os.makedirs(parser.get('vidalia_linux', 'path'))
-
-    os.makedirs(parser.get('thunderbird_windows', 'path'))
-    os.makedirs(parser.get('vidalia_windows', 'path'))
-
-    os.makedirs(parser.get('thunderbird_mac', 'path'))
-    os.makedirs(parser.get('vidalia_mac', 'path'))
-
-    os.makedirs(parser.get('enigmail', 'path'))
-    os.makedirs(parser.get('torbirdy', 'path'))
-
-    os.makedirs(parser.get('gpg4tb', 'path'))
-    os.makedirs(parser.get('gpg4usb', 'path'))
-    os.makedirs(parser.get('gpg4mac', 'path'))
+    for prog in suite("all"):
+        os.makedirs(parser.get(prog, 'path'))
 
     # for extracting tb for mac os, we need to mount a dmg
     # i create an subfolder in tempdir for doing this
@@ -246,27 +230,20 @@ except OSError:
     mainLogger.exception("[ERROR] Folder already exists")
 
 #
-# Download Applications	
+# Download Applications
 #
 
 mainLogger.info('[INFO] Starting to download Applications to: ' + tempdir)
 
-download_application("Thunderbird [Linux]", parser.get('thunderbird_linux', 'url'), parser.get('thunderbird_linux', 'file'))
-download_application("Thunderbird [Windows]", parser.get('thunderbird_windows', 'url'), parser.get('thunderbird_windows', 'file'))
-download_application("Thunderbird [Mac OS]", parser.get('thunderbird_mac', 'url'), parser.get('thunderbird_mac', 'file'))
-download_application("Torbirdy", parser.get('torbirdy', 'url'), parser.get('torbirdy', 'file'))
-download_application("Enigmail", parser.get('enigmail', 'url'), parser.get('enigmail', 'file'))
-download_application("Vidalia [Linux]", parser.get('vidalia_linux', 'url'), parser.get('vidalia_linux', 'file'))
-download_application("Vidalia [Windows]", parser.get('vidalia_windows', 'url'), parser.get('vidalia_windows', 'file'))
-download_application("Vidalia [Mac OS]", parser.get('vidalia_mac', 'url'), parser.get('vidalia_mac', 'file'))
-download_application("GPG 4 Thunderbird [Windows]", parser.get('gpg4tb', 'url'), parser.get('gpg4tb', 'file'))
-download_application("GPG 4 USB [Linux]", parser.get('gpg4usb', 'url'), parser.get('gpg4usb', 'file'))
-download_application("GPG Tools [Mac OS]", parser.get('gpg4mac', 'url'), parser.get('gpg4mac', 'file'))
+for progname in suite("all"):
+    mainLogger.info("Downloading {}".format(progname))
+    download_application(progname, parser.get(progname, 'url'),
+                         parser.get(progname, 'file'))
 
 
 #
 # Extracting Applications
-# 
+#
 # 1. Linux
 # 2. Mac
 # 3. Windows

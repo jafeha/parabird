@@ -15,9 +15,9 @@ import requests
 import plistlib
 import glob
 from xml.dom import minidom
-
 #from utils import *
 from utils import ParaLogger
+
 
 extractLogger=ParaLogger('extract')
 
@@ -98,18 +98,21 @@ def extract_dmg_mac(progname, filename, path):
         extractLogger.exception("Mac Extract: hdiutil not installed. quitting")
         raise
         sys.exit()
-        
-def extract_dmg(progname, dmg, path):
+
+
+def extract_dmg(progname, dmgfile, path):
     extractLogger.info("[INFO] Extracting {}" .format(progname))
+    tempdir = dirname(dmgfile)
+
     try:
         extractLogger.debug("Linux DMG Extract: img2dmg: {} {} {}".format("dmg2img", dmg, dmg+".img"))
         subprocess.check_call(["dmg2img", dmg, dmg+".img"])
         extractLogger.debug(
             "Linux DMG Extract: mounting: {} {} {} {} {} {} {}".format(
             'mount', '-t', 'hfsplus', '-o', 'loop', dmg+".img",
-            tempdir+"/dmg/"))
+            "/dmg/"))
 
-	# The following Code need testing: subprocess call worked in shell. 
+	# The following Code need testing: subprocess call worked in shell.
         # Copying based on Mac Code, hope this works here too.
 
         subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', os.path.join(dmg+".img"), os.path.join(tempdir+"/dmg/")])
