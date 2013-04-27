@@ -219,7 +219,7 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 mainLogger.info("[INFO] Creating Folders in Truecrypt Container:")
 
 try:
-    for prog in suite("all"):
+    for prog in suite("linux"):
         os.makedirs(parser.get(prog, 'path'))
 
     # for extracting tb for mac os, we need to mount a dmg
@@ -239,7 +239,7 @@ mainLogger.info('[INFO] Starting to download Applications to: ' + tempdir)
 
 if (args.cache):
     download_application = copy_from_cache
-for progname in suite("all"):
+for progname in suite("linux"):
     mainLogger.info("Getting {}".format(progname))
     download_application(progname, parser.get(progname, 'url'),
                          parser.get(progname, 'file'))
@@ -264,17 +264,17 @@ extract_tarfile("Vidalia [Linux]", tempdir+"/"+parser.get('vidalia_linux', 'file
 
 # Extract Mac Applications
 
-extract_dmg("Thunderbird [Mac OS]", os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path') )
-extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
-extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
-extract_dmg("GPG Tools [Mac OS]", os.path.join(tempdir, parser.get('gpg4mac', 'file')), parser.get('gpg4mac', 'path'))
-extract_zipfile("Vidalia [Mac OS]", tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
+#extract_dmg("Thunderbird [Mac OS]", os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path') )
+#extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
+#extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
+#extract_dmg("GPG Tools [Mac OS]", os.path.join(tempdir, parser.get('gpg4mac', 'file')), parser.get('gpg4mac', 'path'))
+#extract_zipfile("Vidalia [Mac OS]", tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
 
 # Extract Windows Applications
 
 #extract_7z("Thunderbird [Windows]", ..., ...)
-extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
-extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
+#extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
+#extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
 # extract_7z("GPG 4 Thunderbird [Windows]", ..., ...)
 # extract_7z("Vidalia [Windows]", ..., ...)
 
@@ -282,38 +282,38 @@ extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.g
 # Unmounting Truecrypt
 #
 
-mainLogger.info("[INFO] Unmounting Truecrypt Container")
-mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
-subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
+#mainLogger.info("[INFO] Unmounting Truecrypt Container")
+#mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
+#subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
 #
 # Unmounting USB-Stick
 #
 
-mainLogger.info("[INFO] Unmounting USB-Stick")
+#mainLogger.info("[INFO] Unmounting USB-Stick")
 
-try:
-    if args.device:
-        subprocess.check_call(["umount", mountpoint])
+#try:
+#    if args.device:
+#        subprocess.check_call(["umount", mountpoint])
 
-except:
+#except:
     
-    if (sys.platform=="darwin"):
-       mainLogger.info("[INFO] please unmount your stick via the finder.")
-    else:
-        mainLogger.error("[Error] Unmounting", + mountpoint, + "failed")
+#    if (sys.platform=="darwin"):
+#       mainLogger.info("[INFO] please unmount your stick via the finder.")
+#    else:
+#        mainLogger.error("[Error] Unmounting", + mountpoint, + "failed")
         
 #
 # Removing Temporary folders
 #
 
-mainLogger.info("[INFO] Cleaning up Temporary Directories")
+#mainLogger.info("[INFO] Cleaning up Temporary Directories")
 
-try:
-    if args.device:
-        os.removedirs(mountpoint)
-    os.removedirs(tempdir)
-    os.removedirs(tc_mountpoint)
-except OSError:
-    mainLogger.error("Some temporary Directories could not be removed")
-    mainLogger.exception("Some temporary Directories could not be removed")
+#try:
+#    if args.device:
+#        os.removedirs(mountpoint)
+#    os.removedirs(tempdir)
+#    os.removedirs(tc_mountpoint)
+#except OSError:
+#    mainLogger.error("Some temporary Directories could not be removed")
+#    mainLogger.exception("Some temporary Directories could not be removed")
