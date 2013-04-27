@@ -49,6 +49,7 @@ mainLogger = ParaLogger('main')
 clparser = argparse.ArgumentParser()
 clparser = argparse.ArgumentParser(description='')
 clparser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
+clparser.add_argument("-c", "--cache", help="use a cache in ~/.parabirdy/cache", action="store_true")
 clparser.add_argument("-d", "--device", help="Device Flag to specify USB Stick")
 clparser.add_argument("-t", "--thunder", help="Specify Thunderbird version to download")
 clparser.add_argument("-b", "--torbirdy", help="Specify Torbirdy Version")
@@ -233,10 +234,13 @@ except OSError:
 # Download Applications
 #
 
+
 mainLogger.info('[INFO] Starting to download Applications to: ' + tempdir)
 
+if (args.cache):
+    download_application = copy_from_cache
 for progname in suite("all"):
-    mainLogger.info("Downloading {}".format(progname))
+    mainLogger.info("Getting {}".format(progname))
     download_application(progname, parser.get(progname, 'url'),
                          parser.get(progname, 'file'))
 

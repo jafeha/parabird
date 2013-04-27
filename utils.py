@@ -186,7 +186,7 @@ def download_application(progname, url, filename):
     utilsLogger.info("[INFO] Downloading {}" .format(progname))
 
     try:
-        for r in range(3):
+        for r in range(5):
             down = requests.get(url)
             utilsLogger.debug("Writing {} ".format(tempdir+"/"+filename))
             with codecs.open(tempdir+"/"+filename, "wb") as code:
@@ -194,7 +194,8 @@ def download_application(progname, url, filename):
             if down.status_code == 200:
                 break
         else:
-            utilsLogger.error("[ERROR] Could not download {}. exiting " .format(progname))
+            utilsLogger.error("[ERROR] Could not download {}. exiting "
+                              .format(progname))
             exit()
 
     except IOError:
