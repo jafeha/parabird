@@ -115,7 +115,7 @@ def extract_dmg(progname, dmgfile, path):
 	# The following Code need testing: subprocess call worked in shell.
         # Copying based on Mac Code, hope this works here too.
 
-        subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', os.path.join(dmg+".img"), os.path.join(tempdir+"/dmg/")])
+        subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', os.path.join(dmgfile+".img"), os.path.join(tempdir+"/dmg/")])
 
         for i in glob.glob(tempdir+"/dmg/*.app"):
             shutil.copytree(i, os.path.join(path, os.path.basename(i)))
