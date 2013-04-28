@@ -36,7 +36,7 @@ def extract_tarfile(progname, filename, path):
 def extract_7z(progname, filename, path):
     extractLogger.info("[INFO] Extracting {}" .format(progname))
     try:
-        subprocess.check_call(['7z', '-y', 'e', filename, '-o'+path])
+        subprocess.check_call(['7z', '-y', 'x', filename, '-o'+path])
     except:
         extractLogger.error("[ERROR] Could not extract {}. exiting" .format(progname))
         extractLogger.exception("[ERROR] Could not extract {}. exiting" .format(progname))
@@ -103,7 +103,7 @@ def extract_dmg_mac(progname, filename, path):
 def extract_dmg(progname, dmgfile, path):
     extractLogger.info("[INFO] Extracting {}" .format(progname))
     tempdir = os.path.dirname(dmgfile)
-
+    os.makedirs(tempdir+"/dmg")
     try:
         extractLogger.debug("Linux DMG Extract: img2dmg: {} {} {}".format("dmg2img", dmgfile, dmgfile+".img"))
         subprocess.check_call(["dmg2img", dmgfile, dmgfile+".img"])
@@ -121,7 +121,11 @@ def extract_dmg(progname, dmgfile, path):
         #    shutil.copytree(i, os.path.join(path, os.path.basename(i)))
         #    extractLogger.info('Mac Extract: Copying from {} to {}'.format
         #        (i, os.path.join(path, os.path.basename(i))))
-        subprocess.check_call(['cp', '-R', os.path.join(tempdir+"/dmg/*"), path])
+        # wont work for wildcard bash reasons:
+        #subprocess.check_call(['cp', '-r', os.path.join(tempdir+"/dmg/*.app/*"), path])
+        for i in glob.glob(tempdir+"/dmg/*.app"):
+            subprocess.check_call(['cp', '-r', i, path])
+            
     except:
         extractLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
         extractLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))

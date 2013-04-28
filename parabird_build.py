@@ -224,7 +224,7 @@ try:
 
     # for extracting tb for mac os, we need to mount a dmg
     # i create an subfolder in tempdir for doing this
-    os.makedirs(tempdir+"/dmg")
+    # os.makedirs(tempdir+"/dmg")
 
 except OSError:
     mainLogger.error("[ERROR] Folder already exists")
