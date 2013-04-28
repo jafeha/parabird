@@ -191,10 +191,10 @@ def mount_dmg_linux(path_to_dmg):
         extractLogger.debug(
             "Linux DMG mounting: {} {} {} {} {} {} {}".format(
             'mount', '-t', 'hfsplus', '-o', 'loop', 'quiet', path_to_img,
-            dmg_mountpoint)
+            dmg_mountpoint))
 
-        subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', 
-            path_to_img, dmg_mountpoint])
+        subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop',
+                              path_to_img, dmg_mountpoint])
         return dmg_mountpoint
 
     except:
