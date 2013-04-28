@@ -75,7 +75,7 @@ def extract_dmg_mac(progname, filename, path):
         pldict = plistlib.readPlistFromString(outplist)
         for se in pldict['system-entities']:
             if se.get('mount-point'):
-                dmg_mountpoint =  se.get('mount-point')+"/"
+                dmg_mountpoint = se.get('mount-point')+"/"
                 extractLogger.info("Mac Extract: DMG Mountpoint is {}".format(dmg_mountpoint))
                 break
         else:
@@ -85,9 +85,8 @@ def extract_dmg_mac(progname, filename, path):
 
         for i in glob.glob(dmg_mountpoint+"/*.app"):
             shutil.copytree(i, os.path.join(path, os.path.basename(i)))
-            extractLogger.info('Mac Extract: Copying from {} to {}'.format
-                (i, os.path.join(path, os.path.basename(i))))
-        
+            extractLogger.info('Mac Extract: Copying from {} to {}'
+                               .format(i, os.path.join(path, os.path.basename(i))))
         try:
             extractLogger.info('Mac Extract: Copying for {} done'.format(progname))
             return i
@@ -127,8 +126,16 @@ def extract_dmg(progname, dmgfile, path):
         #subprocess.check_call(['cp', '-r', os.path.join(tempdir+"/dmg/*.app/*"), path])
         for i in glob.glob(tempdir+"/dmg/*.app"):
             subprocess.check_call(['cp', '-r', i, path])
-            
+
     except:
         extractLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
         extractLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))
         sys.exit()
+
+
+def mount_dmg(path_to_dmg):
+    '''
+    mounts the specified .dmg, returns a path for the mounted dmg.
+
+    this will deprecate extract_dmg and extract_dmg_mac
+    '''
