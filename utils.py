@@ -223,6 +223,8 @@ def download_application(progname, url, filename):
 
 def get_extension_id(rdffile):
     '''
+    DEPRECATED: use get_xpi_id instead, this works without unpacking
+
     gets the extension id.
 
     parameters:
@@ -244,6 +246,45 @@ def get_extension_id(rdffile):
         utilsLogger.exception("Not a valid install.rdf File: {}"
                               .format(rdffile))
         return None
+
+
+def get_xpi_id(xpifile):
+    '''
+    Takes a path to a xpifile as argument
+    returns the id without unpacking the archive
+    '''
+    if not os.access(xpifile, os.R_OK):
+        utilsLogger.error('Cant read XPI file {}'.format(xpifile))
+        return False
+    if not (zipfile.is_zipfile(xpifile)):
+        utilsLogger.error('Not a zipped XPI file: {}'.format(xpifile))
+        return False
+
+    zip = zipfile.ZipFile(xpifile)
+    zipmembers = zip.namelist()
+    for i in zipmembers:
+        if (i == 'install.rdf'):
+            rdffile = zip.open(i)
+            try:
+                xmldoc = minidom.parseString(rdffile.read())
+                extension_id = xmldoc.getElementsByTagName('em:id')[0].firstChild.nodeValue
+                utilsLogger.debug("Extension ID from {} is {}".format(
+                                  xpifile, extension_id))
+                return extension_id
+            except IndexError:
+                utilsLogger.error("Doesnt contain a valid install.rdf file: {}"
+                                  .format(xpifile))
+                utilsLogger.exception("Not a valid install.rdf File: {}"
+                                      .format(xpifile))
+                return False
+
+    else:
+        #else from for i in zipmembers
+        utilsLogger.error('No install.rdf: {}'.format(xpifile))
+        return False
+
+
+
 
 
 def suite(suitename):
