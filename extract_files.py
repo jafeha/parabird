@@ -135,7 +135,69 @@ def extract_dmg(progname, dmgfile, path):
 
 def mount_dmg(path_to_dmg):
     '''
-    mounts the specified .dmg, returns a path for the mounted dmg.
+    mounts the specified .dmg, returns a path to the mounted dmg.
 
     this will deprecate extract_dmg and extract_dmg_mac
     '''
+    extractLogger.info("Mounting {}".format(path_to_dmg))
+    if (sys.platform == "darwin"):
+        return mount_dmg_mac(path_to_dmg)
+    elif (sys.platform == "win32"):
+        extractLogger.info("We dont support windows. fork & sent a pull request")
+        return False
+    else:
+        return mount_dmg_linux(path_to_dmg)
+
+
+def mount_dmg_mac(path_to_dmg):
+    '''
+    mounts a dmg under mac. dont call it directly, call it via mount_dmg
+    '''
+    try:
+        outplist = subprocess.Popen(['hdiutil', 'attach', '-plist', path_to_dmg], stdout=subprocess.PIPE).communicate()[0]
+        pldict = plistlib.readPlistFromString(outplist)
+        for se in pldict['system-entities']:
+            if se.get('mount-point'):
+                dmg_mountpoint = se.get('mount-point')+"/"
+                extractLogger.info("mac mount: DMG Mountpoint is {}".format(dmg_mountpoint))
+                return dmg_mountpoint
+        else:
+            extractLogger.error('Mac mount: Mac mountpoint could not be figured out.')
+            return False
+
+    except OSError:
+        extractLogger.error("Mac Extract: hdiutil not installed. quitting")
+        extractLogger.exception("Mac Extract: hdiutil not installed. quitting")
+        raise
+        sys.exit()
+
+
+def mount_dmg_linux(path_to_dmg):
+    '''
+    mount a dmg under linux. dont call it directly
+
+    you need img2dmg and access to mount and a recent kernel and stuff
+    '''
+
+    #we need them quite often so i define some variables
+    path_to_img = path_to_dmg + ".img"
+    tempdir = tempfile.mkdtemp()
+    os.makedirs(os.path.join(tempdir, "dmg"))
+    dmg_mountpoint = os.path.join(tempdir, "dmg")
+
+    try:
+        extractLogger.debug("Linux DMG Extract: img2dmg: {} {} {}".format("dmg2img", path_to_dmg, path_to_img))
+        subprocess.check_call(["dmg2img", path_to_dmg, path_to_img])
+        extractLogger.debug(
+            "Linux DMG mounting: {} {} {} {} {} {} {}".format(
+            'mount', '-t', 'hfsplus', '-o', 'loop', 'quiet', path_to_img,
+            dmg_mountpoint)
+
+        subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', 
+            path_to_img, dmg_mountpoint])
+        return dmg_mountpoint
+
+    except:
+        extractLogger.error("Could not mount {}".format(path_to_dmg))
+        extractLogger.exception("Could not mount {}".format(path_to_dmg))
+        return False
