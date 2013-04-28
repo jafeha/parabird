@@ -180,8 +180,9 @@ def mount_dmg_linux(path_to_dmg):
     '''
 
     #we need them quite often so i define some variables
-    path_to_img = path_to_dmg + ".img"
+
     tempdir = tempfile.mkdtemp()
+    path_to_img = os.path.join(tempdir + ".img")
     os.makedirs(os.path.join(tempdir, "dmg"))
     dmg_mountpoint = os.path.join(tempdir, "dmg")
 
