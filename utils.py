@@ -101,7 +101,7 @@ def mountparse(line_from_mount):
         ret["device"], ret["mountpoint"] = dm_listet[0], dm_listet[1]
     except ValueError:
         print "could'nt decifer your mounts. is it a linux or a mac with /dev/foobar on /mountpoint ?"
-    if (dm_listet[2].find("type")>=0):
+    if (dm_listet[2].find("type") >= 0):
         ret['os'] = 'linux'
         try:
             ret["type"], ret["opts"] = dm_listet[3].split(" (")

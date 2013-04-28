@@ -53,7 +53,7 @@ clparser.add_argument("-c", "--cache", help="use a cache in ~/.parabirdy/cache",
 clparser.add_argument("-d", "--device", help="Device Flag to specify USB Stick")
 clparser.add_argument("-t", "--thunder", help="Specify Thunderbird version to download")
 clparser.add_argument("-b", "--torbirdy", help="Specify Torbirdy Version")
-clparser.add_argument("-e", "--enigmail", help="Specify Enigmail Version") 
+clparser.add_argument("-e", "--enigmail", help="Specify Enigmail Version")
 clparser.add_argument("-a", "--vidalia", help="Specify Vidalia Version")
 clparser.add_argument("-n", "--container_name", help="Specify Container Name")
 clparser.add_argument("-s", "--container_size", help="Specify Container Size in Bytes")
@@ -66,7 +66,7 @@ args = clparser.parse_args()
 #
 
 if (sys.platform == "darwin"):
-    parser.set('truecrypting','tc_binary',parser.get('truecrypting','tc_mac_binary'))
+    parser.set('truecrypting', 'tc_binary', parser.get('truecrypting', 'tc_mac_binary'))
     extract_dmg = extract_dmg_mac
 elif (sys.platform == "win32"):
     mainLogger.error("parabirdy does'nt run on windows. by us a windows license (and some gifts) or reboot in linux. virtualisation might also work")
