@@ -37,7 +37,7 @@ def extract_tarfile(progname, filename, path):
 def extract_7z(progname, filename, path):
     extractLogger.info("[INFO] Extracting {}" .format(progname))
     try:
-        subprocess.check_call(['7z', 'e', filename, '-o',+path])
+        subprocess.check_call(['7z', '-y', 'e', filename, '-o'+path])
     except:
         extractLogger.error("[ERROR] Could not extract {}. exiting" .format(progname))
         extractLogger.exception("[ERROR] Could not extract {}. exiting" .format(progname))
@@ -52,7 +52,7 @@ def extract_zipfile(progname, filename, path):
         zip.close()
     except:
         extractLogger.error("Could not extract {}. exiting " .format(progname))
-        logging.exception("extract_zipfile did not work:")
+        extractLogger.exception("extract_zipfile did not work:")
         raise
         sys.exit()
 
@@ -111,7 +111,7 @@ def extract_dmg(progname, dmgfile, path):
         subprocess.check_call(["dmg2img", dmgfile, dmgfile+".img"])
         extractLogger.debug(
             "Linux DMG Extract: mounting: {} {} {} {} {} {} {}".format(
-            'mount', '-t', 'hfsplus', '-o', 'loop', dmgfile+".img",
+            'mount', '-t', 'hfsplus', '-o', 'loop', 'quiet', dmgfile+".img",
             "/dmg/"))
 
     # The following Code need testing: subprocess call worked in shell.
@@ -119,11 +119,11 @@ def extract_dmg(progname, dmgfile, path):
 
         subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', os.path.join(dmgfile+".img"), os.path.join(tempdir+"/dmg/")])
 
-        for i in glob.glob(tempdir+"/dmg/*.app"):
-            shutil.copytree(i, os.path.join(path, os.path.basename(i)))
-            extractLogger.info('Mac Extract: Copying from {} to {}'.format
-                (i, os.path.join(path, os.path.basename(i))))
-
+        #for i in glob.glob(tempdir+"/dmg/*.app"):
+        #    shutil.copytree(i, os.path.join(path, os.path.basename(i)))
+        #    extractLogger.info('Mac Extract: Copying from {} to {}'.format
+        #        (i, os.path.join(path, os.path.basename(i))))
+        subprocess.check_call(['cp', '-R', os.path.join(tempdir+"/dmg/*"), path])
     except:
         extractLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
         extractLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))

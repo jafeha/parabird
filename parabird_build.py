@@ -219,7 +219,7 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 mainLogger.info("[INFO] Creating Folders in Truecrypt Container:")
 
 try:
-    for prog in suite("linux"):
+    for prog in suite("all"):
         os.makedirs(parser.get(prog, 'path'))
 
     # for extracting tb for mac os, we need to mount a dmg
@@ -239,7 +239,7 @@ mainLogger.info('[INFO] Starting to download Applications to: ' + tempdir)
 
 if (args.cache):
     download_application = copy_from_cache
-for progname in suite("linux"):
+for progname in suite("all"):
     mainLogger.info("Getting {}".format(progname))
     download_application(progname, parser.get(progname, 'url'),
                          parser.get(progname, 'file'))
@@ -257,26 +257,56 @@ for progname in suite("linux"):
 # Extracting Linux Applications
 
 extract_tarfile("Thunderbird [Linux]", tempdir+"/"+parser.get('thunderbird_linux', 'file'), parser.get('thunderbird_linux', 'path'))
+parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_linux', 'path'), 'thunderbird/distribution/extensions/torbirdy'))
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
+print 'Extension ID is:', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))
+os.rename(parser.get('torbirdy', 'path'), os.path.join(parser.get('thunderbird_linux', 'path'), 'thunderbird/distribution/extensions/', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))))
+
+
+parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_linux', 'path'), 'thunderbird/distribution/extensions/enigmail'))
 extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
+print 'Extension ID is:', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
+os.rename(parser.get('enigmail', 'path'), os.path.join(parser.get('thunderbird_linux', 'path'), 'thunderbird/distribution/extensions/', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))))
+
 extract_zipfile("GPG 4 USB [Linux]", tempdir+"/"+parser.get('gpg4usb', 'file'), parser.get('gpg4usb', 'path'))
 extract_tarfile("Vidalia [Linux]", tempdir+"/"+parser.get('vidalia_linux', 'file'), parser.get('vidalia_linux', 'path'))
 
 # Extract Mac Applications
 
-#extract_dmg("Thunderbird [Mac OS]", os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path') )
-#extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
-#extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
+extract_dmg("Thunderbird [Mac OS]", os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path') )
+
+parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Contents/MacOS/distribution/extensions/torbirdy'))
+extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
+print 'Extension ID is:', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))
+os.rename(parser.get('torbirdy', 'path'), os.path.join(parser.get('thunderbird_mac', 'path'), 'Contents/MacOS/distribution/extensions/', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))))
+
+
+parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Contents/MacOS/distribution/extensions/enigmail'))
+extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
+print 'Extension ID is:', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
+os.rename(parser.get('enigmail', 'path'), os.path.join(parser.get('thunderbird_mac', 'path'), 'Contents/MacOS/distribution/extensions/', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))))
+
 #extract_dmg("GPG Tools [Mac OS]", os.path.join(tempdir, parser.get('gpg4mac', 'file')), parser.get('gpg4mac', 'path'))
-#extract_zipfile("Vidalia [Mac OS]", tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
+extract_zipfile("Vidalia [Mac OS]", tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
 
 # Extract Windows Applications
 
-#extract_7z("Thunderbird [Windows]", ..., ...)
-#extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
-#extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
-# extract_7z("GPG 4 Thunderbird [Windows]", ..., ...)
-# extract_7z("Vidalia [Windows]", ..., ...)
+extract_7z("Thunderbird [Windows]", tempdir+"/"+parser.get('thunderbird_windows', 'file'), parser.get('thunderbird_windows','path'))
+
+parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/torbirdy'))
+extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
+print 'Extension ID is:', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))
+os.rename(parser.get('torbirdy', 'path'), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))))
+
+
+parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/enigmail'))
+extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
+print 'Extension ID is:', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
+os.rename(parser.get('enigmail', 'path'), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))))
+
+
+extract_zipfile("GPG 4 USB [Windows]", tempdir+"/"+parser.get('gpg4usb', 'file'), parser.get('gpg4usb', 'path')) 
+extract_7z("Vidalia [Windows]", tempdir+"/"+parser.get('vidalia_windows', 'file'), parser.get('vidalia_windows', 'path'))
 
 #
 # Unmounting Truecrypt
