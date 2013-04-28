@@ -295,14 +295,21 @@ extract_7z("Thunderbird [Windows]", tempdir+"/"+parser.get('thunderbird_windows'
 
 parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/torbirdy'))
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
+ID = get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))
 print 'Extension ID is:', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))
-os.rename(parser.get('torbirdy', 'path'), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))))
+shutil.copy2(os.path.join(tempdir+"/"+parser.get('torbirdy', 'file')), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', ID+'.xpi'))
 
 
 parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/enigmail'))
 extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
+ID = get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
 print 'Extension ID is:', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
-os.rename(parser.get('enigmail', 'path'), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))))
+shutil.copy2(os.path.join(tempdir+"/"+parser.get('enigmail', 'file')), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', ID+'.xpi'))
+
+#parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/enigmail'))
+#extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
+#print 'Extension ID is:', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
+#os.rename(parser.get('enigmail', 'path'), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))))
 
 
 extract_zipfile("GPG 4 USB [Windows]", tempdir+"/"+parser.get('gpg4usb', 'file'), parser.get('gpg4usb', 'path')) 
