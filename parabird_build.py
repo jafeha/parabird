@@ -90,11 +90,11 @@ try:
     mainLogger.debug("truerypt binary is {}".format(parser.get('truecrypting', 'tc_binary')))
     dependency_check([parser.get('truecrypting', 'tc_binary'), "--text", "--version"])
     dependency_check("7z")
-    if (sys.platform=="darwin"):
+    if (sys.platform == "darwin"):
         dependency_check(["hdiutil", "info"])
     else:
         dependency_check("dmg2img")
-except: 
+except:
     mainLogger.error("Dependency Checks failed large scale, exiting...")
     mainLogger.exception("Dependency Checks failed large scale, exiting...")
     sys.exit()
@@ -111,7 +111,7 @@ def update_config(section, key, value_from_argparser):
     If there is a parameter given, it updates the config 
     if not it uses default values from config.ini
     '''
-    
+
     if value_from_argparser:
         mainLogger.info('Parameter given, device or container is: ' + value_from_argparser)
         parser.set(section, key, value_from_argparser)
