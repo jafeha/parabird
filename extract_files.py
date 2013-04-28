@@ -152,6 +152,8 @@ def mount_dmg(path_to_dmg):
 def mount_dmg_mac(path_to_dmg):
     '''
     mounts a dmg under mac. dont call it directly, call it via mount_dmg
+
+    takes a path to the dmg as argument, returns the path to the mountpoint
     '''
     try:
         outplist = subprocess.Popen(['hdiutil', 'attach', '-plist', path_to_dmg], stdout=subprocess.PIPE).communicate()[0]

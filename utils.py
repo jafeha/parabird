@@ -308,9 +308,6 @@ def copy_from_cache(progname, url, archived_file):
     '''
     copy files from ~/.parabirdy/cache/ to tempdir
     returns True on success
-    TODO stub von jonas:
-    expand user
-    test
     '''
     #yeah, ~/.parabirdy/cache/ is hardcoded and tmpdir is from the parser...
     #yeah, you got the files 3 times: in ~/.pbdy/cache/,
