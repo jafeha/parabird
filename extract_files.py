@@ -21,6 +21,7 @@ from utils import ParaLogger
 
 extractLogger=ParaLogger('extract')
 
+
 def extract_tarfile(progname, filename, path):
     extractLogger.info("[INFO] Extracting {}" .format(progname))
     try:
@@ -55,6 +56,7 @@ def extract_zipfile(progname, filename, path):
         raise
         sys.exit()
 
+
 def extract_dmg_mac(progname, filename, path):
     '''
     extracts files from a dmg on mac:
@@ -68,7 +70,7 @@ def extract_dmg_mac(progname, filename, path):
     returns the path
     '''
     extractLogger.info("Extracting {} with extract_dmg_mac".format(progname))
-    try:   
+    try:
         outplist = subprocess.Popen(['hdiutil', 'attach', '-plist', filename], stdout=subprocess.PIPE).communicate()[0]
         pldict = plistlib.readPlistFromString(outplist)
         for se in pldict['system-entities']:
@@ -112,8 +114,8 @@ def extract_dmg(progname, dmgfile, path):
             'mount', '-t', 'hfsplus', '-o', 'loop', dmgfile+".img",
             "/dmg/"))
 
-	# The following Code need testing: subprocess call worked in shell.
-        # Copying based on Mac Code, hope this works here too.
+    # The following Code need testing: subprocess call worked in shell.
+    # Copying based on Mac Code, hope this works here too.
 
         subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', os.path.join(dmgfile+".img"), os.path.join(tempdir+"/dmg/")])
 
@@ -125,4 +127,4 @@ def extract_dmg(progname, dmgfile, path):
     except:
         extractLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
         extractLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))
-        sys.exit()      
+        sys.exit()
