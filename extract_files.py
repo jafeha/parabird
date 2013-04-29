@@ -204,3 +204,8 @@ def mount_dmg_linux(path_to_dmg):
         extractLogger.error("Could not mount {}".format(path_to_dmg))
         extractLogger.exception("Could not mount {}".format(path_to_dmg))
         return False
+
+
+def extract_pkg(path_to_pkg):
+    '''takes a path to a .pkg file, returns the path to the extracted
+    files'''
