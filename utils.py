@@ -101,7 +101,7 @@ def mountparse(line_from_mount):
         ret["device"], ret["mountpoint"] = dm_listet[0], dm_listet[1]
     except ValueError:
         print "could'nt decifer your mounts. is it a linux or a mac with /dev/foobar on /mountpoint ?"
-    if (dm_listet[2].find("type")>=0):
+    if (dm_listet[2].find("type") >= 0):
         ret['os'] = 'linux'
         try:
             ret["type"], ret["opts"] = dm_listet[3].split(" (")
@@ -223,6 +223,8 @@ def download_application(progname, url, filename):
 
 def get_extension_id(rdffile):
     '''
+    DEPRECATED: use get_xpi_id instead, this works without unpacking
+
     gets the extension id.
 
     parameters:
@@ -246,6 +248,49 @@ def get_extension_id(rdffile):
         return None
 
 
+def get_xpi_id(xpifile):
+    '''
+    Takes a path to a xpifile as argument
+    returns the id without unpacking the archive
+
+    to check: does the {} belong to the ID or not?
+    '''
+
+    #is file accessible?
+    if not os.access(xpifile, os.R_OK):
+        utilsLogger.error('Cant read XPI file {}'.format(xpifile))
+        return False
+
+    #is it a zipfile
+    if not (zipfile.is_zipfile(xpifile)):
+        utilsLogger.error('Not a zipped XPI file: {}'.format(xpifile))
+        return False
+
+    #create file objet and check if it contains a install.rdf
+    try:
+        zip = zipfile.ZipFile(xpifile)
+        rdffile = zip.open('install.rdf')
+    except KeyError:
+        utilsLogger.exception('No install.rdf in {}'.format(xpifile))
+        utilsLogger.error('No install.rdf in {}'.format(xpifile))
+        return False
+
+    #get the extension id and check if it is a valid install.rdf
+    try:
+        xmldoc = minidom.parseString(rdffile.read())
+        extension_id = xmldoc.getElementsByTagName('em:id')[0].firstChild.nodeValue
+        utilsLogger.debug("Extension ID from {} is {}".format(
+                          xpifile, extension_id))
+        return extension_id
+
+    except IndexError:
+        utilsLogger.error("Doesnt contain a valid install.rdf file: {}"
+                          .format(xpifile))
+        utilsLogger.exception("Not a valid install.rdf File: {}"
+                              .format(xpifile))
+        return False
+
+
 def suite(suitename):
     '''
     downloads all files from the specified suitename (see config)
@@ -263,9 +308,6 @@ def copy_from_cache(progname, url, archived_file):
     '''
     copy files from ~/.parabirdy/cache/ to tempdir
     returns True on success
-    TODO stub von jonas:
-    expand user
-    test
     '''
     #yeah, ~/.parabirdy/cache/ is hardcoded and tmpdir is from the parser...
     #yeah, you got the files 3 times: in ~/.pbdy/cache/,

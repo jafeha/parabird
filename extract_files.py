@@ -21,6 +21,7 @@ from utils import ParaLogger
 
 extractLogger=ParaLogger('extract')
 
+
 def extract_tarfile(progname, filename, path):
     extractLogger.info("[INFO] Extracting {}" .format(progname))
     try:
@@ -55,6 +56,7 @@ def extract_zipfile(progname, filename, path):
         raise
         sys.exit()
 
+
 def extract_dmg_mac(progname, filename, path):
     '''
     extracts files from a dmg on mac:
@@ -68,12 +70,12 @@ def extract_dmg_mac(progname, filename, path):
     returns the path
     '''
     extractLogger.info("Extracting {} with extract_dmg_mac".format(progname))
-    try:   
+    try:
         outplist = subprocess.Popen(['hdiutil', 'attach', '-plist', filename], stdout=subprocess.PIPE).communicate()[0]
         pldict = plistlib.readPlistFromString(outplist)
         for se in pldict['system-entities']:
             if se.get('mount-point'):
-                dmg_mountpoint =  se.get('mount-point')+"/"
+                dmg_mountpoint = se.get('mount-point')+"/"
                 extractLogger.info("Mac Extract: DMG Mountpoint is {}".format(dmg_mountpoint))
                 break
         else:
@@ -83,9 +85,8 @@ def extract_dmg_mac(progname, filename, path):
 
         for i in glob.glob(dmg_mountpoint+"/*.app"):
             shutil.copytree(i, os.path.join(path, os.path.basename(i)))
-            extractLogger.info('Mac Extract: Copying from {} to {}'.format
-                (i, os.path.join(path, os.path.basename(i))))
-        
+            extractLogger.info('Mac Extract: Copying from {} to {}'
+                               .format(i, os.path.join(path, os.path.basename(i))))
         try:
             extractLogger.info('Mac Extract: Copying for {} done'.format(progname))
             return i
@@ -112,8 +113,8 @@ def extract_dmg(progname, dmgfile, path):
             'mount', '-t', 'hfsplus', '-o', 'loop', 'quiet', dmgfile+".img",
             "/dmg/"))
 
-	# The following Code need testing: subprocess call worked in shell.
-        # Copying based on Mac Code, hope this works here too.
+    # The following Code need testing: subprocess call worked in shell.
+    # Copying based on Mac Code, hope this works here too.
 
         subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', os.path.join(dmgfile+".img"), os.path.join(tempdir+"/dmg/")])
 
@@ -125,8 +126,81 @@ def extract_dmg(progname, dmgfile, path):
         #subprocess.check_call(['cp', '-r', os.path.join(tempdir+"/dmg/*.app/*"), path])
         for i in glob.glob(tempdir+"/dmg/*.app"):
             subprocess.check_call(['cp', '-r', i, path])
-            
+
     except:
         extractLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
         extractLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))
-        sys.exit()      
+        sys.exit()
+
+
+def mount_dmg(path_to_dmg):
+    '''
+    mounts the specified .dmg, returns a path to the mounted dmg.
+
+    this will deprecate extract_dmg and extract_dmg_mac
+    '''
+    extractLogger.info("Mounting {}".format(path_to_dmg))
+    if (sys.platform == "darwin"):
+        return mount_dmg_mac(path_to_dmg)
+    elif (sys.platform == "win32"):
+        extractLogger.info("We dont support windows. fork & sent a pull request")
+        return False
+    else:
+        return mount_dmg_linux(path_to_dmg)
+
+
+def mount_dmg_mac(path_to_dmg):
+    '''
+    mounts a dmg under mac. dont call it directly, call it via mount_dmg
+
+    takes a path to the dmg as argument, returns the path to the mountpoint
+    '''
+    try:
+        outplist = subprocess.Popen(['hdiutil', 'attach', '-plist', path_to_dmg], stdout=subprocess.PIPE).communicate()[0]
+        pldict = plistlib.readPlistFromString(outplist)
+        for se in pldict['system-entities']:
+            if se.get('mount-point'):
+                dmg_mountpoint = se.get('mount-point')+"/"
+                extractLogger.info("mac mount: DMG Mountpoint is {}".format(dmg_mountpoint))
+                return dmg_mountpoint
+        else:
+            extractLogger.error('Mac mount: Mac mountpoint could not be figured out.')
+            return False
+
+    except OSError:
+        extractLogger.error("Mac Extract: hdiutil not installed. quitting")
+        extractLogger.exception("Mac Extract: hdiutil not installed. quitting")
+        raise
+        sys.exit()
+
+
+def mount_dmg_linux(path_to_dmg):
+    '''
+    mount a dmg under linux. dont call it directly
+
+    you need img2dmg and access to mount and a recent kernel and stuff
+    '''
+
+    #we need them quite often so i define some variables
+
+    tempdir = tempfile.mkdtemp()
+    path_to_img = os.path.join(tempdir + ".img")
+    os.makedirs(os.path.join(tempdir, "dmg"))
+    dmg_mountpoint = os.path.join(tempdir, "dmg")
+
+    try:
+        extractLogger.debug("Linux DMG Extract: img2dmg: {} {} {}".format("dmg2img", path_to_dmg, path_to_img))
+        subprocess.check_call(["dmg2img", path_to_dmg, path_to_img])
+        extractLogger.debug(
+            "Linux DMG mounting: {} {} {} {} {} {} {}".format(
+            'mount', '-t', 'hfsplus', '-o', 'loop', 'quiet', path_to_img,
+            dmg_mountpoint))
+
+        subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop',
+                              path_to_img, dmg_mountpoint])
+        return dmg_mountpoint
+
+    except:
+        extractLogger.error("Could not mount {}".format(path_to_dmg))
+        extractLogger.exception("Could not mount {}".format(path_to_dmg))
+        return False
