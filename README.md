@@ -31,15 +31,16 @@ So far we  haven't reached a fully working state yet, but this is the functional
 - [x] Detecting mounting and unmounting an USB-Stick  
 - [x] Creating a Truecrypt container on the USB-Stick
 - [x] Downloading all necessary applications
+- [x] Use Predownloaded packages using --cache
 - [x] Creating a file stucture within the container
 - [x] Full Logging support
 - [x] Configurable using a Configparser (see config.ini)
 - [x] Dependency checks
-- [ ] Extracting all applications to tempdir
-- [ ] Write make_portable() functions
+- [x] Extracting all applications to tempdir
 - [ ] Configure Linux applications
 - [ ] Configuring other applications
-- [ ] Writing startup scripts for all supported Operation systems
+- [ ] GPG Setup Party
+- [ ] Write startup scripts for all supported Operation systems
 - [x] Truecrypt configuration: specify container size
 - [ ] Better truecrypt configuration: dynamic volumes
 - [ ] Support for torified USB-Stick creation (won't happen before first release)
@@ -49,14 +50,16 @@ Usage:
 ------
 
 ```
-python parabird_build.py --help
-
-usage: parabird_build.py [-h] [-v] [-d DEVICE] [-t THUNDER] [-b TORBIRDY]
+python ./parabird_build.py --help
+[INFO::utils]: Logfile: /tmp/parabird_log.txt
+usage: parabird_build.py [-h] [-v] [-c] [-d DEVICE] [-t THUNDER] [-b TORBIRDY]
                          [-e ENIGMAIL] [-a VIDALIA] [-n CONTAINER_NAME]
+                         [-s CONTAINER_SIZE]
 
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         increase output verbosity
+  -c, --cache           use a cache in ~/.parabirdy/cache
   -d DEVICE, --device DEVICE
                         Device Flag to specify USB Stick
   -t THUNDER, --thunder THUNDER
@@ -69,4 +72,6 @@ optional arguments:
                         Specify Vidalia Version
   -n CONTAINER_NAME, --container_name CONTAINER_NAME
                         Specify Container Name
+  -s CONTAINER_SIZE, --container_size CONTAINER_SIZE
+                        Specify Container Size in Bytes
 ```
