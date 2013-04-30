@@ -8,7 +8,7 @@ import tempfile
 import shlex
 import shutil
 import argparse
-
+import glob
 
 
 
@@ -314,6 +314,15 @@ shutil.copy2(os.path.join(tempdir+"/"+parser.get('enigmail', 'file')), os.path.j
 
 extract_zipfile("GPG 4 USB [Windows]", tempdir+"/"+parser.get('gpg4usb', 'file'), parser.get('gpg4usb', 'path')) 
 extract_7z("Vidalia [Windows]", tempdir+"/"+parser.get('vidalia_windows', 'file'), parser.get('vidalia_windows', 'path'))
+
+
+#
+# Copy Starter
+#
+
+mainLogger.info('[INFO] Copying all Starters to: ' + tc_mountpoint)
+for i in glob.glob('starter/*'):
+    shutil.copy2(i, tc_mountpoint)
 
 #
 # Unmounting Truecrypt
