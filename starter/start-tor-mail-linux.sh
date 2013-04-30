@@ -208,6 +208,7 @@ LDPATH="${HOME}/apps/linux/vidalia/tor-browser_de/Lib/"
 export LDPATH
 export LD_LIBRARY_PATH
 
+
 if [ "$debug" -eq 1 ]; then
 	printf "\nStarting Vidalia now\n"
 	cd "${HOME}"
@@ -225,8 +226,8 @@ printf "\nLaunching Tor Thunderbird Bundle for Linux in ${HOME}\n"
 cd "${HOME}"
 # XXX Someday we should pass whatever command-line arguments we got
 # (probably filenames or URLs) to Firefox.
-#./apps/linux/vidalia/tor-browser_de/App/vidalia --datadir apps/linux/vidalia/tor-browser_de/Data/Vidalia/ -style Cleanlooks
-./apps/linux/vidalia/tor-browser_de/App/vidalia --datadir apps/linux/vidalia/tor-browser_de/Data/Vidalia/ -style Cleanlooks & 
+
+"$PWD/apps/linux/vidalia/tor-browser_de/App/vidalia" --datadir "$PWD/apps/linux/vidalia/tor-browser_de/Data/Vidalia/" -style Cleanlooks & 
 
 exitcode="$?"
 if [ "$exitcode" -ne 0 ]; then
@@ -235,8 +236,8 @@ if [ "$exitcode" -ne 0 ]; then
 else
 	printf '\nVidalia exited cleanly.\n'
 fi
-
-./apps/linux/thunderbird/thunderbird/thunderbird -profile profile/
+export GNUPGHOME=$PWD/apps/linux/gpg/gpg4usb/bin/
+"$PWD/apps/linux/thunderbird/thunderbird/thunderbird" --no-remote -profile "$PWD/profile/"
 
 exitcode="$?"
 if [ "$exitcode" -ne 0 ]; then
