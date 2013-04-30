@@ -221,7 +221,7 @@ mainLogger.info("[INFO] Creating Folders in Truecrypt Container:")
 try:
     for prog in suite("all"):
         os.makedirs(parser.get(prog, 'path'))
-
+        os.makedirs(tc_mountpoint+"/data/profile")
     # for extracting tb for mac os, we need to mount a dmg
     # i create an subfolder in tempdir for doing this
     # os.makedirs(tempdir+"/dmg")
