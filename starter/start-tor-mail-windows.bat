@@ -1,3 +1,6 @@
 @echo off
-start /D "\apps\win\vidalia\Tor Browser" /NORMAL call "Start Tor Browser.exe"
-"apps\win\thunderbird\core\thunderbird.exe" -profile \data\profile\
+
+set GNUPGHOME="%CD%\data\gpg\"
+COPY "%CD%\conf\user-win.js" "%CD%\profile\user.js"
+start /D "%CD%\apps\win\vidalia\Tor Browser" /NORMAL call "Start Tor Browser.exe"
+"%CD%\apps\win\thunderbird\core\thunderbird.exe" -profile \data\profile\

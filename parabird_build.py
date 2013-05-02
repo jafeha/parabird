@@ -324,6 +324,12 @@ mainLogger.info('[INFO] Copying all Starters to: ' + tc_mountpoint)
 for i in glob.glob('starter/*'):
     shutil.copy2(i, tc_mountpoint)
 
+
+mainLogger.info('[INFO] Thunderbird configs to: ' + tc_mountpoint+"/conf/")
+os.makedirs(tc_mountpoint+"/conf")
+for i in glob.glob('prefs/*'):
+    shutil.copy2(i, tc_mountpoint+"/conf/")
+
 #
 # Unmounting Truecrypt
 #

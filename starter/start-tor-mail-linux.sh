@@ -236,7 +236,9 @@ if [ "$exitcode" -ne 0 ]; then
 else
 	printf '\nVidalia exited cleanly.\n'
 fi
-#export GNUPGHOME=$PWD/apps/linux/gpg/gpg4usb/bin/
+
+export GNUPGHOME=$PWD/data/gpg/
+cp "$PWD/conf/users-linux.js" "$PWD/data/profile/"
 "$PWD/apps/linux/thunderbird/thunderbird/thunderbird" --no-remote -profile "$PWD/data/profile/"
 
 exitcode="$?"
