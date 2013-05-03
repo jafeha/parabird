@@ -113,19 +113,15 @@ def extract_dmg(progname, dmgfile, path):
             'mount', '-t', 'hfsplus', '-o', 'loop', 'quiet', dmgfile+".img",
             "/dmg/"))
 
-    # The following Code need testing: subprocess call worked in shell.
-    # Copying based on Mac Code, hope this works here too.
-
         subprocess.check_call(['mount', '-t', 'hfsplus', '-o', 'loop', os.path.join(dmgfile+".img"), os.path.join(tempdir+"/dmg/")])
 
-        #for i in glob.glob(tempdir+"/dmg/*.app"):
-        #    shutil.copytree(i, os.path.join(path, os.path.basename(i)))
-        #    extractLogger.info('Mac Extract: Copying from {} to {}'.format
-        #        (i, os.path.join(path, os.path.basename(i))))
-        # wont work for wildcard bash reasons:
-        #subprocess.check_call(['cp', '-r', os.path.join(tempdir+"/dmg/*.app/*"), path])
         for i in glob.glob(tempdir+"/dmg/*.app"):
             subprocess.check_call(['cp', '-r', i, path])
+        # syntax probs here?
+        # we need extra code for mac os: 
+        # "diskutil eject os.path.join(tempdir+dmgfile+".img")"
+        #extractLogger.info("[INFO] Unmounting {}".format(dmgfile+".img")
+        #subprocess.check_call(['umount', os.path.join(tempdir+"/dmg/")])
 
     except:
         extractLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))

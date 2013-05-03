@@ -3,15 +3,15 @@ parabird
 
 Python script for building an os independent [Linux, Windows and Mac OS] truecrypt encrypted usb-stick containing a portable thunderbird, enigmail, torbirdy and vidalia.
 
-**NOTE:** The script is not yet functional, it's pre-pre-alpha. Give me a litte time to figure things out because it is also some kind of a python learning script for me.
+**NOTE:** The script is only partial functional, it is definitely in alpha state. Give me a litte time to figure things out because it is also some kind of a python learning script for me. If you have some hints for solving our issues or any thunderbird tweaking tips, please get in touch.
 
 Requirements:
 -------------
 
-* USB-Stick or any other removable device with a maximum of 4GB space (limit for FAT32 formatted sticks). The programs won't take that much space and there should be enough space left for mails. we don't force users to use an NTFS formatted USB-Stick, so you won't be able to use a container bigger than 4GB on a FAT32 formatted USB-Stick
+* USB-Stick with at least 1GB free disk space (we regret, but we have recommend FAT32 file system)
 * Internet Connection
 * Linux or Mac OS based Host for building the Stick
-* Depending on your Host it's very likly that you need adminstrator priviledges for un/mounting the tc container
+* You will need admin priviledges for building the stick because it is necessary for un/mounting the tc container
 
 Depedencies:
 ------------
@@ -31,16 +31,19 @@ So far we  haven't reached a fully working state yet, but this is the functional
 - [x] Detecting mounting and unmounting an USB-Stick  
 - [x] Creating a Truecrypt container on the USB-Stick
 - [x] Downloading all necessary applications
+- [x] Use Predownloaded packages using --cache
 - [x] Creating a file stucture within the container
 - [x] Full Logging support
 - [x] Configurable using a Configparser (see config.ini)
 - [x] Dependency checks
-- [ ] Extracting all applications to tempdir
-- [ ] Write make_portable() functions
-- [ ] Configure Linux applications
-- [ ] Configuring other applications
-- [ ] Writing startup scripts for all supported Operation systems
 - [x] Truecrypt configuration: specify container size
+- [x] Extracting all applications
+- [x] Configure Linux applications
+- [ ] Configure Windows applications (0.5/1)
+- [ ] Configure Mac applications (0.5/1)
+- [ ] GPG Setup Party (1.5/3)
+- [ ] Write startup scripts for all supported Operation systems (1.5/3)
+- [ ] Testing
 - [ ] Better truecrypt configuration: dynamic volumes
 - [ ] Support for torified USB-Stick creation (won't happen before first release)
 - [ ] Release Party
@@ -49,14 +52,16 @@ Usage:
 ------
 
 ```
-python parabird_build.py --help
-
-usage: parabird_build.py [-h] [-v] [-d DEVICE] [-t THUNDER] [-b TORBIRDY]
+python ./parabird_build.py --help
+[INFO::utils]: Logfile: /tmp/parabird_log.txt
+usage: parabird_build.py [-h] [-v] [-c] [-d DEVICE] [-t THUNDER] [-b TORBIRDY]
                          [-e ENIGMAIL] [-a VIDALIA] [-n CONTAINER_NAME]
+                         [-s CONTAINER_SIZE]
 
 optional arguments:
   -h, --help            show this help message and exit
   -v, --verbose         increase output verbosity
+  -c, --cache           use a cache in ~/.parabirdy/cache
   -d DEVICE, --device DEVICE
                         Device Flag to specify USB Stick
   -t THUNDER, --thunder THUNDER
@@ -69,4 +74,6 @@ optional arguments:
                         Specify Vidalia Version
   -n CONTAINER_NAME, --container_name CONTAINER_NAME
                         Specify Container Name
+  -s CONTAINER_SIZE, --container_size CONTAINER_SIZE
+                        Specify Container Size in Bytes
 ```
