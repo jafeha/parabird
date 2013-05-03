@@ -38,7 +38,7 @@ So far we haven't reached a fully working state yet, but this is the functionali
 - [x] Dependency checks
 - [x] Truecrypt configuration: specify container size
 - [x] Extracting all applications
-- [x] Extract GPG for Mac OS
+- [ ] Extract GPG for Mac OS
 - [x] Configure Linux applications
 - [x] Configure Windows applications
 - [x] Configure Mac applications
