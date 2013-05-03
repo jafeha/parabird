@@ -222,6 +222,7 @@ try:
     for prog in suite("all"):
         os.makedirs(parser.get(prog, 'path'))
         os.makedirs(tc_mountpoint+"/data/profile")
+        os.makedirs(tc_mountpoint+"/data/gpg")
     # for extracting tb for mac os, we need to mount a dmg
     # i create an subfolder in tempdir for doing this
     # os.makedirs(tempdir+"/dmg")
@@ -275,16 +276,16 @@ extract_tarfile("Vidalia [Linux]", tempdir+"/"+parser.get('vidalia_linux', 'file
 
 extract_dmg("Thunderbird [Mac OS]", os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path') )
 
-parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Contents/MacOS/distribution/extensions/torbirdy'))
+parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/torbirdy'))
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
 print 'Extension ID is:', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))
-os.rename(parser.get('torbirdy', 'path'), os.path.join(parser.get('thunderbird_mac', 'path'), 'Contents/MacOS/distribution/extensions/', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))))
+os.rename(parser.get('torbirdy', 'path'), os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))))
 
 
-parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Contents/MacOS/distribution/extensions/enigmail'))
+parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/enigmail'))
 extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
 print 'Extension ID is:', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
-os.rename(parser.get('enigmail', 'path'), os.path.join(parser.get('thunderbird_mac', 'path'), 'Contents/MacOS/distribution/extensions/', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))))
+os.rename(parser.get('enigmail', 'path'), os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))))
 
 #extract_dmg("GPG Tools [Mac OS]", os.path.join(tempdir, parser.get('gpg4mac', 'file')), parser.get('gpg4mac', 'path'))
 extract_zipfile("Vidalia [Mac OS]", tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
@@ -325,7 +326,7 @@ for i in glob.glob('starter/*'):
     shutil.copy2(i, tc_mountpoint)
 
 
-mainLogger.info('[INFO] Thunderbird configs to: ' + tc_mountpoint+"/conf/")
+mainLogger.info('[INFO] Copying Thunderbird configs to: ' + tc_mountpoint+"/conf/")
 os.makedirs(tc_mountpoint+"/conf")
 for i in glob.glob('prefs/*'):
     shutil.copy2(i, tc_mountpoint+"/conf/")

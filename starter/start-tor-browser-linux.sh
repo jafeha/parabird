@@ -198,13 +198,13 @@ else
 	export HOME
 fi
 
-if ldd ./apps/linux/vidalia/tor-browser_de/App/Firefox/firefox-bin | grep -q "libz\.so\.1.*not found"; then
-	LD_LIBRARY_PATH="${HOME}/apps/linux/vidalia/tor-browser_de/Lib:${HOME}/Lib/libz"
+if ldd ./apps/linux/tor-browser_de/App/Firefox/firefox-bin | grep -q "libz\.so\.1.*not found"; then
+	LD_LIBRARY_PATH="${HOME}/apps/linux/tor-browser_de/Lib:${HOME}/Lib/libz"
 else
-	LD_LIBRARY_PATH="${HOME}/apps/linux/vidalia/tor-browser_de/Lib"
+	LD_LIBRARY_PATH="${HOME}/apps/linux/tor-browser_de/Lib"
 fi
 
-LDPATH="${HOME}/apps/linux/vidalia/tor-browser_de/Lib/"
+LDPATH="${HOME}/apps/linux/tor-browser_de/Lib/"
 export LDPATH
 export LD_LIBRARY_PATH
 
@@ -214,8 +214,8 @@ if [ "$debug" -eq 1 ]; then
 	printf "\nLaunching Vidalia from: `pwd`\n"
 	# XXX Someday we should pass whatever command-line arguments we got
 	# (probably filenames or URLs) to Firefox.
-	./apps/linux/vidalia/tor-browser_de/App/vidalia --loglevel debug --logfile vidalia-debug-log \
-	--datadir apps/linux/vidalia/tor-browser_de/Data/Vidalia/ -style Cleanlooks
+	./apps/linux/tor-browser_de/App/vidalia --loglevel debug --logfile vidalia-debug-log \
+	--datadir apps/linux/tor-browser_de/Data/Vidalia/ -style Cleanlooks
 	printf "\nVidalia exited with the following return code: $?\n"
 	exit
 fi
@@ -225,7 +225,7 @@ printf "\nLaunching Tor Browser Bundle for Linux in ${HOME}\n"
 cd "${HOME}"
 # XXX Someday we should pass whatever command-line arguments we got
 # (probably filenames or URLs) to Firefox.
-./apps/linux/vidalia/tor-browser_de/App/vidalia --datadir apps/linux/vidalia/tor-browser_de/Data/Vidalia/ -style Cleanlooks
+./apps/linux/tor-browser_de/App/vidalia --datadir apps/linux/tor-browser_de/Data/Vidalia/ -style Cleanlooks
 exitcode="$?"
 if [ "$exitcode" -ne 0 ]; then
 	complain "Vidalia exited abnormally.  Exit code: $exitcode"
