@@ -38,11 +38,12 @@ So far we  haven't reached a fully working state yet, but this is the functional
 - [x] Dependency checks
 - [x] Truecrypt configuration: specify container size
 - [x] Extracting all applications
+- [x] Extract GPG for Mac OS
 - [x] Configure Linux applications
-- [ ] Configure Windows applications (0.5/1)
-- [ ] Configure Mac applications (0.5/1)
-- [ ] GPG Setup Party (1.5/3)
-- [ ] Write startup scripts for all supported Operation systems (1.5/3)
+- [x] Configure Windows applications
+- [x] Configure Mac applications
+- [x] GPG Setup Party
+- [x] Write startup scripts for all supported Operation systems (3/3)
 - [ ] Testing
 - [ ] Better truecrypt configuration: dynamic volumes
 - [ ] Support for torified USB-Stick creation (won't happen before first release)
