@@ -150,9 +150,10 @@ def detect_stick(user_interface='console'):
                 mp = mountparse(i)
                 if (mp):
                     if mp['type'] != ('msdos' or 'fat' or 'vfat'):
+                        print "\n"
                         utilsLogger.warning(
-                        "is {} mounted on {} really a usb stick where you want to write?"
-                        .format(mp['device'], mp['mountpoint']))
+                        "is {} mounted on {} really the usb stick where you want to write?"
+                        .format(mp['device'], mp['mountpoint'])),confirm('Please confirm container creation', resp=False)
                     else:
                         utilsLogger.info("found new Device: {}"
                                          .format(mp['mountpoint']))
@@ -317,3 +318,45 @@ def copy_from_cache(progname, url, archived_file):
                        os.path.basename(archived_file))
     dst = os.path.join(tempdir, os.path.basename(archived_file))
     shutil.copy2(src, dst)
+
+
+def confirm(prompt=None, resp=False):
+    """prompts for yes or no response from the user. Returns True for yes and
+    False for no.
+
+    'resp' should be set to the default value assumed by the caller when
+    user simply types ENTER.
+
+    >>> confirm(prompt='Create Directory?', resp=True)
+    Create Directory? [y]|n: 
+    True
+    >>> confirm(prompt='Create Directory?', resp=False)
+    Create Directory? [n]|y: 
+    False
+    >>> confirm(prompt='Create Directory?', resp=False)
+    Create Directory? [n]|y: y
+    True
+
+    """
+    
+    if prompt is None:
+        prompt = 'Confirm'
+
+    if resp:
+        prompt = '{} [{}]|{}: ' .format(prompt, 'y', 'n')
+    else:
+        prompt = '{} [{}]|{}: ' .format(prompt, 'n', 'y')
+        
+    while True:
+        ans = raw_input(prompt)
+        if not ans:
+            return resp
+        if ans not in ['y', 'Y', 'n', 'N']:
+            print 'Invalid answer, please confirm entering [y] or [n].'
+            continue
+        if ans == 'y' or ans == 'Y':
+            return True
+        if ans == 'n' or ans == 'N':
+#            return False
+            utilsLogger.error("No Confirmation, exiting...")
+            sys.exit()
