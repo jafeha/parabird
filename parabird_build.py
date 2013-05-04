@@ -80,7 +80,7 @@ elif (sys.platform == "win32"):
 
 
 
-print "=" * 50, "\nChecking Dependencies and Configure\n", "=" * 50
+print "=" * 60, "\nChecking Dependencies and Configure\n", "=" * 60
 
 print "Tempdir is:", tempdir
 
@@ -138,7 +138,7 @@ except NameError:
     mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
     mainLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
 
-print "=" * 50, "\nMounting and Truecrypting\n", "=" * 50
+print "=" * 60, "\nMounting and Truecrypting\n", "=" * 60
 
 #
 # Use an USB-Stick given by a Parameter or a detected one:
@@ -213,7 +213,7 @@ mainLogger.info("Mounting Truecrypt Container")
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 
 
-print "=" * 50, "\nCreating Folders, Downloading and Extracting \n", "=" * 50
+print "=" * 60, "\nCreating Folders, Downloading and Extracting \n", "=" * 60
 
 #
 # Create Folders
@@ -229,17 +229,6 @@ try:
             os.makedirs(tc_mountpoint+"/data/profile")
         if not os.path.exists(tc_mountpoint+"/data/gpg"):
             os.makedirs(tc_mountpoint+"/data/gpg")
-
-        #os.mkdir(tc_mountpoint+"/data/")
-        #os.mkdir(tc_mountpoint+"/data/profile")
-        #os.mkdir(tc_mountpoint+"/data/gpg")
-        
-        #os.makedirs(parser.get(prog, 'path'))
-        #os.makedirs(tc_mountpoint+"/data/profile")
-        #os.makedirs(tc_mountpoint+"/data/gpg")
-    # for extracting tb for mac os, we need to mount a dmg
-    # i create an subfolder in tempdir for doing this
-    # os.makedirs(tempdir+"/dmg")
 
 except OSError:
     mainLogger.error("[ERROR] Folder already exists")
@@ -317,12 +306,6 @@ extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.g
 ID = get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
 shutil.copy2(os.path.join(tempdir+"/"+parser.get('enigmail', 'file')), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', ID+'.xpi'))
 
-#parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/enigmail'))
-#extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
-#print 'Extension ID is:', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
-#os.rename(parser.get('enigmail', 'path'), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))))
-
-
 extract_zipfile("GPG 4 USB [Windows]", tempdir+"/"+parser.get('gpg4usb', 'file'), parser.get('gpg4usb', 'path')) 
 extract_7z("Vidalia [Windows]", tempdir+"/"+parser.get('vidalia_windows', 'file'), parser.get('vidalia_windows', 'path'))
 
@@ -341,42 +324,49 @@ os.makedirs(tc_mountpoint+"/conf")
 for i in glob.glob('prefs/*'):
     shutil.copy2(i, tc_mountpoint+"/conf/")
 
+print "=" * 60, "\nTidying up... \n", "=" * 60
+
 #
 # Unmounting Truecrypt
 #
 
-#mainLogger.info("Unmounting Truecrypt Container")
-#mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
-#subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
+mainLogger.info("Unmounting Truecrypt Container")
+mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
+subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
 #
 # Unmounting USB-Stick
 #
 
-#mainLogger.info("Unmounting USB-Stick")
 
-#try:
-#    if args.device:
-#        subprocess.check_call(["umount", mountpoint])
+try:
+    if args.device:
+        mainLogger.info("Unmounting USB-Stick")
+        if (sys.platform == "darwin"):
+            subprocess.check_call(['diskutil', 'eject', mountpoint])
+        else:
+            subprocess.check_call(["umount", mountpoint])
+except OSError:
+    mainLogger.error("Could not umount {}").format(mountpoint)
+    mainLogger.exception("Could not umount {}").format(mountpoint)
 
-#except:
+#
+# Removing Temporary Directories
+#
+
+mainLogger.info("Cleaning up Temporary Directories")
+
+try:
+    if args.device:
+        shutil.rmtree(mountpoint)
+    shutil.rmtree(tc_mountpoint)
+    shutil.rmtree(tempdir)
+except OSError:
+    mainLogger.error("Some temporary Directories could not be removed")
+    mainLogger.exception("Some temporary Directories could not be removed")
     
-#    if (sys.platform=="darwin"):
-#       mainLogger.info("Please unmount your stick via the finder.")
-#    else:
-#        mainLogger.error("[Error] Unmounting", + mountpoint, + "failed")
-        
-#
-# Removing Temporary folders
-#
 
-#mainLogger.info("Cleaning up Temporary Directories")
+print "=" * 60, "\nThe Container {} was sucessfully created." .format(mountpoint+"/container.tc")
+print "You can mount it using truecrypt."
+print "=" * 60
 
-#try:
-#    if args.device:
-#        os.removedirs(mountpoint)
-#    os.removedirs(tempdir)
-#    os.removedirs(tc_mountpoint)
-#except OSError:
-#    mainLogger.error("Some temporary Directories could not be removed")
-#    mainLogger.exception("Some temporary Directories could not be removed")

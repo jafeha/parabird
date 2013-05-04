@@ -123,8 +123,11 @@ def extract_dmg(progname, dmgfile, path):
         # we need extra code for mac os: 
         # "diskutil eject os.path.join(tempdir+dmgfile+".img")"
         #extractLogger.debug("Unmounting {}".format(dmgfile+".img")
-        #subprocess.check_call(['umount', os.path.join(tempdir+"/dmg/")])
-
+    
+        if (sys.platform == "darwin"):
+            subprocess.check_call(['diskutil', 'eject', os.path.join(tempdir+"/dmg/")])
+        else: 
+            subprocess.check_call(['umount', os.path.join(tempdir+"/dmg/")])
     except:
         extractLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
         extractLogger.exception("[ERROR] Could not extract {}. exiting " .format(progname))

@@ -153,7 +153,10 @@ def detect_stick(user_interface='console'):
                         print "\n"
                         utilsLogger.warning(
                         "is {} mounted on {} really the usb stick where you want to write?"
-                        .format(mp['device'], mp['mountpoint'])),confirm('Please confirm container creation', resp=False)
+                        .format(mp['device'], mp['mountpoint']))
+                        print "=" * 60
+                        confirm('Please confirm container creation', resp=True)
+                        print "=" * 60
                     else:
                         utilsLogger.info("found new Device: {}"
                                          .format(mp['mountpoint']))
@@ -343,19 +346,19 @@ def confirm(prompt=None, resp=False):
         prompt = 'Confirm'
 
     if resp:
-        prompt = '{} [{}]|{}: ' .format(prompt, 'y', 'n')
+        prompt = '{} ({}/{}) [Yes]: ' .format(prompt, 'y=Yes', 'n=No')
     else:
-        prompt = '{} [{}]|{}: ' .format(prompt, 'n', 'y')
+        prompt = '{} ({}/{} [No]): ' .format(prompt, 'n=No', 'y=Yes')
         
     while True:
         ans = raw_input(prompt)
         if not ans:
             return resp
-        if ans not in ['y', 'Y', 'n', 'N']:
-            print 'Invalid answer, please confirm entering [y] or [n].'
+        if ans not in ['y', 'Y', 'Yes', 'yes', 'n', 'N', 'No', 'no',]:
+            print 'Invalid answer, please confirm entering [y]es or [n]o.'
             continue
-        if ans == 'y' or ans == 'Y':
+        if ans == 'y' or ans == 'Y' or ans == 'Yes' or ans == 'yes':
             return True
-        if ans == 'n' or ans == 'N':
+        if ans == 'n' or ans == 'N' or ans == 'No' or ans == 'no':
             utilsLogger.error("No Confirmation, exiting...")
             sys.exit()
