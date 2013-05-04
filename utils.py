@@ -357,6 +357,5 @@ def confirm(prompt=None, resp=False):
         if ans == 'y' or ans == 'Y':
             return True
         if ans == 'n' or ans == 'N':
-#            return False
             utilsLogger.error("No Confirmation, exiting...")
             sys.exit()

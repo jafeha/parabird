@@ -80,7 +80,7 @@ elif (sys.platform == "win32"):
 
 
 
-print "=" * 30, "\nChecking Dependencies and Configure\n", "=" * 30
+print "=" * 50, "\nChecking Dependencies and Configure\n", "=" * 50
 
 print "Tempdir is:", tempdir
 
@@ -138,7 +138,7 @@ except NameError:
     mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
     mainLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
 
-print "=" * 30, "\nMounting and Truecrypting\n", "=" * 30
+print "=" * 50, "\nMounting and Truecrypting\n", "=" * 50
 
 #
 # Use an USB-Stick given by a Parameter or a detected one:
@@ -212,17 +212,28 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
 mainLogger.info("Mounting Truecrypt Container")
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 
+
+print "=" * 50, "\nCreating Folders, Downloading and Extracting \n", "=" * 50
+
 #
 # Create Folders
 #
 
-mainLogger.info("Creating Folders in Truecrypt Container:")
+mainLogger.info("Creating Folders in Truecrypt Container")
 
 try:
     for prog in suite("all"):
-        os.makedirs(parser.get(prog, 'path'))
-        os.makedirs(os.path.join(tc_mountpoint+"/data/profile"))
-        os.makedirs(os.path.join(tc_mountpoint+"/data/gpg"))
+        if not os.path.exists(parser.get(prog, 'path')):
+            os.makedirs(parser.get(prog, 'path'))
+        if not os.path.exists(tc_mountpoint+"/data/profile"): 
+            os.makedirs(tc_mountpoint+"/data/profile")
+        if not os.path.exists(tc_mountpoint+"/data/gpg"):
+            os.makedirs(tc_mountpoint+"/data/gpg")
+
+        #os.mkdir(tc_mountpoint+"/data/")
+        #os.mkdir(tc_mountpoint+"/data/profile")
+        #os.mkdir(tc_mountpoint+"/data/gpg")
+        
         #os.makedirs(parser.get(prog, 'path'))
         #os.makedirs(tc_mountpoint+"/data/profile")
         #os.makedirs(tc_mountpoint+"/data/gpg")

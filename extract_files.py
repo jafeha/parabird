@@ -23,7 +23,7 @@ extractLogger=ParaLogger('extract')
 
 
 def extract_tarfile(progname, filename, path):
-    extractLogger.info("Extracting {}" .format(progname))
+    extractLogger.debug("Extracting {}" .format(progname))
     try:
         tar = tarfile.open(filename)
         tar.extractall(path)
@@ -35,7 +35,7 @@ def extract_tarfile(progname, filename, path):
 
 
 def extract_7z(progname, filename, path):
-    extractLogger.info("Extracting {}" .format(progname))
+    extractLogger.debug("Extracting {}" .format(progname))
     try:
         FNULL = open(os.devnull, 'w')
         subprocess.check_call(['7z', '-y', 'x', filename, '-o'+path], stdout=FNULL)
@@ -46,7 +46,7 @@ def extract_7z(progname, filename, path):
 
 
 def extract_zipfile(progname, filename, path):
-    extractLogger.info("Extracting {}" .format(progname))
+    extractLogger.debug("Extracting {}" .format(progname))
     try:
         zip = zipfile.ZipFile(filename)
         zip.extractall(path)
@@ -70,14 +70,14 @@ def extract_dmg_mac(progname, filename, path):
 
     returns the path
     '''
-    extractLogger.info("Extracting {} with extract_dmg_mac".format(progname))
+    extractLogger.debug("Extracting {} with extract_dmg_mac".format(progname))
     try:
         outplist = subprocess.Popen(['hdiutil', 'attach', '-plist', filename], stdout=subprocess.PIPE).communicate()[0]
         pldict = plistlib.readPlistFromString(outplist)
         for se in pldict['system-entities']:
             if se.get('mount-point'):
                 dmg_mountpoint = se.get('mount-point')+"/"
-                extractLogger.info("Mac Extract: DMG Mountpoint is {}".format(dmg_mountpoint))
+                extractLogger.debug("Mac Extract: DMG Mountpoint is {}".format(dmg_mountpoint))
                 break
         else:
             dmg_mountpoint = None
@@ -86,10 +86,10 @@ def extract_dmg_mac(progname, filename, path):
 
         for i in glob.glob(dmg_mountpoint+"/*.app"):
             shutil.copytree(i, os.path.join(path, os.path.basename(i)))
-            extractLogger.info('Mac Extract: Copying from {} to {}'
+            extractLogger.debug('Mac Extract: Copying from {} to {}'
                                .format(i, os.path.join(path, os.path.basename(i))))
         try:
-            extractLogger.info('Mac Extract: Copying for {} done'.format(progname))
+            extractLogger.debug('Mac Extract: Copying for {} done'.format(progname))
             return i
         except NameError:
             #aka no i
@@ -103,7 +103,7 @@ def extract_dmg_mac(progname, filename, path):
 
 
 def extract_dmg(progname, dmgfile, path):
-    extractLogger.info("Extracting {}" .format(progname))
+    extractLogger.debug("Extracting {}" .format(progname))
     tempdir = os.path.dirname(dmgfile)
     os.makedirs(tempdir+"/dmg")
     try:
@@ -122,7 +122,7 @@ def extract_dmg(progname, dmgfile, path):
         # syntax probs here?
         # we need extra code for mac os: 
         # "diskutil eject os.path.join(tempdir+dmgfile+".img")"
-        #extractLogger.info("Unmounting {}".format(dmgfile+".img")
+        #extractLogger.debug("Unmounting {}".format(dmgfile+".img")
         #subprocess.check_call(['umount', os.path.join(tempdir+"/dmg/")])
 
     except:
@@ -137,11 +137,11 @@ def mount_dmg(path_to_dmg):
 
     this will deprecate extract_dmg and extract_dmg_mac
     '''
-    extractLogger.info("Mounting {}".format(path_to_dmg))
+    extractLogger.debug("Mounting {}".format(path_to_dmg))
     if (sys.platform == "darwin"):
         return mount_dmg_mac(path_to_dmg)
     elif (sys.platform == "win32"):
-        extractLogger.info("We dont support windows. fork & sent a pull request")
+        extractLogger.debug("We dont support windows. fork & sent a pull request")
         return False
     else:
         return mount_dmg_linux(path_to_dmg)
@@ -159,7 +159,7 @@ def mount_dmg_mac(path_to_dmg):
         for se in pldict['system-entities']:
             if se.get('mount-point'):
                 dmg_mountpoint = se.get('mount-point')+"/"
-                extractLogger.info("mac mount: DMG Mountpoint is {}".format(dmg_mountpoint))
+                extractLogger.debug("mac mount: DMG Mountpoint is {}".format(dmg_mountpoint))
                 return dmg_mountpoint
         else:
             extractLogger.error('Mac mount: Mac mountpoint could not be figured out.')
