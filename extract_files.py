@@ -23,7 +23,7 @@ extractLogger=ParaLogger('extract')
 
 
 def extract_tarfile(progname, filename, path):
-    extractLogger.info("[INFO] Extracting {}" .format(progname))
+    extractLogger.info("Extracting {}" .format(progname))
     try:
         tar = tarfile.open(filename)
         tar.extractall(path)
@@ -35,9 +35,10 @@ def extract_tarfile(progname, filename, path):
 
 
 def extract_7z(progname, filename, path):
-    extractLogger.info("[INFO] Extracting {}" .format(progname))
+    extractLogger.info("Extracting {}" .format(progname))
     try:
-        subprocess.check_call(['7z', '-y', 'x', filename, '-o'+path])
+        FNULL = open(os.devnull, 'w')
+        subprocess.check_call(['7z', '-y', 'x', filename, '-o'+path], stdout=FNULL)
     except:
         extractLogger.error("[ERROR] Could not extract {}. exiting" .format(progname))
         extractLogger.exception("[ERROR] Could not extract {}. exiting" .format(progname))
@@ -45,7 +46,7 @@ def extract_7z(progname, filename, path):
 
 
 def extract_zipfile(progname, filename, path):
-    extractLogger.info("[INFO] Extracting {}" .format(progname))
+    extractLogger.info("Extracting {}" .format(progname))
     try:
         zip = zipfile.ZipFile(filename)
         zip.extractall(path)
@@ -102,12 +103,13 @@ def extract_dmg_mac(progname, filename, path):
 
 
 def extract_dmg(progname, dmgfile, path):
-    extractLogger.info("[INFO] Extracting {}" .format(progname))
+    extractLogger.info("Extracting {}" .format(progname))
     tempdir = os.path.dirname(dmgfile)
     os.makedirs(tempdir+"/dmg")
     try:
         extractLogger.debug("Linux DMG Extract: img2dmg: {} {} {}".format("dmg2img", dmgfile, dmgfile+".img"))
-        subprocess.check_call(["dmg2img", dmgfile, dmgfile+".img"])
+        FNULL = open(os.devnull, 'w')
+        subprocess.check_call(["dmg2img", dmgfile, dmgfile+".img"], stdout=FNULL)
         extractLogger.debug(
             "Linux DMG Extract: mounting: {} {} {} {} {} {} {}".format(
             'mount', '-t', 'hfsplus', '-o', 'loop', 'quiet', dmgfile+".img",
@@ -120,7 +122,7 @@ def extract_dmg(progname, dmgfile, path):
         # syntax probs here?
         # we need extra code for mac os: 
         # "diskutil eject os.path.join(tempdir+dmgfile+".img")"
-        #extractLogger.info("[INFO] Unmounting {}".format(dmgfile+".img")
+        #extractLogger.info("Unmounting {}".format(dmgfile+".img")
         #subprocess.check_call(['umount', os.path.join(tempdir+"/dmg/")])
 
     except:

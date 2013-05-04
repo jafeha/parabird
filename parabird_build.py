@@ -80,7 +80,7 @@ elif (sys.platform == "win32"):
 
 
 
-print "%" * 30, "\nChecking Dependencies and Configure\n", "%" * 30
+print "=" * 30, "\nChecking Dependencies and Configure\n", "=" * 30
 
 print "Tempdir is:", tempdir
 
@@ -101,7 +101,7 @@ except:
 
 
 
-mainLogger.info("[INFO] Configuring...")
+mainLogger.info("Configuring...")
 
 
 
@@ -138,7 +138,7 @@ except NameError:
     mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
     mainLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
 
-print "%" * 30, "\nMounting and Truecrypting\n", "%" * 30
+print "=" * 30, "\nMounting and Truecrypting\n", "=" * 30
 
 #
 # Use an USB-Stick given by a Parameter or a detected one:
@@ -163,7 +163,7 @@ else:
         #which scenarios are possible (except detection not working)
         mountpoint = os.path.realpath(tempfile.mkdtemp())
         mainLogger.error("Stick detection did not work, try to run with what you specified")
-        mainLogger.info('[INFO] Mounting USB Stick to' + mountpoint)
+        mainLogger.info('Mounting USB Stick to' + mountpoint)
 
         try:
             subprocess.check_call(["mount", parser.get('DEFAULT', 'device'), mountpoint])
@@ -189,7 +189,7 @@ mainLogger.debug("TC Mountpoint is: {}".format(parser.get('DEFAULT', 'tc_mountpo
 
 
 #Multiple Variables like this, because the logger only takes 1 argument:
-mainLogger.info("[INFO] Creating Container " + parser.get('DEFAULT', 'container_name') + " on USB-Stick: " + parser.get('DEFAULT', 'device'))
+mainLogger.info("Creating Container " + parser.get('DEFAULT', 'container_name') + " on USB-Stick: " + parser.get('DEFAULT', 'device'))
 
 #
 # Exit if the container already exists
@@ -209,14 +209,14 @@ subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
 # Mount Container
 #
 
-mainLogger.info("[INFO] Mounting Truecrypt Container")
+mainLogger.info("Mounting Truecrypt Container")
 subprocess.check_call(shlex.split(parser.get('truecrypting', 'mount')))
 
 #
 # Create Folders
 #
 
-mainLogger.info("[INFO] Creating Folders in Truecrypt Container:")
+mainLogger.info("Creating Folders in Truecrypt Container:")
 
 try:
     for prog in suite("all"):
@@ -236,12 +236,12 @@ except OSError:
 #
 
 
-mainLogger.info('[INFO] Starting to download Applications to: ' + tempdir)
+mainLogger.info('Downloading / Copying Applications to: ' + tempdir)
 
 if (args.cache):
     download_application = copy_from_cache
 for progname in suite("all"):
-    mainLogger.info("Getting {}".format(progname))
+    mainLogger.debug("Getting {}".format(progname))
     download_application(progname, parser.get(progname, 'url'),
                          parser.get(progname, 'file'))
 
@@ -257,16 +257,16 @@ for progname in suite("all"):
 
 # Extracting Linux Applications
 
+mainLogger.info('Extracting Applications')
+
 extract_tarfile("Thunderbird [Linux]", tempdir+"/"+parser.get('thunderbird_linux', 'file'), parser.get('thunderbird_linux', 'path'))
 parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_linux', 'path'), 'thunderbird/distribution/extensions/torbirdy'))
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
-print 'Extension ID is:', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))
 os.rename(parser.get('torbirdy', 'path'), os.path.join(parser.get('thunderbird_linux', 'path'), 'thunderbird/distribution/extensions/', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))))
 
 
 parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_linux', 'path'), 'thunderbird/distribution/extensions/enigmail'))
 extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
-print 'Extension ID is:', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
 os.rename(parser.get('enigmail', 'path'), os.path.join(parser.get('thunderbird_linux', 'path'), 'thunderbird/distribution/extensions/', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))))
 
 extract_zipfile("GPG 4 USB [Linux]", tempdir+"/"+parser.get('gpg4usb', 'file'), parser.get('gpg4usb', 'path'))
@@ -278,13 +278,11 @@ extract_dmg("Thunderbird [Mac OS]", os.path.join(tempdir, parser.get('thunderbir
 
 parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/torbirdy'))
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
-print 'Extension ID is:', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))
 os.rename(parser.get('torbirdy', 'path'), os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))))
 
 
 parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/enigmail'))
 extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
-print 'Extension ID is:', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
 os.rename(parser.get('enigmail', 'path'), os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))))
 
 #extract_dmg("GPG Tools [Mac OS]", os.path.join(tempdir, parser.get('gpg4mac', 'file')), parser.get('gpg4mac', 'path'))
@@ -297,14 +295,12 @@ extract_7z("Thunderbird [Windows]", tempdir+"/"+parser.get('thunderbird_windows'
 parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/torbirdy'))
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
 ID = get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))
-print 'Extension ID is:', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))
 shutil.copy2(os.path.join(tempdir+"/"+parser.get('torbirdy', 'file')), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', ID+'.xpi'))
 
 
 parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/enigmail'))
 extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
 ID = get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
-print 'Extension ID is:', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
 shutil.copy2(os.path.join(tempdir+"/"+parser.get('enigmail', 'file')), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', ID+'.xpi'))
 
 #parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/enigmail'))
@@ -321,12 +317,12 @@ extract_7z("Vidalia [Windows]", tempdir+"/"+parser.get('vidalia_windows', 'file'
 # Copy Starter
 #
 
-mainLogger.info('[INFO] Copying all Starters to: ' + tc_mountpoint)
+mainLogger.info('Copying all Starters to: ' + tc_mountpoint)
 for i in glob.glob('starter/*'):
     shutil.copy2(i, tc_mountpoint)
 
 
-mainLogger.info('[INFO] Copying Thunderbird configs to: ' + tc_mountpoint+"/conf/")
+mainLogger.info('Copying Thunderbird configs to: ' + tc_mountpoint+"/conf/")
 os.makedirs(tc_mountpoint+"/conf")
 for i in glob.glob('prefs/*'):
     shutil.copy2(i, tc_mountpoint+"/conf/")
@@ -335,7 +331,7 @@ for i in glob.glob('prefs/*'):
 # Unmounting Truecrypt
 #
 
-#mainLogger.info("[INFO] Unmounting Truecrypt Container")
+#mainLogger.info("Unmounting Truecrypt Container")
 #mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
 #subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
@@ -343,7 +339,7 @@ for i in glob.glob('prefs/*'):
 # Unmounting USB-Stick
 #
 
-#mainLogger.info("[INFO] Unmounting USB-Stick")
+#mainLogger.info("Unmounting USB-Stick")
 
 #try:
 #    if args.device:
@@ -352,7 +348,7 @@ for i in glob.glob('prefs/*'):
 #except:
     
 #    if (sys.platform=="darwin"):
-#       mainLogger.info("[INFO] please unmount your stick via the finder.")
+#       mainLogger.info("Please unmount your stick via the finder.")
 #    else:
 #        mainLogger.error("[Error] Unmounting", + mountpoint, + "failed")
         
@@ -360,7 +356,7 @@ for i in glob.glob('prefs/*'):
 # Removing Temporary folders
 #
 
-#mainLogger.info("[INFO] Cleaning up Temporary Directories")
+#mainLogger.info("Cleaning up Temporary Directories")
 
 #try:
 #    if args.device:

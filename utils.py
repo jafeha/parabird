@@ -191,7 +191,7 @@ def dependency_check(checked_app):
 # want to install.
 def download_application(progname, url, filename):
     tempdir = parser.get('DEFAULT', 'tempdir')
-    utilsLogger.info("[INFO] Downloading {}" .format(progname))
+    utilsLogger.info("Downloading {}" .format(progname))
 
     try:
         for r in range(5):
