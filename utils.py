@@ -150,9 +150,13 @@ def detect_stick(user_interface='console'):
                 mp = mountparse(i)
                 if (mp):
                     if mp['type'] != ('msdos' or 'fat' or 'vfat'):
+                        print "\n"
                         utilsLogger.warning(
-                        "is {} mounted on {} really a usb stick where you want to write?"
+                        "is {} mounted on {} really the usb stick where you want to write?"
                         .format(mp['device'], mp['mountpoint']))
+                        print "=" * 60
+                        confirm('Please confirm container creation', resp=True)
+                        print "=" * 60
                     else:
                         utilsLogger.info("found new Device: {}"
                                          .format(mp['mountpoint']))
@@ -191,7 +195,7 @@ def dependency_check(checked_app):
 # want to install.
 def download_application(progname, url, filename):
     tempdir = parser.get('DEFAULT', 'tempdir')
-    utilsLogger.info("[INFO] Downloading {}" .format(progname))
+    utilsLogger.info("Downloading {}" .format(progname))
 
     try:
         for r in range(5):
@@ -317,3 +321,44 @@ def copy_from_cache(progname, url, archived_file):
                        os.path.basename(archived_file))
     dst = os.path.join(tempdir, os.path.basename(archived_file))
     shutil.copy2(src, dst)
+
+
+def confirm(prompt=None, resp=False):
+    """prompts for yes or no response from the user. Returns True for yes and
+    False for no.
+
+    'resp' should be set to the default value assumed by the caller when
+    user simply types ENTER.
+
+    >>> confirm(prompt='Create Directory?', resp=True)
+    Create Directory? [y]|n: 
+    True
+    >>> confirm(prompt='Create Directory?', resp=False)
+    Create Directory? [n]|y: 
+    False
+    >>> confirm(prompt='Create Directory?', resp=False)
+    Create Directory? [n]|y: y
+    True
+
+    """
+    
+    if prompt is None:
+        prompt = 'Confirm'
+
+    if resp:
+        prompt = '{} ({}/{}) [Yes]: ' .format(prompt, 'y=Yes', 'n=No')
+    else:
+        prompt = '{} ({}/{} [No]): ' .format(prompt, 'n=No', 'y=Yes')
+        
+    while True:
+        ans = raw_input(prompt)
+        if not ans:
+            return resp
+        if ans not in ['y', 'Y', 'Yes', 'yes', 'n', 'N', 'No', 'no',]:
+            print 'Invalid answer, please confirm entering [y]es or [n]o.'
+            continue
+        if ans == 'y' or ans == 'Y' or ans == 'Yes' or ans == 'yes':
+            return True
+        if ans == 'n' or ans == 'N' or ans == 'No' or ans == 'no':
+            utilsLogger.error("No Confirmation, exiting...")
+            sys.exit()

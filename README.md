@@ -1,9 +1,9 @@
 parabird
 ========
 
-Python script for building an os independent [Linux, Windows and Mac OS] truecrypt encrypted usb-stick containing a portable thunderbird, enigmail, torbirdy and vidalia.
+Parabird is a Python script for building a os independent [Linux, Windows and Mac OS] truecrypt encrypted usb-stick containing a portable version of thunderbird, enigmail, torbirdy and vidalia and a shared profile.
 
-**NOTE:** The script is only partial functional, it is definitely in alpha state. Give me a litte time to figure things out because it is also some kind of a python learning script for me. If you have some hints for solving our issues or any thunderbird tweaking tips, please get in touch.
+**NOTE:** The script is functional, but it is definitely in beta state. At the moment **GPG is not supported for Mac OS**. Give me a litte time to figure things out because it is also some kind of a python learning script for me. If you have some hints for solving our issues or any thunderbird tweaking tips, please get in touch. 
 
 Requirements:
 -------------
@@ -26,7 +26,7 @@ Depedency checks are done automatically. The Script should exit if any Dependenc
 
 Implementation:
 ---------------
-So far we  haven't reached a fully working state yet, but this is the functionality working so far:
+So far we haven't reached a fully working state yet, but this is the functionality working so far:
 
 - [x] Detecting mounting and unmounting an USB-Stick  
 - [x] Creating a Truecrypt container on the USB-Stick
@@ -38,15 +38,26 @@ So far we  haven't reached a fully working state yet, but this is the functional
 - [x] Dependency checks
 - [x] Truecrypt configuration: specify container size
 - [x] Extracting all applications
+- [ ] Extract GPG for Mac OS
 - [x] Configure Linux applications
-- [ ] Configure Windows applications (0.5/1)
-- [ ] Configure Mac applications (0.5/1)
-- [ ] GPG Setup Party (1.5/3)
-- [ ] Write startup scripts for all supported Operation systems (1.5/3)
+- [x] Configure Windows applications
+- [x] Configure Mac applications
+- [x] GPG Setup Party
+- [x] Write startup scripts for all supported Operation systems
 - [ ] Testing
 - [ ] Better truecrypt configuration: dynamic volumes
 - [ ] Support for torified USB-Stick creation (won't happen before first release)
 - [ ] Release Party
+
+Download / Install:
+-------------------
+Downloading and running parabird is quite simple. Please take care of the depedencies and take a look at the usage below.
+
+```
+git clone https://github.com/jafeha/parabird
+cd parabird
+sudo python parabird.py
+```
 
 Usage:
 ------
