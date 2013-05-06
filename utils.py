@@ -184,11 +184,14 @@ def dependency_check(checked_app):
     except OSError:
         utilsLogger.error("Missing Depedencies: {} not installed, exiting..."
                           .format(checked_app))
+        utilsLogger.setLevel('CRITICAL')
         utilsLogger.exception(
             "Missing Depedencies: {} not installed, exiting..."
             .format(checked_app))
+        utilsLogger.setLevel('INFO')
 
         sys.exit()
+    
 
 
 # This function tries to downloads all the programs we
