@@ -185,6 +185,7 @@ mainLogger.debug("TC Mountpoint is: {}".format(parser.get('DEFAULT', 'tc_mountpo
 
 #Multiple Variables like this, because the logger only takes 1 argument:
 mainLogger.info("Creating Container " + parser.get('DEFAULT', 'container_name') + " on USB-Stick: " + parser.get('DEFAULT', 'device'))
+mainLogger.info("NOTE: this could take a while, depending on how fast your USB-Stick and your PC is. So please be patient, stay calm and drink a cup of coffee after you entered your password twice if you know you're not running 21st century hardware...")
 
 #
 # Exit if the container already exists
