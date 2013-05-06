@@ -86,18 +86,13 @@ print "Tempdir is:", tempdir
 
 mainLogger.info("Checking all Dependencies...")
 
-try:
-    mainLogger.debug("truerypt binary is {}".format(parser.get('truecrypting', 'tc_binary')))
-    dependency_check([parser.get('truecrypting', 'tc_binary'), "--text", "--version"])
-    dependency_check("7z")
-    if (sys.platform == "darwin"):
-        dependency_check(["hdiutil", "info"])
-    else:
-        dependency_check("dmg2img")
-except:
-    mainLogger.error("Dependency Checks failed large scale, exiting...")
-    mainLogger.exception("Dependency Checks failed large scale, exiting...")
-    sys.exit()
+mainLogger.debug("truerypt binary is {}".format(parser.get('truecrypting', 'tc_binary')))
+dependency_check([parser.get('truecrypting', 'tc_binary'), "--text", "--version"])
+dependency_check("7z")
+if (sys.platform == "darwin"):
+    dependency_check(["hdiutil", "info"])
+else:
+    dependency_check("dmg2img")
 
 
 
