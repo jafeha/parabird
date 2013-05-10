@@ -14,8 +14,7 @@ cd parabird
 sudo python parabird.py
 ```
 
-Usage:
-------
+#### Usage:
 
 ```
 python ./parabird_build.py --help
