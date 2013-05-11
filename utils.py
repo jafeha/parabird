@@ -191,11 +191,11 @@ def dependency_check(checked_app):
         utilsLogger.setLevel('INFO')
 
         sys.exit()
-    
-
 
 # This function tries to downloads all the programs we
 # want to install.
+
+
 def download_application(progname, url, filename):
     tempdir = parser.get('DEFAULT', 'tempdir')
     utilsLogger.info("Downloading {}" .format(progname))
@@ -334,17 +334,17 @@ def confirm(prompt=None, resp=False):
     user simply types ENTER.
 
     >>> confirm(prompt='Create Directory?', resp=True)
-    Create Directory? [y]|n: 
+    Create Directory? [y]|n:
     True
     >>> confirm(prompt='Create Directory?', resp=False)
-    Create Directory? [n]|y: 
+    Create Directory? [n]|y:
     False
     >>> confirm(prompt='Create Directory?', resp=False)
     Create Directory? [n]|y: y
     True
 
     """
-    
+
     if prompt is None:
         prompt = 'Confirm'
 
@@ -352,12 +352,11 @@ def confirm(prompt=None, resp=False):
         prompt = '{} ({}/{}) [Yes]: ' .format(prompt, 'y=Yes', 'n=No')
     else:
         prompt = '{} ({}/{} [No]): ' .format(prompt, 'n=No', 'y=Yes')
-        
     while True:
         ans = raw_input(prompt)
         if not ans:
             return resp
-        if ans not in ['y', 'Y', 'Yes', 'yes', 'n', 'N', 'No', 'no',]:
+        if ans not in ['y', 'Y', 'Yes', 'yes', 'n', 'N', 'No', 'no']:
             print 'Invalid answer, please confirm entering [y]es or [n]o.'
             continue
         if ans == 'y' or ans == 'Y' or ans == 'Yes' or ans == 'yes':

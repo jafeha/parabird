@@ -10,8 +10,6 @@ import shutil
 import argparse
 import glob
 
-
-
 from utils import ParaLogger, detect_stick, dependency_check, download_application, get_extension_id, copy_from_cache, configtransport, suite
 from extract_files import extract_tarfile, extract_7z, extract_zipfile, extract_dmg_mac, extract_dmg
 
@@ -34,7 +32,6 @@ logfile = os.path.realpath(tempdir+"/"+"parabirdy_log.txt")
 
 
 mainLogger = ParaLogger('main')
-
 
 #
 # Configuring Commandline Arguments and Config
@@ -77,9 +74,6 @@ elif (sys.platform == "win32"):
 #if args.verbose:
 #   mainLogger.info("verbosity turned on")
 
-
-
-
 print "=" * 60, "\nChecking Dependencies and Configure\n", "=" * 60
 
 print "Tempdir is:", tempdir
@@ -94,16 +88,13 @@ if (sys.platform == "darwin"):
 else:
     dependency_check("dmg2img")
 
-
-
 mainLogger.info("Configuring...")
-
 
 
 def update_config(section, key, value_from_argparser):
     '''
-    This function checks if there is any parameter given, 
-    If there is a parameter given, it updates the config 
+    This function checks if there is any parameter given,
+    If there is a parameter given, it updates the config
     if not it uses default values from config.ini
     '''
 
@@ -167,7 +158,7 @@ else:
             mainLogger.exception("Mounting {} to {} failed".format(parser.get('DEFAULT', 'device', mountpoint)))
             raise
 
-    #ok, we can write to the stick        
+    #ok, we can write to the stick
     else:
         parser.set('DEFAULT', "device", stick['device'])
         mountpoint = stick['mountpoint']
@@ -192,7 +183,7 @@ mainLogger.info("NOTE: this could take a while, depending on how fast your USB-S
 #
 
 if os.path.exists(parser.get('DEFAULT', 'container_path')):
-    mainLogger.info("The Container given ("+ parser.get('DEFAULT', 'container_path')+") already exists. Exiting...")
+    mainLogger.info("The Container given (" + parser.get('DEFAULT', 'container_path')+") already exists. Exiting...")
     exit()
 
 #
@@ -221,7 +212,7 @@ try:
     for prog in suite("all"):
         if not os.path.exists(parser.get(prog, 'path')):
             os.makedirs(parser.get(prog, 'path'))
-        if not os.path.exists(tc_mountpoint+"/data/profile"): 
+        if not os.path.exists(tc_mountpoint+"/data/profile"):
             os.makedirs(tc_mountpoint+"/data/profile")
         if not os.path.exists(tc_mountpoint+"/data/gpg"):
             os.makedirs(tc_mountpoint+"/data/gpg")
@@ -273,7 +264,7 @@ extract_tarfile("Vidalia [Linux]", tempdir+"/"+parser.get('vidalia_linux', 'file
 
 # Extract Mac Applications
 
-extract_dmg("Thunderbird [Mac OS]", os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path') )
+extract_dmg("Thunderbird [Mac OS]", os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path'))
 
 parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/torbirdy'))
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
@@ -289,7 +280,7 @@ extract_zipfile("Vidalia [Mac OS]", tempdir+"/"+parser.get('vidalia_mac', 'file'
 
 # Extract Windows Applications
 
-extract_7z("Thunderbird [Windows]", tempdir+"/"+parser.get('thunderbird_windows', 'file'), parser.get('thunderbird_windows','path'))
+extract_7z("Thunderbird [Windows]", tempdir+"/"+parser.get('thunderbird_windows', 'file'), parser.get('thunderbird_windows', 'path'))
 
 parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/torbirdy'))
 extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
@@ -302,7 +293,7 @@ extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.g
 ID = get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))
 shutil.copy2(os.path.join(tempdir+"/"+parser.get('enigmail', 'file')), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', ID+'.xpi'))
 
-extract_zipfile("GPG 4 USB [Windows]", tempdir+"/"+parser.get('gpg4usb', 'file'), parser.get('gpg4usb', 'path')) 
+extract_zipfile("GPG 4 USB [Windows]", tempdir+"/"+parser.get('gpg4usb', 'file'), parser.get('gpg4usb', 'path'))
 extract_7z("Vidalia [Windows]", tempdir+"/"+parser.get('vidalia_windows', 'file'), parser.get('vidalia_windows', 'path'))
 
 
@@ -340,7 +331,7 @@ except OSError:
 #
 
 try:
-    if args.device and os.path.exists(mountpoint) and os.path.ismount(mountpoint) == True:
+    if args.device and os.path.exists(mountpoint) and os.path.ismount(mountpoint) is True:
         mainLogger.info("Unmounting USB-Stick")
         if (sys.platform == "darwin"):
             subprocess.check_call(['diskutil', 'eject', mountpoint])
@@ -357,13 +348,13 @@ except OSError:
 mainLogger.info("Cleaning up Temporary Directories")
 
 try:
-    if args.device and os.path.exists(mountpoint) and os.path.ismount(mountpoint) == False:
+    if args.device and os.path.exists(mountpoint) and os.path.ismount(mountpoint) is False:
         shutil.rmtree(mountpoint)
-    if os.path.exists(tc_mountpoint) and os.path.ismount(tc_mountpoint) == False:
+    if os.path.exists(tc_mountpoint) and os.path.ismount(tc_mountpoint) is False:
         shutil.rmtree(tc_mountpoint)
-    if (sys.platform == "darwin") and os.path.exists(tempdir+"/dmg") and os.path.ismount(tempdir+"/dmg") == True:
+    if (sys.platform == "darwin") and os.path.exists(tempdir+"/dmg") and os.path.ismount(tempdir+"/dmg") is True:
         subprocess.check_call(['diskutil', 'eject', os.path.join(tempdir+"/dmg")])
-    elif os.path.exists(tempdir+"/dmg") and os.path.ismount(tempdir+"/dmg") == True:
+    elif os.path.exists(tempdir+"/dmg") and os.path.ismount(tempdir+"/dmg") is True:
         subprocess.check_call(['umount', os.path.join(tempdir+"/dmg/")])
     if os.path.exists(tempdir):
         shutil.rmtree(tempdir)
@@ -375,4 +366,3 @@ except OSError:
 print "=" * 60, "\nThe Container {} was sucessfully created." .format(mountpoint+"/container.tc")
 print "You can mount it using truecrypt."
 print "=" * 60
-

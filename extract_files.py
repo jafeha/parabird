@@ -9,8 +9,6 @@ import os
 import tempfile
 import shlex
 import shutil
-import tarfile
-import zipfile
 import requests
 import plistlib
 import glob
@@ -19,7 +17,7 @@ from xml.dom import minidom
 from utils import ParaLogger
 
 
-extractLogger=ParaLogger('extract')
+extractLogger = ParaLogger('extract')
 
 
 def extract_tarfile(progname, filename, path):
@@ -120,13 +118,12 @@ def extract_dmg(progname, dmgfile, path):
         for i in glob.glob(tempdir+"/dmg/*.app"):
             subprocess.check_call(['cp', '-r', i, path])
         # syntax probs here?
-        # we need extra code for mac os: 
+        # we need extra code for mac os:
         # "diskutil eject os.path.join(tempdir+dmgfile+".img")"
         #extractLogger.debug("Unmounting {}".format(dmgfile+".img")
-    
         if (sys.platform == "darwin"):
             subprocess.check_call(['diskutil', 'eject', os.path.join(tempdir+"/dmg/")])
-        else: 
+        else:
             subprocess.check_call(['umount', os.path.join(tempdir+"/dmg/")])
     except:
         extractLogger.error("[ERROR] Could not extract {}. exiting " .format(progname))
