@@ -322,21 +322,25 @@ for i in glob.glob('prefs/*'):
 
 print "=" * 60, "\nTidying up... \n", "=" * 60
 
+
 #
 # Unmounting Truecrypt
 #
+try:
+    if os.path.exists(tc_mountpoint) and os.path.ismount(tc_mountpoint):
+        mainLogger.info("Unmounting Truecrypt Container")
+    mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
+    subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
 
-mainLogger.info("Unmounting Truecrypt Container")
-mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
-subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
-
+except OSError:
+    mainLogger.error("Could not unmount tc container on {}").format(tc_mountpoint)
+    mainLogger.exception("Could not unmount tc container on {}").format(tc_mountpoint)
 #
 # Unmounting USB-Stick
 #
 
-
 try:
-    if args.device:
+    if args.device and os.path.exists(mountpoint) and os.path.ismount(mountpoint) == True:
         mainLogger.info("Unmounting USB-Stick")
         if (sys.platform == "darwin"):
             subprocess.check_call(['diskutil', 'eject', mountpoint])
@@ -353,14 +357,20 @@ except OSError:
 mainLogger.info("Cleaning up Temporary Directories")
 
 try:
-    if args.device:
+    if args.device and os.path.exists(mountpoint) and os.path.ismount(mountpoint) == False:
         shutil.rmtree(mountpoint)
-    shutil.rmtree(tc_mountpoint)
-    shutil.rmtree(tempdir)
+    if os.path.exists(tc_mountpoint) and os.path.ismount(tc_mountpoint) == False:
+        shutil.rmtree(tc_mountpoint)
+    if (sys.platform == "darwin") and os.path.exists(tempdir+"/dmg") and os.path.ismount(tempdir+"/dmg") == True:
+        subprocess.check_call(['diskutil', 'eject', os.path.join(tempdir+"/dmg")])
+    elif os.path.exists(tempdir+"/dmg") and os.path.ismount(tempdir+"/dmg") == True:
+        subprocess.check_call(['umount', os.path.join(tempdir+"/dmg/")])
+    if os.path.exists(tempdir):
+        shutil.rmtree(tempdir)
 except OSError:
     mainLogger.error("Some temporary Directories could not be removed")
     mainLogger.exception("Some temporary Directories could not be removed")
-    
+
 
 print "=" * 60, "\nThe Container {} was sucessfully created." .format(mountpoint+"/container.tc")
 print "You can mount it using truecrypt."
