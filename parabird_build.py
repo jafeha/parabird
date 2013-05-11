@@ -49,8 +49,6 @@ clparser.add_argument("-v", "--verbose", help="increase output verbosity", actio
 clparser.add_argument("-c", "--cache", help="use a cache in ~/.parabirdy/cache", action="store_true")
 clparser.add_argument("-d", "--device", help="Device Flag to specify USB Stick")
 clparser.add_argument("-t", "--thunder", help="Specify Thunderbird version to download")
-clparser.add_argument("-b", "--torbirdy", help="Specify Torbirdy Version")
-clparser.add_argument("-e", "--enigmail", help="Specify Enigmail Version")
 clparser.add_argument("-a", "--vidalia", help="Specify Vidalia Version")
 clparser.add_argument("-n", "--container_name", help="Specify Container Name")
 clparser.add_argument("-s", "--container_size", help="Specify Container Size in Bytes")
@@ -113,10 +111,12 @@ def update_config(section, key, value_from_argparser):
 
 try:
     update_config("DEFAULT", "device", args.device)
-    #update_config("thunderbird", "version", args.thunder)
-    #update_config("torbirdy", "version", args.torbirdy)
-    #update_config("enigmail", "version", args.enigmail)
-    #update_config("vidalia", "version", args.vidalia)
+    update_config("thunderbird_linux", "version", args.thunder)
+    update_config("thunderbird_windows", "version", args.thunder)
+    update_config("thunderbird_mac", "version", args.thunder)
+    update_config("vidalia_linux", "version", args.vidalia)
+    update_config("vidalia_windows", "version", args.vidalia)
+    update_config("vidalia_mac", "version", args.vidalia)
     update_config("DEFAULT", "container_name", args.container_name)
     update_config("truecrypting", "size", args.container_size)
 
