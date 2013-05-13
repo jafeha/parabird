@@ -220,12 +220,18 @@ def download_application(progname, url, filename):
             exit()
 
     except IOError:
-        utilsLogger.error("[ERROR] Could not download {}" .format(progname))
-        utilsLogger.exception("[ERROR] Could not download {}"
+        utilsLogger.error("Could not download {}"
+                          .format(progname))
+        utilsLogger.exception("Could not download {}"
                               .format(progname))
         raise
         sys.exit()
-        return None
+
+    except requests.exceptions.ConnectionError:
+        utilsLogger.error("Could not download {} You're probably not connected to the internet. Get online or use the --cache parameter."
+                          .format(progname))
+        raise
+        sys.exit()
 
 
 def get_extension_id(rdffile):
