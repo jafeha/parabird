@@ -31,10 +31,6 @@ optional arguments:
                         Device Flag to specify USB Stick
   -t THUNDER, --thunder THUNDER
                         Specify Thunderbird version to download
-  -b TORBIRDY, --torbirdy TORBIRDY
-                        Specify Torbirdy Version
-  -e ENIGMAIL, --enigmail ENIGMAIL
-                        Specify Enigmail Version
   -a VIDALIA, --vidalia VIDALIA
                         Specify Vidalia Version
   -n CONTAINER_NAME, --container_name CONTAINER_NAME
