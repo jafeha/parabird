@@ -191,13 +191,13 @@ if os.path.exists(parser.get('DEFAULT', 'container_path')):
 # Exit if there is not enough free diskspace
 #
 
-#f = os.statvfs(mountpoint)
-#totalSize = (f[statvfs.F_BSIZE] * f[statvfs.F_BFREE])
-#print totalSize
-#print parser.get('truecrypting', 'size')
-#if totalSize < parser.get('truecrypting', 'size'):
-#    mainLogger.info("Insufficient Diskpace on your Device: {}".format(parser.get('DEFAULT', 'device')))
-#    exit()
+s = os.statvfs(mountpoint)
+totalSize = (s.f_bavail * s.f_frsize)
+print totalSize
+print int(parser.get('truecrypting', 'size'))
+if totalSize < int(parser.get('truecrypting', 'size')):
+    mainLogger.info("Insufficient Diskpace on your Device: {}".format(parser.get('DEFAULT', 'device')))
+    exit()
 
 #
 # Create Container
