@@ -1,4 +1,4 @@
-!#/bin/bash
+#!/bin/bash
 cd `dirname $0`
 open $PWD/apps/mac/TorBrowser.app
 sleep 5 
