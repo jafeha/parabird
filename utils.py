@@ -170,6 +170,21 @@ def detect_stick(user_interface='console'):
         utilsLogger.error("No USB stick in 200 seconds")
         return None
 
+def update_config(section, key, value_from_argparser):
+    '''
+    This function checks if there is any parameter given,
+    If there is a parameter given, it updates the config
+    if not it uses default values from config.ini
+    '''
+
+    if value_from_argparser:
+        utilsLogger.info('Parameter given, device or container is: ' + value_from_argparser)
+        parser.set(section, key, value_from_argparser)
+
+    if value_from_argparser is None:
+        utilsLogger.info("Taking {} {} from Config: {}"
+                        .format(section, key, parser.get(section, key)))
+
 
 # This function tests dependencies. All stdout is send to devnull
 def dependency_check(checked_app):

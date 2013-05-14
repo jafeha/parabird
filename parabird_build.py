@@ -11,7 +11,7 @@ import argparse
 import glob
 import statvfs
 
-from utils import ParaLogger, detect_stick, dependency_check, download_application, get_extension_id, copy_from_cache, configtransport, suite
+from utils import ParaLogger, detect_stick, dependency_check, download_application, get_extension_id, copy_from_cache, configtransport, suite, update_config
 from extract_files import extract_tarfile, extract_7z, extract_zipfile, extract_dmg_mac, extract_dmg
 
 try:
@@ -82,22 +82,6 @@ try:
         dependency_check("dmg2img")
 
     mainLogger.info("Configuring...")
-
-
-    def update_config(section, key, value_from_argparser):
-        '''
-        This function checks if there is any parameter given,
-        If there is a parameter given, it updates the config
-        if not it uses default values from config.ini
-        '''
-
-        if value_from_argparser:
-            mainLogger.info('Parameter given, device or container is: ' + value_from_argparser)
-            parser.set(section, key, value_from_argparser)
-
-        if value_from_argparser is None:
-            mainLogger.info("Taking {} {} from Config: {}"
-                            .format(section, key, parser.get(section, key)))
 
     #
     # Setting Parameters given from argparse
@@ -185,8 +169,6 @@ try:
 
     s = os.statvfs(mountpoint)
     totalSize = (s.f_bavail * s.f_frsize)
-    print totalSize
-    print int(parser.get('truecrypting', 'size'))
     if totalSize < int(parser.get('truecrypting', 'size')):
         mainLogger.info("Insufficient Diskpace on your Device: {}".format(parser.get('DEFAULT', 'device')))
         exit()
