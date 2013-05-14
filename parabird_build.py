@@ -13,6 +13,7 @@ import statvfs
 
 from utils import ParaLogger, detect_stick, dependency_check, download_application, get_extension_id, copy_from_cache, configtransport, suite, update_config
 from extract_files import extract_tarfile, extract_7z, extract_zipfile, extract_dmg_mac, extract_dmg
+from cleanup import cleanup
 
 try:
 
@@ -286,54 +287,7 @@ try:
 
     print "=" * 60, "\nTidying up... \n", "=" * 60
 
-    #
-    # Unmounting Truecrypt
-    #
-
-    try:
-        if os.path.exists(tc_mountpoint) and os.path.ismount(tc_mountpoint):
-            mainLogger.info("Unmounting Truecrypt Container")
-        mainLogger.debug('UNMOUNT COMMAND: ' + parser.get('truecrypting', 'unmount'))
-        subprocess.check_call(shlex.split(parser.get('truecrypting', 'unmount')))
-
-    except OSError:
-        mainLogger.error("Could not unmount tc container on {}").format(tc_mountpoint)
-        mainLogger.exception("Could not unmount tc container on {}").format(tc_mountpoint)
-    #
-    # Unmounting USB-Stick
-    #
-
-    try:
-        if args.device and os.path.exists(mountpoint) and os.path.ismount(mountpoint) is True:
-            mainLogger.info("Unmounting USB-Stick")
-            if (sys.platform == "darwin"):
-                subprocess.check_call(['diskutil', 'eject', mountpoint])
-            else:
-                subprocess.check_call(["umount", mountpoint])
-    except OSError:
-        mainLogger.error("Could not umount {}").format(mountpoint)
-        mainLogger.exception("Could not umount {}").format(mountpoint)
-
-    #
-    # Removing Temporary Directories
-    #
-
-    mainLogger.info("Cleaning up Temporary Directories")
-
-    try:
-        if args.device and os.path.exists(mountpoint) and os.path.ismount(mountpoint) is False:
-            shutil.rmtree(mountpoint)
-        if os.path.exists(tc_mountpoint) and os.path.ismount(tc_mountpoint) is False:
-            shutil.rmtree(tc_mountpoint)
-        if (sys.platform == "darwin") and os.path.exists(tempdir+"/dmg") and os.path.ismount(tempdir+"/dmg") is True:
-            subprocess.check_call(['diskutil', 'eject', os.path.join(tempdir+"/dmg")])
-        elif os.path.exists(tempdir+"/dmg") and os.path.ismount(tempdir+"/dmg") is True:
-            subprocess.check_call(['umount', os.path.join(tempdir+"/dmg/")])
-        if os.path.exists(tempdir):
-            shutil.rmtree(tempdir)
-    except OSError:
-        mainLogger.error("Some temporary Directories could not be removed")
-        mainLogger.exception("Some temporary Directories could not be removed")
+    cleanup(mountpoint, tc_mountpoint, tempdir, args.device)
 
     print "=" * 60, "\nThe Container {} was sucessfully created." .format(mountpoint+"/container.tc")
     print "You can mount it using truecrypt."
