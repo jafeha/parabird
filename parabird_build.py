@@ -87,20 +87,15 @@ try:
     # Setting Parameters given from argparse
     #
 
-    try:
-        update_config("DEFAULT", "device", args.device)
-        update_config("thunderbird_linux", "version", args.thunder)
-        update_config("thunderbird_windows", "version", args.thunder)
-        update_config("thunderbird_mac", "version", args.thunder)
-        update_config("vidalia_linux", "version", args.vidalia)
-        update_config("vidalia_windows", "version", args.vidalia)
-        update_config("vidalia_mac", "version", args.vidalia)
-        update_config("DEFAULT", "container_name", args.container_name)
-        update_config("truecrypting", "size", args.container_size)
-
-    except NameError:
-        mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
-        mainLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
+    update_config("DEFAULT", "device", args.device)
+    update_config("thunderbird_linux", "version", args.thunder)
+    update_config("thunderbird_windows", "version", args.thunder)
+    update_config("thunderbird_mac", "version", args.thunder)
+    update_config("vidalia_linux", "version", args.vidalia)
+    update_config("vidalia_windows", "version", args.vidalia)
+    update_config("vidalia_mac", "version", args.vidalia)
+    update_config("DEFAULT", "container_name", args.container_name)
+    update_config("truecrypting", "size", args.container_size)
 
     print "=" * 60, "\nMounting and Truecrypting\n", "=" * 60
 
