@@ -78,42 +78,47 @@ def mountparse(line_from_mount):
 
     from jojoo, gplv3
     '''
-    ret = {}
+    try:
+        ret = {}
 
-    device_point = r'''
-    ^       # beginning of the line
-    (.+)    #   some chars until there is a whitespace and a on - DEVICE
-    \s      #   whitespace
-    on      #   on - valid at linux and osx
-    \s      #   whitespace
-    (.+)\s  #   some chars until there is a whitespace and a "type" or ( - MPOINT
-    (\(.*\s| #( with a whitespace after some time (mac) OR              )
-    type\s) #type with a whitespace short after(linux)
-    (.*)\)
-    '''
-    d_p = re.compile(device_point, re.VERBOSE)
-    try:
-        dm_listet = d_p.search(line_from_mount).groups()
-    except AttributeError:
-        #print "mountparse could not parse the line from mount"
-        return None
-    try:
-        ret["device"], ret["mountpoint"] = dm_listet[0], dm_listet[1]
-    except ValueError:
-        print "could'nt decifer your mounts. is it a linux or a mac with /dev/foobar on /mountpoint ?"
-    if (dm_listet[2].find("type") >= 0):
-        ret['os'] = 'linux'
+        device_point = r'''
+        ^       # beginning of the line
+        (.+)    #   some chars until there is a whitespace and a on - DEVICE
+        \s      #   whitespace
+        on      #   on - valid at linux and osx
+        \s      #   whitespace
+        (.+)\s  #   some chars until there is a whitespace and a "type" or ( - MPOINT
+        (\(.*\s| #( with a whitespace after some time (mac) OR              )
+        type\s) #type with a whitespace short after(linux)
+        (.*)\)
+        '''
+        d_p = re.compile(device_point, re.VERBOSE)
         try:
-            ret["type"], ret["opts"] = dm_listet[3].split(" (")
+            dm_listet = d_p.search(line_from_mount).groups()
+        except AttributeError:
+            #print "mountparse could not parse the line from mount"
+            return None
+        try:
+            ret["device"], ret["mountpoint"] = dm_listet[0], dm_listet[1]
         except ValueError:
-            print "not a linux? dont know what to do, splitting of", dm_listet[3], "failed"
-    else:
-        ret['os'] = 'darwin'
-        temp = dm_listet[2].split(', ')
-        ret['type'] = temp[0].replace('(', '')
-        ret['opts'] = ", ".join(temp[1:]) + dm_listet[3]
+            print "could'nt decifer your mounts. is it a linux or a mac with /dev/foobar on /mountpoint ?"
+        if (dm_listet[2].find("type") >= 0):
+            ret['os'] = 'linux'
+            try:
+                ret["type"], ret["opts"] = dm_listet[3].split(" (")
+            except ValueError:
+                print "not a linux? dont know what to do, splitting of", dm_listet[3], "failed"
+        else:
+            ret['os'] = 'darwin'
+            temp = dm_listet[2].split(', ')
+            ret['type'] = temp[0].replace('(', '')
+            ret['opts'] = ", ".join(temp[1:]) + dm_listet[3]
 
-    return ret
+        return ret
+
+    except KeyboardInterrupt:
+        utilsLogger.error("You've hit Strg+C for interrupting Parabird. Now clean up your own mess. Exiting...")
+        sys.exit()
 
 
 def detect_stick(user_interface='console'):
@@ -121,55 +126,58 @@ def detect_stick(user_interface='console'):
     detects if a stick is plugged in, returns a dict with infos about
     the stick. see mountparse for a description of the dict
     '''
-    #read from mount for the first time
-    output_first, error_first = subprocess.Popen(
-        "mount", stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE).communicate()
-
-    utilsLogger.debug("trying to guess usb stick")
-    utilsLogger.warning("Pleaze insert stick, and wait till is it mountet")
-    sys.stdout.flush()
-    for i in range(400):
-        if user_interface == 'console':
-            time.sleep(0.5)
-            sys.stdout.write(".")
-            sys.stdout.flush()
-        else:
-            pass
-        #read from mount for the second time
-        output_second, error_second = subprocess.Popen(
+    try:
+        #read from mount for the first time
+        output_first, error_first = subprocess.Popen(
             "mount", stdout=subprocess.PIPE,
             stderr=subprocess.PIPE).communicate()
-        #convert it to sets
-        output_first_set = set(output_first.split("\n"))
-        output_second_set = set(output_second.split("\n"))
-        if output_second_set.difference(output_first_set):
-            #iterate through the items, which are not in both
-            #sets (e.g. new lines)
-            for i in output_first_set.symmetric_difference(output_second_set):
-                mp = mountparse(i)
-                if (mp):
-                    if mp['type'] != ('msdos' or 'fat' or 'vfat'):
-                        print "\n"
-                        utilsLogger.warning(
-                        "is {} mounted on {} really the usb stick where you want to write?"
-                        .format(mp['device'], mp['mountpoint']))
-                        print "=" * 60
-                        confirm('Please confirm container creation', resp=True)
-                        print "=" * 60
-                    else:
-                        utilsLogger.info("found new Device: {}"
-                                         .format(mp['mountpoint']))
-                    return mp
-                    break
-                else:
-                    return None
-            break
-    else:
-        #else from the for loop
-        utilsLogger.error("No USB stick in 200 seconds")
-        return None
 
+        utilsLogger.debug("trying to guess usb stick")
+        utilsLogger.warning("Pleaze insert stick, and wait till is it mountet")
+        sys.stdout.flush()
+        for i in range(400):
+            if user_interface == 'console':
+                time.sleep(0.5)
+                sys.stdout.write(".")
+                sys.stdout.flush()
+            else:
+                pass
+            #read from mount for the second time
+            output_second, error_second = subprocess.Popen(
+                "mount", stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE).communicate()
+            #convert it to sets
+            output_first_set = set(output_first.split("\n"))
+            output_second_set = set(output_second.split("\n"))
+            if output_second_set.difference(output_first_set):
+                #iterate through the items, which are not in both
+                #sets (e.g. new lines)
+                for i in output_first_set.symmetric_difference(output_second_set):
+                    mp = mountparse(i)
+                    if (mp):
+                        if mp['type'] != ('msdos' or 'fat' or 'vfat'):
+                            print "\n"
+                            utilsLogger.warning(
+                            "is {} mounted on {} really the usb stick where you want to write?"
+                            .format(mp['device'], mp['mountpoint']))
+                            print "=" * 60
+                            confirm('Please confirm container creation', resp=True)
+                            print "=" * 60
+                        else:
+                            utilsLogger.info("found new Device: {}"
+                                             .format(mp['mountpoint']))
+                        return mp
+                        break
+                    else:
+                        return None
+                break
+        else:
+            #else from the for loop
+            utilsLogger.error("No USB stick in 200 seconds")
+            return None
+    except KeyboardInterrupt:
+        utilsLogger.error("You've hit Strg+C for interrupting Parabird. Now clean up your own mess. Exiting...")
+        sys.exit()
 
 def update_config(section, key, value_from_argparser):
     '''
@@ -189,10 +197,14 @@ def update_config(section, key, value_from_argparser):
         utilsLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
         utilsLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
 
+    except KeyboardInterrupt:
+        utilsLogger.error("You've hit Strg+C for interrupting Parabird. Now clean up your own mess. Exiting...")
+        sys.exit()
 
-# This function tests dependencies. All stdout is send to devnull
+
 def dependency_check(checked_app):
     '''
+    This function tests dependencies. All stdout is send to devnull.
     Checks if a command is available by simply running it and looking it
     is available in the path
     '''
@@ -209,6 +221,9 @@ def dependency_check(checked_app):
             .format(checked_app))
         utilsLogger.setLevel('INFO')
 
+        sys.exit()
+    except KeyboardInterrupt:
+        utilsLogger.error("You've hit Strg+C for interrupting Parabird. Now clean up your own mess. Exiting...")
         sys.exit()
 
 # This function tries to downloads all the programs we
@@ -252,6 +267,10 @@ def download_application(progname, url, filename):
         raise
         sys.exit()
 
+    except KeyboardInterrupt:
+        utilsLogger.error("You've hit Strg+C for interrupting Parabird. Now clean up your own mess. Exiting...")
+        sys.exit()
+
 
 def get_extension_id(rdffile):
     '''
@@ -278,6 +297,9 @@ def get_extension_id(rdffile):
         utilsLogger.exception("Not a valid install.rdf File: {}"
                               .format(rdffile))
         return None
+    except KeyboardInterrupt:
+        utilsLogger.error("You've hit Strg+C for interrupting Parabird. Now clean up your own mess. Exiting...")
+        sys.exit()
 
 
 def get_xpi_id(xpifile):
@@ -287,40 +309,43 @@ def get_xpi_id(xpifile):
 
     to check: does the {} belong to the ID or not?
     '''
-
-    #is file accessible?
-    if not os.access(xpifile, os.R_OK):
-        utilsLogger.error('Cant read XPI file {}'.format(xpifile))
-        return False
-
-    #is it a zipfile
-    if not (zipfile.is_zipfile(xpifile)):
-        utilsLogger.error('Not a zipped XPI file: {}'.format(xpifile))
-        return False
-
-    #create file objet and check if it contains a install.rdf
     try:
-        zip = zipfile.ZipFile(xpifile)
-        rdffile = zip.open('install.rdf')
-    except KeyError:
-        utilsLogger.exception('No install.rdf in {}'.format(xpifile))
-        utilsLogger.error('No install.rdf in {}'.format(xpifile))
-        return False
+        #is file accessible?
+        if not os.access(xpifile, os.R_OK):
+            utilsLogger.error('Cant read XPI file {}'.format(xpifile))
+            return False
 
-    #get the extension id and check if it is a valid install.rdf
-    try:
-        xmldoc = minidom.parseString(rdffile.read())
-        extension_id = xmldoc.getElementsByTagName('em:id')[0].firstChild.nodeValue
-        utilsLogger.debug("Extension ID from {} is {}".format(
-                          xpifile, extension_id))
-        return extension_id
+        #is it a zipfile
+        if not (zipfile.is_zipfile(xpifile)):
+            utilsLogger.error('Not a zipped XPI file: {}'.format(xpifile))
+            return False
 
-    except IndexError:
-        utilsLogger.error("Doesnt contain a valid install.rdf file: {}"
-                          .format(xpifile))
-        utilsLogger.exception("Not a valid install.rdf File: {}"
+        #create file objet and check if it contains a install.rdf
+        try:
+            zip = zipfile.ZipFile(xpifile)
+            rdffile = zip.open('install.rdf')
+        except KeyError:
+            utilsLogger.exception('No install.rdf in {}'.format(xpifile))
+            utilsLogger.error('No install.rdf in {}'.format(xpifile))
+            return False
+
+        #get the extension id and check if it is a valid install.rdf
+        try:
+            xmldoc = minidom.parseString(rdffile.read())
+            extension_id = xmldoc.getElementsByTagName('em:id')[0].firstChild.nodeValue
+            utilsLogger.debug("Extension ID from {} is {}".format(
+                              xpifile, extension_id))
+            return extension_id
+
+        except IndexError:
+            utilsLogger.error("Doesnt contain a valid install.rdf file: {}"
                               .format(xpifile))
-        return False
+            utilsLogger.exception("Not a valid install.rdf File: {}"
+                                  .format(xpifile))
+            return False
+    except KeyboardInterrupt:
+        utilsLogger.error("You've hit Strg+C for interrupting Parabird. Now clean up your own mess. Exiting...")
+        sys.exit()
 
 
 def suite(suitename):
@@ -329,11 +354,14 @@ def suite(suitename):
     suite can be all, linux, mac, win
     returns True if all worked
     '''
-
-    #we need to remove duplicates!
-    suitename = list(set(parser.get('suite', suitename).split(" ")))
-    for progname in suitename:
-        yield progname
+    try:
+        #we need to remove duplicates!
+        suitename = list(set(parser.get('suite', suitename).split(" ")))
+        for progname in suitename:
+            yield progname
+    except KeyboardInterrupt:
+        utilsLogger.error("You've hit Strg+C for interrupting Parabird. Now clean up your own mess. Exiting...")
+        sys.exit()
 
 
 def copy_from_cache(progname, url, archived_file):
@@ -344,11 +372,15 @@ def copy_from_cache(progname, url, archived_file):
     #yeah, ~/.parabirdy/cache/ is hardcoded and tmpdir is from the parser...
     #yeah, you got the files 3 times: in ~/.pbdy/cache/,
     #in the tmpdir and then extracted....
-    tempdir = parser.get('DEFAULT', 'tempdir')
-    src = os.path.join(os.path.expanduser('~'), ".parabird/cache",
-                       os.path.basename(archived_file))
-    dst = os.path.join(tempdir, os.path.basename(archived_file))
-    shutil.copy2(src, dst)
+    try:
+        tempdir = parser.get('DEFAULT', 'tempdir')
+        src = os.path.join(os.path.expanduser('~'), ".parabird/cache",
+                           os.path.basename(archived_file))
+        dst = os.path.join(tempdir, os.path.basename(archived_file))
+        shutil.copy2(src, dst)
+    except KeyboardInterrupt:
+        utilsLogger.error("You've hit Strg+C for interrupting Parabird. Now clean up your own mess. Exiting...")
+        sys.exit()
 
 
 def confirm(prompt=None, resp=False):
@@ -369,23 +401,27 @@ def confirm(prompt=None, resp=False):
     True
 
     """
+    try:
 
-    if prompt is None:
-        prompt = 'Confirm'
+        if prompt is None:
+            prompt = 'Confirm'
 
-    if resp:
-        prompt = '{} ({}/{}) [Yes]: ' .format(prompt, 'y=Yes', 'n=No')
-    else:
-        prompt = '{} ({}/{} [No]): ' .format(prompt, 'n=No', 'y=Yes')
-    while True:
-        ans = raw_input(prompt)
-        if not ans:
-            return resp
-        if ans not in ['y', 'Y', 'Yes', 'yes', 'n', 'N', 'No', 'no']:
-            print 'Invalid answer, please confirm entering [y]es or [n]o.'
-            continue
-        if ans == 'y' or ans == 'Y' or ans == 'Yes' or ans == 'yes':
-            return True
-        if ans == 'n' or ans == 'N' or ans == 'No' or ans == 'no':
-            utilsLogger.error("No Confirmation, exiting...")
-            sys.exit()
+        if resp:
+            prompt = '{} ({}/{}) [Yes]: ' .format(prompt, 'y=Yes', 'n=No')
+        else:
+            prompt = '{} ({}/{} [No]): ' .format(prompt, 'n=No', 'y=Yes')
+        while True:
+            ans = raw_input(prompt)
+            if not ans:
+                return resp
+            if ans not in ['y', 'Y', 'Yes', 'yes', 'n', 'N', 'No', 'no']:
+                print 'Invalid answer, please confirm entering [y]es or [n]o.'
+                continue
+            if ans == 'y' or ans == 'Y' or ans == 'Yes' or ans == 'yes':
+                return True
+            if ans == 'n' or ans == 'N' or ans == 'No' or ans == 'no':
+                utilsLogger.error("No Confirmation, exiting...")
+                sys.exit()
+    except KeyboardInterrupt:
+        utilsLogger.error("You've hit Strg+C for interrupting Parabird. Now clean up your own mess. Exiting...")
+        sys.exit()
