@@ -1,7 +1,6 @@
 import os
 import shutil
 import shlex
-#import argparse
 import subprocess
 import sys
 
@@ -12,10 +11,6 @@ def cleanup(mountpoint, tc_mountpoint, tempdir, value_from_argparser):
     try:
         cleanupLogger = ParaLogger('cleanup')
         parser = configtransport()
-        #clparser = argparse.ArgumentParser()
-        #clparser = argparse.ArgumentParser(description='')
-        #clparser.add_argument("-d", "--device", help="Device Flag to specify USB Stick")
-        #args = clparser.parse_args()
 
         #
         # Unmounting Truecrypt

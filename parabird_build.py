@@ -147,8 +147,7 @@ try:
     parser.set('DEFAULT', 'tc_mountpoint', tc_mountpoint)
     mainLogger.debug("TC Mountpoint is: {}".format(parser.get('DEFAULT', 'tc_mountpoint')))
 
-    #Multiple Variables like this, because the logger only takes 1 argument:
-    mainLogger.info("Creating Container " + parser.get('DEFAULT', 'container_name') + " on USB-Stick: " + parser.get('DEFAULT', 'device'))
+    mainLogger.info("Creating Container {} on USB-Stick: {}".format(parser.get('DEFAULT', 'container_name'), parser.get('DEFAULT', 'device')))
     mainLogger.info("NOTE: this could take a while, depending on how fast your USB-Stick and your PC is. So please be patient, stay calm and drink a cup of coffee after you entered your password twice if you know you're not running 21st century hardware...")
 
     #
@@ -156,7 +155,7 @@ try:
     #
 
     if os.path.exists(parser.get('DEFAULT', 'container_path')):
-        mainLogger.info("The Container given (" + parser.get('DEFAULT', 'container_path')+") already exists. Exiting...")
+        mainLogger.info("The Container given ({}) already exists. Exiting...".format(parser.get('DEFAULT', 'container_path')))
         exit()
 
     #
@@ -172,7 +171,7 @@ try:
     #
     # Create Container
     #
-    mainLogger.debug('Truecrypting create: ' + parser.get('truecrypting', 'create'))
+    mainLogger.debug('Truecrypting create: {}' .format(parser.get('truecrypting', 'create')))
     subprocess.check_call(shlex.split(parser.get('truecrypting', 'create')))
 
     #
@@ -207,7 +206,7 @@ try:
     # Download Applications
     #
 
-    mainLogger.info('Downloading / Copying Applications to: ' + tempdir)
+    mainLogger.info('Downloading / Copying Applications to: {}' .format(tempdir))
 
     if (args.cache):
         download_application = copy_from_cache
@@ -276,11 +275,11 @@ try:
     # Copy Starter
     #
 
-    mainLogger.info('Copying all Starters to: ' + tc_mountpoint)
+    mainLogger.info('Copying all Starters to: {}' .format(tc_mountpoint))
     for i in glob.glob('starter/*'):
         shutil.copy2(i, tc_mountpoint)
 
-    mainLogger.info('Copying Thunderbird configs to: ' + tc_mountpoint+"/conf/")
+    mainLogger.info('Copying Thunderbird configs to: {}' .format(tc_mountpoint+"/conf/"))
     os.makedirs(tc_mountpoint+"/conf")
     for i in glob.glob('prefs/*'):
         shutil.copy2(i, tc_mountpoint+"/conf/")
