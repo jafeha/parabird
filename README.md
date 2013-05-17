@@ -19,9 +19,8 @@ sudo python parabird.py
 ```
 python ./parabird_build.py --help
 [INFO::utils]: Logfile: /tmp/parabird_log.txt
-usage: parabird_build.py [-h] [-v] [-c] [-d DEVICE] [-t THUNDER] [-b TORBIRDY]
-                         [-e ENIGMAIL] [-a VIDALIA] [-n CONTAINER_NAME]
-                         [-s CONTAINER_SIZE]
+usage: parabird_build.py [-h] [-v] [-c] [-d DEVICE] [-t THUNDER]
+                         [-a VIDALIA] [-n CONTAINER_NAME] [-s CONTAINER_SIZE]
 
 optional arguments:
   -h, --help            show this help message and exit
