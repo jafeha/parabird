@@ -13,7 +13,7 @@ import statvfs
 
 from utils import ParaLogger, detect_stick, dependency_check, download_application, get_extension_id, copy_from_cache, configtransport, suite, update_config
 from extract_files import extract_tarfile, extract_7z, extract_zipfile, extract_dmg_mac, extract_dmg
-from cleanup import cleanup
+from cleanup import cleanup, cleanup_failed
 
 try:
 
@@ -156,6 +156,7 @@ try:
 
     if os.path.exists(parser.get('DEFAULT', 'container_path')):
         mainLogger.info("The Container given ({}) already exists. Exiting...".format(parser.get('DEFAULT', 'container_path')))
+        cleanup(mountpoint, tc_mountpoint, tempdir, args.device)
         exit()
 
     #
@@ -166,6 +167,7 @@ try:
     totalSize = (s.f_bavail * s.f_frsize)
     if totalSize < int(parser.get('truecrypting', 'size')):
         mainLogger.info("Insufficient Diskpace on your Device: {}".format(parser.get('DEFAULT', 'device')))
+        cleanup_failed(mountpoint, tc_mountpoint, tempdir, args.device, parser.get('DEFAULT', 'container_name'))
         exit()
 
     #
@@ -294,4 +296,5 @@ try:
 
 except KeyboardInterrupt:
     mainLogger.error("You've hit Strg+C for interrupting Parabird. Now clean up your own mess. Exiting...")
+    cleanup_failed(mountpoint, tc_mountpoint, tempdir, args.device, parser.get('DEFAULT', 'container_name'))
     sys.exit()
