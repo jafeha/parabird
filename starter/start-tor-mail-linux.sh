@@ -3,6 +3,6 @@
 sleep 5
 
 export GNUPGHOME=$PWD/data/gpg/
-echo user_pref\(\"extensions.enigmail.agentPath\", \"$PWD/apps/linux/gpg4usb/bin/gpg\"\)\; > $PWD"/conf/user-linux.js"
-cp $PWD"/conf/user-linux.js" $PWD"/data/profile/user.js"
+sed '/agentPath/d' -i $PWD"/data/profile/user.js"
+echo user_pref\(\"extensions.enigmail.agentPath\", \"$PWD/apps/linux/gpg4usb/bin/gpg\"\)\; >> $PWD"/data/profile/user.js"
 "$PWD/apps/linux/thunderbird/thunderbird" --no-remote -profile "$PWD/data/profile/"
