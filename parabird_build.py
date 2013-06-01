@@ -11,8 +11,10 @@ import argparse
 import glob
 import statvfs
 
+from seven_zip import SevenZip
+
 from utils import ParaLogger, detect_stick, dependency_check, download_application, get_extension_id, copy_from_cache, configtransport, suite, update_config
-from extract_files import extract_tarfile, extract_7z, extract_zipfile, extract_dmg_mac, extract_dmg
+from extract_files import extract_tarfile, extract_zipfile
 from cleanup import cleanup, cleanup_failed
 
 try:
@@ -58,7 +60,6 @@ try:
 
     if (sys.platform == "darwin"):
         parser.set('truecrypting', 'tc_binary', parser.get('truecrypting', 'tc_mac_binary'))
-        extract_dmg = extract_dmg_mac
     elif (sys.platform == "win32"):
         mainLogger.error("parabirdy does'nt run on windows. by us a windows license (and some gifts) or reboot in linux. virtualisation might also work")
         sys.exit()
@@ -76,11 +77,6 @@ try:
 
     mainLogger.debug("truerypt binary is {}".format(parser.get('truecrypting', 'tc_binary')))
     dependency_check([parser.get('truecrypting', 'tc_binary'), "--text", "--version"])
-    dependency_check("7z")
-    if (sys.platform == "darwin"):
-        dependency_check(["hdiutil", "info"])
-    else:
-        dependency_check("dmg2img")
 
     mainLogger.info("Configuring...")
 
@@ -110,8 +106,8 @@ try:
             update_config("DEFAULT", "device", args.device)
 
         except NameError:
-            mainLogger.error("[ERROR] Hier ist was ganz arg schiefgelaufen")
-            mainLogger.exception("[ERROR] Hier ist was ganz arg schiefgelaufen")
+            mainLogger.error("[ERROR] Something went terribly wrong")
+            mainLogger.exception("[ERROR] Something went terribly wrong")
     else:
         stick = detect_stick()
 
@@ -243,22 +239,30 @@ try:
 
     # Extract Mac Applications
 
-    extract_dmg("Thunderbird [Mac OS]", os.path.join(tempdir, parser.get('thunderbird_mac', 'file')), parser.get('thunderbird_mac', 'path'))
+    mainLogger.debug("file: {}\npath:{}".format(parser.get('thunderbird_mac', 'file'), parser.get('thunderbird_mac', 'path')))
 
-    parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/torbirdy'))
+    tb = SevenZip(os.path.join(tempdir, parser.get('thunderbird_mac', 'file')))
+    tb.extract_smart(os.path.join(mountpoint, parser.get('thunderbird_mac', 'path')))
+
+    parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird/Thunderbird.app/Contents/MacOS/distribution/extensions/torbirdy'))
     extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
-    os.rename(parser.get('torbirdy', 'path'), os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))))
+    os.rename(parser.get('torbirdy', 'path'), os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird/Thunderbird.app/Contents/MacOS/distribution/extensions/', get_extension_id(os.path.join(parser.get('torbirdy', 'path'), 'install.rdf'))))
 
-    parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/enigmail'))
+    parser.set('enigmail', 'path', os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird/Thunderbird.app/Contents/MacOS/distribution/extensions/enigmail'))
     extract_zipfile("Enigmail", tempdir+"/"+parser.get('enigmail', 'file'), parser.get('enigmail', 'path'))
-    os.rename(parser.get('enigmail', 'path'), os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird.app/Contents/MacOS/distribution/extensions/', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))))
+    os.rename(parser.get('enigmail', 'path'), os.path.join(parser.get('thunderbird_mac', 'path'), 'Thunderbird/Thunderbird.app/Contents/MacOS/distribution/extensions/', get_extension_id(os.path.join(parser.get('enigmail', 'path'), 'install.rdf'))))
 
-    #extract_dmg("GPG Tools [Mac OS]", os.path.join(tempdir, parser.get('gpg4mac', 'file')), parser.get('gpg4mac', 'path'))
+    print os.path.join(tempdir, parser.get('gpg4mac', 'file'))
+    gpg_mac = SevenZip(os.path.join(tempdir, parser.get('gpg4mac', 'file')))
+    gpg_mac.extract_super_smart(os.path.join(parser.get('gpg4mac', 'path')))
+    shutil.copytree(os.path.join(parser.get('gpg4mac', 'path'), 'usr/local/'), os.path.join(tc_mountpoint, "apps/mac/gpg4mac"))
+
     extract_zipfile("Vidalia [Mac OS]", tempdir+"/"+parser.get('vidalia_mac', 'file'), parser.get('vidalia_mac', 'path'))
 
     # Extract Windows Applications
 
-    extract_7z("Thunderbird [Windows]", tempdir+"/"+parser.get('thunderbird_windows', 'file'), parser.get('thunderbird_windows', 'path'))
+    tb_win = SevenZip(os.path.join(tempdir, parser.get('thunderbird_windows', 'file')))
+    tb_win.extract_all(os.path.join(mountpoint, parser.get('thunderbird_windows', 'path')))
 
     parser.set('torbirdy', 'path', os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/torbirdy'))
     extract_zipfile("Torbirdy", tempdir+"/"+parser.get('torbirdy', 'file'), parser.get('torbirdy', 'path'))
@@ -271,7 +275,9 @@ try:
     shutil.copy2(os.path.join(tempdir+"/"+parser.get('enigmail', 'file')), os.path.join(parser.get('thunderbird_windows', 'path'), 'core/distribution/extensions/', ID+'.xpi'))
 
     extract_zipfile("GPG 4 USB [Windows]", tempdir+"/"+parser.get('gpg4usb', 'file'), parser.get('gpg4usb', 'path'))
-    extract_7z("Vidalia [Windows]", tempdir+"/"+parser.get('vidalia_windows', 'file'), parser.get('vidalia_windows', 'path'))
+
+    vidalia = SevenZip(os.path.join(tempdir, parser.get('vidalia_windows', 'file')))
+    vidalia.extract_all(os.path.join(mountpoint, parser.get('vidalia_windows', 'path')))
 
     #
     # Copy Starter
