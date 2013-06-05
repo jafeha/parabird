@@ -9,7 +9,7 @@ Parabird is a Python script for building a os independent [Linux, Windows and Ma
 #### Info:
 
 **NOTE:** The script is functional, but this is still a Release Candidate. If you find a bug, please open an issue. Thunderbird for Mac OS and especially **the GPG/Enigmail Setup for Mac OS needs testing**. Give me a litte time to figure things out because it is also some kind of a python learning script for me. If you have some hints for solving our issues or any thunderbird tweaking tips, please get in touch.
-Please also notice the Security issue being discussed on the [[Testing Page]] and the [[Dependencies]].
+Please also notice the Security issue being discussed on the [Testing Page](https://github.com/jafeha/parabird/wiki/Testing) and the [Dependencies]((https://github.com/jafeha/parabird/wiki/Depedencies)).
 
 #### Download / Install:
 If you want to test or run parabird, you best go with the tarball: [parabird-0.0.1-RC1.tar.gz](https://github.com/jafeha/parabird/raw/master/parabird-0.0.1-RC1.tar.gz).
