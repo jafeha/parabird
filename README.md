@@ -9,16 +9,13 @@ Parabird is a Python script for building a os independent [Linux, Windows and Ma
 #### Info:
 
 **NOTE:** The script is functional, but this is still a Release Candidate. If you find a bug, please open an issue. Thunderbird for Mac OS and especially **the GPG/Enigmail Setup for Mac OS needs testing**. Give me a litte time to figure things out because it is also some kind of a python learning script for me. If you have some hints for solving our issues or any thunderbird tweaking tips, please get in touch.
-
-**SECURITY NOTE:** Until we've reached a more stable stage after some more testing, we use /dev/urandom instead of /dev/random. We do this for performance reasons. If you actually want to use Parabird productively **we strongy recommend to use /dev/random.** You can specify this changing the truecrypting command in the config.ini. If you like to know more about the difference between /dev/random and /dev/urandom, take a look here: [/dev/random vs /dev/urandom](http://www.onkarjoshi.com/blog/191/device-dev-random-vs-urandom/)
+Please also notice the Security issue being discussed on the [[Testing Page]] and the [[Dependencies]].
 
 #### Download / Install:
 If you want to test or run parabird, you best go with the tarball: [parabird-0.0.1-RC1.tar.gz](https://github.com/jafeha/parabird/raw/master/parabird-0.0.1-RC1.tar.gz).
 
-Please take care of the depedencies and take a look at the usage below.
-
 #### Contributing code:
-If you like to join the parabird development, you best start downloading the git repo. Please take care of the depedencies and take a look at the usage below.
+If you like to join the parabird development, you best start downloading the git repo.
 
 ```
 git clone https://github.com/jafeha/parabird
