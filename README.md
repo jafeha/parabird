@@ -4,7 +4,8 @@ parabird
 Parabird is a Python script for building a os independent [Linux, Windows and Mac OS] truecrypt encrypted usb-stick containing a portable version of thunderbird, enigmail, torbirdy and vidalia and a shared profile.
 
 #### News:
-* June 1st 2013: Releasing Parabird RC 1
+* July 4th 2013: Releasing Parabird v.0.0.1 RC 2
+* June 1st 2013: Releasing Parabird v.0.0.1 RC 1
 
 #### Info:
 
@@ -12,7 +13,7 @@ Parabird is a Python script for building a os independent [Linux, Windows and Ma
 Please also notice the **Security issue** being discussed on the [Testing Page](https://github.com/jafeha/parabird/wiki/Testing) and the [Dependencies](https://github.com/jafeha/parabird/wiki/Depedencies).
 
 #### Download / Install:
-If you want to test or run parabird, you best go with the tarball: [parabird-0.0.1-RC1.tar.gz](https://github.com/jafeha/parabird/raw/master/parabird-0.0.1-RC1.tar.gz).
+If you want to test or run parabird, you best go with the released tarball: [parabird-0.0.1-RC2.tar.gz](https://github.com/jafeha/parabird/releases/v0.0.1-RC2/1454/parabird-0.0.1-rc2.tar.gz).
 
 #### Contributing code:
 If you like to join the parabird development, you best start downloading the git repo.
