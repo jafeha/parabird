@@ -26,5 +26,6 @@ $gpgdir = @WorkingDir & "data\gpg\"
 EnvSet ( "GNUPGHOME", $gpgdir )
 
 ; start the applications
+Run ( "apps/win/Tor Browser/Start Tor Browser.exe", "apps/win/Tor Browser/" )
 $runcommand = "apps/win/thunderbird/core/thunderbird.exe -no-remote --profile " & @WorkingDir & "data\profile\"
 Run ( $runcommand, "apps\win\thunderbird\core\")
