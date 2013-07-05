@@ -4,6 +4,7 @@ parabird
 Parabird is a Python script for building a os independent [Linux, Windows and Mac OS] truecrypt encrypted usb-stick containing a portable version of thunderbird, enigmail, torbirdy and vidalia and a shared profile.
 
 #### News:
+* July 5th 2013: Releasing Parabird v.0.0.1 RC 3
 * July 4th 2013: Releasing Parabird v.0.0.1 RC 2
 * June 1st 2013: Releasing Parabird v.0.0.1 RC 1
 
