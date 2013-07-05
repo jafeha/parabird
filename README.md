@@ -14,7 +14,7 @@ Parabird is a Python script for building a os independent [Linux, Windows and Ma
 Please also notice the **Security issue** being discussed on the [Testing Page](https://github.com/jafeha/parabird/wiki/Testing) and the [Dependencies](https://github.com/jafeha/parabird/wiki/Depedencies).
 
 #### Download / Install:
-If you want to test or run parabird, you best go with the released tarball: [parabird-0.0.1-RC2.tar.gz](https://github.com/jafeha/parabird/releases/v0.0.1-RC2/1454/parabird-0.0.1-rc2.tar.gz).
+If you want to test or run parabird, you best go with the released tarball: [parabird-0.0.1-RC3.tar.gz](https://github.com/jafeha/parabird/releases/v0.0.1-RC3/1826/parabird-0.0.1-rc3.tar.gz).
 
 #### Contributing code:
 If you like to join the parabird development, you best start downloading the git repo.
