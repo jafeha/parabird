@@ -19,6 +19,22 @@ from cleanup import cleanup, cleanup_failed
 
 try:
 
+    print "=" * 60
+    print('''
+_|_|_|      _|     _| _|_|       _|     _| _| _|  _|  _|_|_|    _|_|_|
+_|   _|   _|  _|   _|    _|    _|  _|   _|    _|  _|  _|   _|   _|    _|
+_|_|_|   _|    _|  _| _|_|    _|    _|  _|_|_|    _|  _|_|_|    _|    _|
+_|       _| _| _|  _|    _|   _| _| _|  _|    _|  _|  _|   _|   _|    _|
+_|       _|    _|  _|     _|  _|    _|  _| _| _|  _|  _|    _|  _|_|_|
+
+Authors:            Jakob Hasselmann
+                    Jonas Osswald
+Licence:            GPLv3
+Follow on Twitter:  @jafeha
+Download:           https://github.com/jafeha/parabird
+
+''')
+
     #
     #getting the config
     #
@@ -291,6 +307,9 @@ try:
     os.makedirs(tc_mountpoint+"/conf")
     for i in glob.glob('prefs/*'):
         shutil.copy2(i, tc_mountpoint+"/conf/")
+
+    mainLogger.info('Copying GPG Config to: {}' .format(tc_mountpoint+"/data/gpg/"))
+    shutil.copy2(tc_mountpoint+"/conf/gpg.conf" tc_mountpoint+"/data/gpg/")
 
     print "=" * 60, "\nTidying up... \n", "=" * 60
 
