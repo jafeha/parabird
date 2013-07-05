@@ -309,7 +309,7 @@ Download:           https://github.com/jafeha/parabird
         shutil.copy2(i, tc_mountpoint+"/conf/")
 
     mainLogger.info('Copying GPG Config to: {}' .format(tc_mountpoint+"/data/gpg/"))
-    shutil.copy2(tc_mountpoint+"/conf/gpg.conf" tc_mountpoint+"/data/gpg/")
+    shutil.copy2(tc_mountpoint+"/conf/gpg.conf", tc_mountpoint+"/data/gpg/")
 
     print "=" * 60, "\nTidying up... \n", "=" * 60
 
