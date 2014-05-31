@@ -1,3 +1,7 @@
+Disclaimer
+=========
+As of the moment, the situation about truecrypts future is unsure. We we're considering a OO-rewrite of parabird last week but stopped all of those intentions until things get a bit clearer. It looks like TC isn't completely broken ([see here](https://www.grc.com/misc/truecrypt/truecrypt.htm)) but for further development someone needs to fork it. We'll take a look at parabird again when things changed a bit. 
+
 parabird
 ========
 
